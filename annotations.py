@@ -7,9 +7,7 @@ class Annotation:
 		self.start = start_time
 		self.end = end_time
 	def __str__(self):
-		dct = vars(self)
-		return str(dct)
-		# return "{\"title\": \"{}\", \"content\": \"{}\", \"start\": \"{}\", \"end\": \"{}\"}".format(self.title, self.content, self.start, self.end)  
+		return str(vars(dct))
 	def __repr__(self):
 		return str(self)
 def encode_annotation(annotation):

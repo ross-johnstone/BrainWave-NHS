@@ -30,11 +30,11 @@ def generate_annotations():
 	annotations.append(Annotation("Test annotation 4", "This is in fact not the fourth test annotation, just kidding it actually is.", 600, 700))
 	return annotations
 
-def save_json(annotations):
+def save_json(annotations, filename):
 	"""
 	Saves an annotation object as json
 	"""
-	with open("test.txt","w+") as outfile:
+	with open("filename","w+") as outfile:
 		json.dump(annotations, outfile, sort_keys=True, default=encode_annotation)
 
 def open_json(filename):

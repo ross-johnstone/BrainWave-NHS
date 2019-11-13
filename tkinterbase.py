@@ -1,10 +1,12 @@
-from tkinter import Tk, Label, Button, Toplevel
+from tkinter import Tk, Label, Button, Toplevel, Entry
 import tkinter
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_tkagg import (
     FigureCanvasTkAgg, NavigationToolbar2Tk)
 from matplotlib.widgets import SpanSelector
+import datetime
 import numpy as np
+import matplotlib
 
 
 class TkBase:
@@ -17,6 +19,11 @@ class TkBase:
 
         #plot values on the axes
         self.ax.plot(times,values)
+        self.ax.xaxis_date()
+        plt.gcf().autofmt_xdate()
+
+        line = self.ax.lines[0]
+        print(line.get_xdata())
 
         #put the plot with navbar on the tkinter window
         self.canvas = FigureCanvasTkAgg(self.fig, master=root)
@@ -35,8 +42,8 @@ class TkBase:
 
 
         #variables for storing min and max of the current span selection
-        self.span_min=-1
-        self.span_max=-1
+        self.span_min=None
+        self.span_max=None
 
 
         #create buttons for interaction
@@ -52,35 +59,65 @@ class TkBase:
         #activate the span selector
         self.span.set_visible(True)
 
+        #deactivate toolbar functionalities if any are active
+        if(self.toolbar._active=='PAN'):
+            self.toolbar.pan()
+
+        if(self.toolbar._active=='ZOOM'):
+            self.toolbar.zoom()
+
+
         self.anotate_button.config(text='confirm',command = self.confirm)
 
     #callback method for the anotate button after span is sellected this button
     #is pressed to add descriptions to the anotation and confirm selection
     def confirm(self):
+        #if something is selected
+        if(self.span_min):
+            print(self.span_min,self.span_max)
 
-        print(self.span_min,self.span_max)
+            #save the anotation somewhere
 
-        #save the anotation somewhere
+            #create popup where you add text to the anotation
+            top = Toplevel(root)
+            top.title('confirm anotation')
+            top.grab_set()
 
-        #create popup where you add text to the anotation
-        top = Toplevel(root)
-        top.grab_set()
+            #labels in top level window showing anotation start time and end time
+            anotation_start_label = Label(top,text='anotation start time: '+str(datetime.datetime.fromtimestamp(self.span_min/1e3)))
+            anotation_end_label = Label(top,text='anotation end time: '+str(datetime.datetime.fromtimestamp(self.span_max/1e3)))
+            anotation_start_label.pack()
+            anotation_end_label.pack()
+
+            title_entry = Entry(top)
+            title_entry.pack()
+
+            description_entry = Entry(top)
+            description_entry.pack()
 
 
-        #change button back to anotate button and hide span selector again
-        self.anotate_button.config(text='anotate',command=self.anotate)
-        self.span.set_visible(False)
 
-        #hide the rectagle after confirm button is pressed
-        self.span.stay_rect.set_visible(False)
-        self.canvas.draw()
+            #change button back to anotate button and hide span selector again
+            self.anotate_button.config(text='anotate',command=self.anotate)
+            self.span.set_visible(False)
+
+            #hide the rectagle after confirm button is pressed
+            self.span.stay_rect.set_visible(False)
+            self.canvas.draw()
+
+            self.span_min=None
+            self.span_max=None
+
+
 
     #callback method of the span selector, after every selection it writes
     #the selected range to class variables
     def onselect(self,min,max):
+        print(min)
+        print(max)
         self.span_min = min
         self.span_max = max
 
 root = Tk()
-my_gui = TkBase(root,[1,2,3],[1,2,3])
+my_gui = TkBase(root,[datetime.datetime.now() - datetime.timedelta(hours=x) for x in range(10)],[1,2,3,5,3,1,8,6,4,7])
 root.mainloop()

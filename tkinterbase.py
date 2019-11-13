@@ -84,8 +84,8 @@ class TkBase:
             top.grab_set()
 
             #labels in top level window showing anotation start time and end time
-            anotation_start_label = Label(top,text='anotation start time: '+str(datetime.datetime.fromtimestamp(self.span_min/1e3)))
-            anotation_end_label = Label(top,text='anotation end time: '+str(datetime.datetime.fromtimestamp(self.span_max/1e3)))
+            anotation_start_label = Label(top,text='anotation start time: '+str(self.span_min))
+            anotation_end_label = Label(top,text='anotation end time: '+str(self.span_max))
             anotation_start_label.pack()
             anotation_end_label.pack()
 
@@ -113,10 +113,10 @@ class TkBase:
     #callback method of the span selector, after every selection it writes
     #the selected range to class variables
     def onselect(self,min,max):
-        print(min)
-        print(max)
-        self.span_min = min
-        self.span_max = max
+        print(datetime.datetime.fromordinal(int(min))+datetime.timedelta(seconds=divmod(min,1)[1]*86400))
+        print(datetime.datetime.fromordinal(int(max))+datetime.timedelta(seconds=divmod(max,1)[1]*86400))
+        self.span_min = datetime.datetime.fromordinal(int(min))+datetime.timedelta(seconds=divmod(min,1)[1]*86400)
+        self.span_max = datetime.datetime.fromordinal(int(max))+datetime.timedelta(seconds=divmod(max,1)[1]*86400)
 
 root = Tk()
 my_gui = TkBase(root,[datetime.datetime.now() - datetime.timedelta(hours=x) for x in range(10)],[1,2,3,5,3,1,8,6,4,7])

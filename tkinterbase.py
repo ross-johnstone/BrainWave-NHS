@@ -29,6 +29,7 @@ class TkBase:
         self.canvas = FigureCanvasTkAgg(self.fig, master=root)
         self.canvas.draw()
         self.canvas.get_tk_widget().pack(side=tkinter.BOTTOM, fill=tkinter.BOTH, expand=1)
+        self.canvas.mpl_connect('button_release_event',self.butrelease)
 
         self.toolbar = NavigationToolbar2Tk(self.canvas, root)
         self.toolbar.update()
@@ -54,6 +55,14 @@ class TkBase:
         self.close_button.pack()
 
     #callback method for the anotate button activates the span selector
+    def butrelease(self,event):
+        #deactivate toolbar functionalities if any are active
+        if(self.toolbar._active=='PAN'):
+            self.toolbar.pan()
+
+        if(self.toolbar._active=='ZOOM'):
+            self.toolbar.zoom()
+
     def anotate(self):
 
         #activate the span selector

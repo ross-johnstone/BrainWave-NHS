@@ -20,7 +20,14 @@ def app_screen():
     fig, ax = plt.subplots()
 
     # plot values on the axes
-    ax.plot(times, values)
+    # colour chose in approximately same as NHS theme on wesite
+    ax.plot(times, values, color='#5436ff')
+    #customising how graph looks
+    #adding grid
+    ax.grid(color='grey',linestyle='-', linewidth=0.25, alpha=0.5)
+    #removing top and right borders
+    ax.spines['top'].set_visible(False)
+    ax.spines['right'].set_visible(False)
 
     # put the plot with navbar on the tkinter window
     canvas = FigureCanvasTkAgg(fig, master=app_page)

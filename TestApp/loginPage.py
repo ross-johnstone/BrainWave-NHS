@@ -27,10 +27,10 @@ def login_page_screen():
     bg_label.place(x=-28, y=0)
 
     # add text entries2
-    username_entry = Entry(master=login_page, width="21", exportselection=0, font=22)
+    username_entry = Entry(master=login_page, width="16", exportselection=0, font=22)
     username_entry.place(x=51, y=180)
 
-    password_entry = Entry(master=login_page, width="21", show="*", exportselection=0, font=22)
+    password_entry = Entry(master=login_page, width="16", show="*", exportselection=0, font=22)
     password_entry.place(x=52, y=240)
 
     # create a Quit button

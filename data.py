@@ -6,6 +6,12 @@ import datetime
 from annotations import open_json
 
 def open_project(path):
+	"""
+		Given a directory path, open_project opens each .wav file as a numpy array,
+		stacks all of them into a single numpy array and returns it as the first element in result,
+		the timestamp as a datetime object as the second element in result 
+		and a list of Annotation objects  as the third element in result. 
+	"""
 	contents = os.listdir(path)
 	calfile = ""
 	datafiles = []
@@ -30,7 +36,7 @@ def open_project(path):
 	if jsonfile != "":
 		annotations = open_json(jsonfile)
 
-	print(data, timestamp, annotations)
+	return data, timestamp, annotations
 	# print(".cal file is: " + calfile + "\n" + "datafiles are: " + str(datafiles) + "\n" + "jsonfile is" + jsonfile) 
 
 def read_wav(filename):

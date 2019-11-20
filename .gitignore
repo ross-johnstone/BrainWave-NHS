@@ -1,2 +1,4 @@
+/TestApp/__pycache__/*
+/data/*
 test.txt
 *.csv

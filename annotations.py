@@ -7,7 +7,7 @@ class Annotation:
 		self.start = start_time
 		self.end = end_time
 	def __str__(self):
-		return str(vars(dct))
+		return str(vars(self))
 	def __repr__(self):
 		return str(self)
 def encode_annotation(annotation):
@@ -34,7 +34,7 @@ def save_json(annotations, filename):
 	"""
 	Saves an annotation object as json
 	"""
-	with open("filename","w+") as outfile:
+	with open(filename,"w+") as outfile:
 		json.dump(annotations, outfile, sort_keys=True, default=encode_annotation)
 
 def open_json(filename):
@@ -47,7 +47,7 @@ def open_json(filename):
 def main ():
 	#TODO make these testcases in the automated tests check against [{u'content': u'This is the first test annotation.', u'start': 100, u'end': 250, u'title': u'Test annotation 1'}, {u'content': u"This is the second test annotation, but it's a little bit longer just as an edge case.", u'start': 300, u'end': 350, u'title': u'Test annotation 2'}, {u'content': u'This is the third test annotation.', u'start': 455, u'end': 500, u'title': u'Test annotation 3'}, {u'content': u'This is in fact not the fourth test annotation, just kidding it actually is.', u'start': 600, u'end': 700, u'title': u'Test annotation 4'}]
 	annotations = generate_annotations()
-	save_json(annotations)
+	save_json(annotations, "test.txt")
 	loaded_annotations = open_json("test.txt")
 	print(loaded_annotations)
 

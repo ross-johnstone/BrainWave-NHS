@@ -7,12 +7,16 @@ from matplotlib.widgets import SpanSelector
 import datetime
 import numpy as np
 import matplotlib
+from annotations import Annotation
 
 
 class TkBase:
     def __init__(self, master,times,values):
         self.master = master
         master.title("tkinter barebones")
+
+        #list of all anotations
+        self.anotations = []
 
         #create a matplotlib figure with a single axes on which the data will be displayed
         self.fig, self.ax = plt.subplots()
@@ -46,6 +50,8 @@ class TkBase:
         self.span_min=None
         self.span_max=None
 
+        self.display_anotations = Label(master, text = self.anotations,wraplength=300)
+        self.display_anotations.pack()
 
         #create buttons for interaction
         self.anotate_button = Button(master, text="anotate", command=self.anotate)
@@ -85,7 +91,28 @@ class TkBase:
         if(self.span_min):
             print(self.span_min,self.span_max)
 
-            #save the anotation somewhere
+            #method called when cancel button on popup is pressed
+            def cancel():
+                top.destroy()
+                top.update()
+
+            #method called when save button on popup is pressed
+            def save():
+                #new_anotation = Annotation(title_entry.text)
+                print(title_entry.get())
+                print(description_entry.get())
+
+                new_anotation = Annotation(title_entry.get(),description_entry.get(),self.span_min,self.span_max)
+
+                self.anotations.append(new_anotation)
+
+                self.display_anotations['text'] = self.anotations;
+                #set spans back to none after the anotation is saved to prevent buggy behavior
+                self.span_min=None
+                self.span_max=None
+                print(new_anotation)
+                #destroy popup after annotation is saved
+                cancel()
 
             #create popup where you add text to the anotation
             top = Toplevel(root)
@@ -104,6 +131,12 @@ class TkBase:
             description_entry = Entry(top)
             description_entry.pack()
 
+            cancel_button = Button(master=top, text = "cancel",command = cancel)
+            cancel_button.pack()
+
+            save_button = Button(master=top, text = "save", command= save)
+            save_button.pack()
+
 
 
             #change button back to anotate button and hide span selector again
@@ -114,8 +147,6 @@ class TkBase:
             self.span.stay_rect.set_visible(False)
             self.canvas.draw()
 
-            self.span_min=None
-            self.span_max=None
 
 
 

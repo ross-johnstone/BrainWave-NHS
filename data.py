@@ -10,7 +10,8 @@ def open_project(path):
 		Given a directory path, open_project opens each .wav file as a numpy array,
 		stacks all of them into a single numpy array and returns it as the first element in result,
 		the timestamp as a datetime object as the second element in result 
-		and a list of Annotation objects  as the third element in result. 
+		and a list of Annotation objects  as the third element in result if a json file is present,
+		else it returns an empty list. 
 	"""
 	contents = os.listdir(path)
 	calfile = ""
@@ -66,7 +67,8 @@ def get_initial_timestamp(filename):
 		return timestamp
 def main ():
 	# wav = read_wav("./data/recording1/pat1/08-12-2007_12_41_54_0000_000000.wav")
-	open_project("./data/recording2/pat2/")
+	data, timestamp, annotations = open_project("./data/recording2/pat2/")
+	# do whatever with the data in testing
 
 if __name__ == "__main__":
 	main()

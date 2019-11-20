@@ -1,0 +1,7 @@
+image: blang/latex
+build:
+  script:
+    - latexmk -pdf -cd template/dissertation.tex
+  artifacts:
+    paths:
+      - "*.pdf"

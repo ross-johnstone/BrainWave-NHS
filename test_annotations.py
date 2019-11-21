@@ -4,6 +4,7 @@ from annotations import save_json
 from annotations import open_json
 from annotations import encode_annotation
 from annotations import decode_annotation
+import os
 
 class TestAnnotations(unittest.TestCase):
 
@@ -57,7 +58,7 @@ class TestAnnotations(unittest.TestCase):
             # check whether the annotation objects loaded have the correct information
             bool = annotations[i].title == loaded_annotations[i].title and annotations[i].content == loaded_annotations[i].content and annotations[i].start == loaded_annotations[i].start and annotations[i].end == loaded_annotations[i].end
             self.assertEqual(bool, True, "Annotations should be equal")
-
+        os.remove("test.txt")
 
 if __name__ == '__main__':
     unittest.main()

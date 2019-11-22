@@ -10,6 +10,13 @@ class Annotation:
 		return str(vars(self))
 	def __repr__(self):
 		return str(self)
+	def __eq__(self, other): 
+		# only compare against other annotations
+		if not isinstance(other, Annotation):
+			return NotImplemented
+		return self.title == other.title and self.content == other.content and self.start == other.start and self.end == other.end
+	def __hash__(self):
+		return hash((self.title, self.content, self.start_time, self.end_time))
 
 def encode_annotation(annotation):
 	if isinstance(annotation, Annotation):
@@ -23,11 +30,11 @@ def decode_annotation(dict):
 		return Annotation(dict["title"], dict["content"], dict["start_time"], dict["end_time"])
 	return dict
 
-def save_json(annotations):
+def save_json(annotations, filename):
 	"""
 	Saves an annotation object as json
 	"""
-	with open("test.txt","w+") as outfile:
+	with open(filename,"w+") as outfile:
 		json.dump(annotations, outfile, sort_keys=True, default=encode_annotation)
 
 def open_json(filename):

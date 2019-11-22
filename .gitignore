@@ -1,2 +1,4 @@
 test.txt
 *.csv
+annotations.pyc
+/data/*

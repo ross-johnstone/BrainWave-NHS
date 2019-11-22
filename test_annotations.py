@@ -39,10 +39,7 @@ class TestAnnotations(unittest.TestCase):
 
         decoded_annotation = decode_annotation(encoded_annotation)
         self.assertEqual(isinstance(decoded_annotation, Annotation), True, "This should be an annotation object")
-        self.assertEqual(decoded_annotation.title, annotation.title, "The titles should be the same")
-        self.assertEqual(decoded_annotation.content, annotation.content, "The content should be the same")
-        self.assertEqual(decoded_annotation.start, annotation.start, "The start should be the same")
-        self.assertEqual(decoded_annotation.end, annotation.end, "The end should be the same")
+        self.assertEqual(annotation, decoded_annotation)
 
 
     def test_save_open_annotations(self):
@@ -51,13 +48,8 @@ class TestAnnotations(unittest.TestCase):
         loaded_annotations = open_json("test.txt")
         self.assertEqual(len(loaded_annotations), len(annotations), "Should be: 4")
         for i in range(len(annotations)):
-            # check if objects are annotations
-            if not isinstance(annotations[i], Annotation) or not isinstance(loaded_annotations[i], Annotation):
-                # don't attempt to compare against unrelated types
-                bool = False
             # check whether the annotation objects loaded have the correct information
-            bool = annotations[i].title == loaded_annotations[i].title and annotations[i].content == loaded_annotations[i].content and annotations[i].start == loaded_annotations[i].start and annotations[i].end == loaded_annotations[i].end
-            self.assertEqual(bool, True, "Annotations should be equal")
+            self.assertEqual(annotations[i], loaded_annotations[i], "Annotations should be equal")
         os.remove("test.txt")
 
 if __name__ == '__main__':

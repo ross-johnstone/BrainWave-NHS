@@ -47,7 +47,7 @@ class TestAnnotations(unittest.TestCase):
 
     def test_save_open_annotations(self):
         annotations = self.annotations
-        save_json(annotations)
+        save_json(annotations, "test.txt")
         loaded_annotations = open_json("test.txt")
         self.assertEqual(len(loaded_annotations), len(annotations), "Should be: 4")
         for i in range(len(annotations)):

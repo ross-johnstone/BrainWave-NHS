@@ -17,6 +17,7 @@ def open_project(path):
 	calfile = ""
 	datafiles = []
 	jsonfile = ""
+	# acquire filepaths for the different project files
 	for filepath in contents:
 		if re.match(r'\d{2}-\d{2}-\d{4}_\d{2}_\d{2}_\d{2}_\d{1,4}_\d*.cal', filepath):
 			calfile = path + filepath
@@ -24,21 +25,27 @@ def open_project(path):
 			datafiles.append(path + filepath)
 		elif re.match('.*\.json', filepath):
 			jsonfile = path + filepath
+	# sort datafiles to obtain the correct order of data
 	datafiles.sort()
 	raw_data = []
 
+	# create a numpy array from the datafiles
 	for file in datafiles:
 		raw_data.append(read_wav(file))
 	data = np.hstack(raw_data)
 
-	timestamp = get_initial_timestamp(calfile)
-	print(jsonfile)
+	# create timestamps 
+	timestamps = None
+	if calfile != "":
+		initial_time = get_initial_timestamp(calfile)
+		# timestamps = np.fromfunction(lambda i: np.datetime64(initial_time + datetime.timedelta(seconds = i/50)), data.shape)
+		timestamps = list(initial_time + datetime.timedelta(microseconds=1000*20*i) for i in range(data.shape[0]))
+	# load annotations
 	annotations = []
 	if jsonfile != "":
 		annotations = open_json(jsonfile)
 
-	return data, timestamp, annotations
-	# print(".cal file is: " + calfile + "\n" + "datafiles are: " + str(datafiles) + "\n" + "jsonfile is" + jsonfile) 
+	return data, timestamps, annotations
 
 def read_wav(filename):
 	"""
@@ -66,8 +73,7 @@ def get_initial_timestamp(filename):
 		timestamp = datetime.datetime.strptime(match.group(1), '%d-%m-%Y %H:%M:%S')
 		return timestamp
 def main ():
-	# wav = read_wav("./data/recording1/pat1/08-12-2007_12_41_54_0000_000000.wav")
-	data, timestamp, annotations = open_project("./data/recording2/pat2/")
+	data, timestamps, annotations = open_project("./data/recording2/pat2/")
 	# do whatever with the data in testing
 
 if __name__ == "__main__":

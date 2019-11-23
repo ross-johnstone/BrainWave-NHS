@@ -45,6 +45,15 @@ class TkBase:
                 rectprops=dict(alpha=0.5, facecolor='red'),span_stays=True)
         self.span.set_visible(False)
 
+        #second, reference graph displayed
+        self.fig2, self.ax2 = plt.subplots()
+        self.ax2.plot(times,values)
+        self.ax2.xaxis_date()
+
+        self.canvas2 = FigureCanvasTkAgg(self.fig2, master=root)
+        self.canvas2.draw()
+        self.canvas2.get_tk_widget().pack(side=tkinter.BOTTOM, fill=tkinter.BOTH, expand=1)
+
 
         #variables for storing min and max of the current span selection
         self.span_min=None

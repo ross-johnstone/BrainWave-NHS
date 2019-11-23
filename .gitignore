@@ -1,4 +1,5 @@
+/TestApp/__pycache__/*
+/data/*
 test.txt
 *.csv
-annotations.pyc
-/data/*
+*.pyc

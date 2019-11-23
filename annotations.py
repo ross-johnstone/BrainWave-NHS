@@ -43,4 +43,3 @@ def open_json(filename):
 	"""
 	with open(filename) as infile:
 		return json.load(infile, object_hook=decode_annotation)
-

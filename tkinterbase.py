@@ -8,6 +8,7 @@ import datetime
 import numpy as np
 import matplotlib
 from annotations import Annotation
+import data
 
 
 class TkBase:
@@ -16,13 +17,13 @@ class TkBase:
         master.title("tkinter barebones")
 
         #list of all anotations
-        self.anotations = []
+        self.data, self.timestamps, self.anotations = data.open_project('data/pat1/')
 
         #create a matplotlib figure with a single axes on which the data will be displayed
         self.fig, self.ax = plt.subplots()
 
         #plot values on the axes
-        self.ax.plot(times,values)
+        self.ax.plot(self.timestamps,self.data)
         self.ax.xaxis_date()
         plt.gcf().autofmt_xdate()
 
@@ -47,7 +48,7 @@ class TkBase:
 
         #second, reference graph displayed
         self.fig2, self.ax2 = plt.subplots()
-        self.ax2.plot(times,values)
+        self.ax2.plot(self.timestamps,self.data)
         self.ax2.xaxis_date()
 
         self.canvas2 = FigureCanvasTkAgg(self.fig2, master=root)

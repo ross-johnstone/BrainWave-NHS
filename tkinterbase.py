@@ -105,12 +105,12 @@ class TkBase:
         if (self.toolbar._active == 'ZOOM'):
             self.toolbar.zoom()
 
-        self.anotate_button.config(text='confirm', command=self.confirm)
+        self.annotate_button.config(text='confirm', command=self.confirm)
 
         self.annotate_button.config(text='Confirm',command = self.confirm)
 
     #callback method for the annotate button after span is sellected this button
-    #is pressed to add descriptions to the anontation and confirm selection
+    #is pressed to add descriptions to the annotation and confirm selection
     def confirm(self):
         # if something is selected
         if (self.span_min):

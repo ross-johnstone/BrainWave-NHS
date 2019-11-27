@@ -76,7 +76,6 @@ def get_initial_timestamp(filename):
 		return timestamp
 def main ():
 	data, timestamps, annotations = open_project("./data/recording2/pat2/")
-	print(timestamps)
 	# do whatever with the data in testing
 
 if __name__ == "__main__":

@@ -20,14 +20,15 @@ class Annotation:
 
 def encode_annotation(annotation):
 	if isinstance(annotation, Annotation):
-		return {"__annotation__":True, "title":annotation.title, "content":annotation.content, "start_time":annotation.start, "end_time":annotation.end}
+		return {"__annotation__":True, "title":annotation.title, "content":annotation.content,
+				"start_time":datetime.isoformat(annotation.start), "end_time":datetime.isoformat(annotation.end)}
 	else:
 		type_name = annotation.__class__.__name__
 		raise TypeError("Object of type '{}' is not JSON serializable".format(type_name))
 
 def decode_annotation(dict):
 	if "__annotation__" in dict:
-		return Annotation(dict["title"], dict["content"], dict["start_time"], dict["end_time"])
+		return Annotation(dict["title"], dict["content"], datetime.fromisoformat(dict["start_time"]), datetime.fromisoformat(dict["end_time"]))
 	return dict
 
 def save_json(annotations, filename):

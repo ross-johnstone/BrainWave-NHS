@@ -7,7 +7,7 @@ from matplotlib.widgets import SpanSelector
 import datetime
 import numpy as np
 import matplotlib
-from annotations import Annotation
+from annotations import Annotation, save_json
 import data
 
 
@@ -24,6 +24,10 @@ class TkBase:
 
         #plot values on the axe and set plot hue to NHS blue
         self.ax.plot(self.timestamps,self.data, color='#5436ff')
+        #draw all saved annotations
+        for annotation in self.annotations:
+            self.draw_annotation(annotation)
+
         self.ax.xaxis_date()
         plt.gcf().autofmt_xdate()
         #adding grid
@@ -67,9 +71,6 @@ class TkBase:
         #variables for storing min and max of the current span selection
         self.span_min=None
         self.span_max=None
-
-        self.display_annotations = Label(master, text = self.annotations,wraplength=300)
-        self.display_annotations.pack()
 
         #create buttons for interaction
         self.annotate_button = Button(master, text="Annotate", command=self.annotate, bg='white')
@@ -130,12 +131,13 @@ class TkBase:
                 new_annotation = Annotation(title_entry.get(),description_entry.get(),self.span_min,self.span_max)
 
                 self.annotations.append(new_annotation)
+                save_json(self.annotations,'data/pat1/annotations.json')
+                self.draw_annotation(new_annotation)
 
-                self.display_annotations['text'] = self.annotations
                 #set spans back to none after the annotation is saved to prevent buggy behavior
                 self.span_min=None
                 self.span_max=None
-                print(new_annotation)
+
                 #destroy popup after annotation is saved
                 cancel()
 
@@ -180,6 +182,11 @@ class TkBase:
         self.span_min = datetime.datetime.fromordinal(int(min)) + datetime.timedelta(seconds=divmod(min, 1)[1] * 86400)
         self.span_max = datetime.datetime.fromordinal(int(max)) + datetime.timedelta(seconds=divmod(max, 1)[1] * 86400)
 
+    def draw_annotation(self,annotation):
+
+        self.ax.add_patch(plt.Rectangle((matplotlib.dates.date2num(annotation.start),10),
+                                         matplotlib.dates.date2num(annotation.end)-matplotlib.dates.date2num(annotation.start),1000,fc='r'))
+        self.fig.canvas.draw()
 
 root = Tk()
 my_gui = TkBase(root, [datetime.datetime.now() - datetime.timedelta(hours=x) for x in range(10)],

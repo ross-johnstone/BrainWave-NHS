@@ -46,19 +46,20 @@ def open_project(path):
     if jsonfile != "":
         annotations = open_json(jsonfile)
 
-	# create timestamps
-	timestamps = None
-	if calfile != "":
-		initial_time = get_initial_timestamp(calfile)
-		timestamps = np.arange(data.shape[0])*datetime.timedelta(microseconds=1000*20)
-		timestamps += initial_time
-		# timestamps = np.fromfunction(lambda i: np.datetime64(initial_time + datetime.timedelta(seconds = i/50)), data.shape)
-		# timestamps = list(initial_time + datetime.timedelta(microseconds=1000*20*i) for i in range(data.shape[0]))
-	# load annotations
-	annotations = []
-	if jsonfile != "":
-		annotations = open_json(jsonfile)
+    # create timestamps
+    timestamps = None
+    if calfile != "":
+        initial_time = get_initial_timestamp(calfile)
+        timestamps = np.arange(data.shape[0])*datetime.timedelta(microseconds=1000*20)
+        timestamps += initial_time
+        # timestamps = np.fromfunction(lambda i: np.datetime64(initial_time + datetime.timedelta(seconds = i/50)), data.shape)
+        # timestamps = list(initial_time + datetime.timedelta(microseconds=1000*20*i) for i in range(data.shape[0]))
+    # load annotations
+    annotations = []
+    if jsonfile != "":
+        annotations = open_json(jsonfile)
 
+    return data, timestamps, annotations
 
 def read_wav(filename):
     """

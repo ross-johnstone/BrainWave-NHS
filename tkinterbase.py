@@ -8,6 +8,8 @@ import datetime
 import numpy as np
 import matplotlib
 from annotations import Annotation
+from data import open_project
+from tkinter import filedialog
 
 
 class TkBase:
@@ -59,6 +61,15 @@ class TkBase:
 
         self.close_button = Button(master, text="Close", command=master.quit)
         self.close_button.pack()
+
+        self.open_button = Button(master, text="Open", command=self.open)
+        self.open_button.pack()
+
+    #callback method for the open button, opens an existing project
+    def open(self):
+    	path = filedialog.askdirectory()
+    	path = path + "/"
+    	open_project(path)
 
     #callback method for the anotate button activates the span selector
     def butrelease(self,event):

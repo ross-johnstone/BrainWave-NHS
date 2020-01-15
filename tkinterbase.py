@@ -4,6 +4,8 @@ import matplotlib.pyplot as plt
 from matplotlib.backends.backend_tkagg import (
     FigureCanvasTkAgg, NavigationToolbar2Tk)
 from matplotlib.widgets import SpanSelector
+from matplotlib.textpath import TextPath
+from matplotlib.patches import PathPatch
 import datetime
 import numpy as np
 import matplotlib
@@ -13,6 +15,9 @@ import data
 
 class TkBase:
     def __init__(self, master, times, values):
+
+        FIGSIZE = (8,3)
+
         self.master = master
         master.title("tkinter barebones")
 
@@ -20,7 +25,7 @@ class TkBase:
         self.data, self.timestamps, self.annotations = data.open_project('data/pat1/')
 
         # create a matplotlib figure with a single axes on which the data will be displayed
-        self.fig, self.ax = plt.subplots()
+        self.fig, self.ax = plt.subplots(figsize = FIGSIZE)
 
         #plot values on the axe and set plot hue to NHS blue
         self.ax.plot(self.timestamps,self.data, color='#5436ff')
@@ -56,7 +61,7 @@ class TkBase:
         self.span.set_visible(False)
 
         # second, reference graph displayed
-        self.fig2, self.ax2 = plt.subplots()
+        self.fig2, self.ax2 = plt.subplots(figsize=FIGSIZE)
         self.ax2.plot(self.timestamps, self.data)
         self.ax2.xaxis_date()
 
@@ -138,6 +143,9 @@ class TkBase:
                 self.span_min=None
                 self.span_max=None
 
+                plt.figure(1)
+                plt.savefig('fig.pdf')
+
                 #destroy popup after annotation is saved
                 cancel()
 
@@ -182,10 +190,26 @@ class TkBase:
         self.span_min = datetime.datetime.fromordinal(int(min)) + datetime.timedelta(seconds=divmod(min, 1)[1] * 86400)
         self.span_max = datetime.datetime.fromordinal(int(max)) + datetime.timedelta(seconds=divmod(max, 1)[1] * 86400)
 
-    def draw_annotation(self,annotation):
+        #get vertical range for a given annotation
+    def get_vertical_range(self,annotation):
 
-        self.ax.add_patch(plt.Rectangle((matplotlib.dates.date2num(annotation.start),10),
-                                         matplotlib.dates.date2num(annotation.end)-matplotlib.dates.date2num(annotation.start),1000,fc='r'))
+        range_indices = np.where(np.logical_and(self.timestamps>annotation.start,self.timestamps<annotation.end))
+
+        range_data = self.data[range_indices]
+        return range_data[np.argmax(range_data)], range_data[np.argmin(range_data)]
+
+    def draw_annotation(self,annotation):
+        #if date range annotation draw rectangle
+        if(annotation.start != annotation.end):
+            vmax,vmin = self.get_vertical_range(annotation)
+            tp = TextPath((matplotlib.dates.date2num(annotation.start)+6000,300), annotation.title, size=100000)
+            self.ax.add_patch(PathPatch(tp, color="black"))
+            self.ax.add_patch(plt.Rectangle((matplotlib.dates.date2num(annotation.start),vmin-10),
+                                             matplotlib.dates.date2num(annotation.end)-matplotlib.dates.date2num(annotation.start),vmax-vmin+20,fc='r'))
+        #if point annotation draw a vertical line
+        if(annotation.start==annotation.end):
+            plt.figure(1)
+            plt.axvline(x=matplotlib.dates.date2num(annotation.start))
         self.fig.canvas.draw()
 
 root = Tk()

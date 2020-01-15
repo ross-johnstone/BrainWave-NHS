@@ -67,6 +67,8 @@ class TkBase:
 
         # create a matplotlib figure with a single axes on which the data will be displayed
         self.fig, self.ax = plt.subplots(figsize=FIGSIZE)
+        self.fig.set_facecolor('xkcd:grey')
+        self.ax.set_facecolor('xkcd:dark grey')
 
         # plot values on the axe and set plot hue to NHS blue
         self.ax.plot(self.timestamps, self.data, color='#5436ff')
@@ -103,7 +105,9 @@ class TkBase:
 
         # second, reference graph displayed
         self.fig2, self.ax2 = plt.subplots(figsize=FIGSIZE)
-        self.ax2.plot(self.timestamps, self.data, "r")
+        self.fig2.set_facecolor('xkcd:grey')
+        self.ax2.plot(self.timestamps, self.data, color="cyan")
+        self.ax2.set_facecolor('xkcd:dark grey')
         self.ax2.xaxis_date()
 
         self.canvas2 = FigureCanvasTkAgg(self.fig2, master=root)
@@ -122,25 +126,28 @@ class TkBase:
         annotate_image = PhotoImage(file=r"./res/annotation_img.png").subsample(8, 8)
         self.annotate_button = Button(master, command=self.annotate, image=annotate_image)
         self.annotate_button.image = annotate_image
-        self.annotate_button.place(x=240, y=301)
+        self.annotate_button.place(x=240, y=337)
         CreateToolTip(self.annotate_button, text="Create an annotation")
         #self.annotate_button.pack(side=tkinter.BOTTOM, fill=tkinter.BOTH, expand=1)
 
         export_image = PhotoImage(file=r"./res/export_img.png").subsample(8, 8)
         self.export_button = Button(master, command=self.export, image=export_image)
         self.export_button.image = export_image
-        self.export_button.place(x=273, y=301)
+        self.export_button.place(x=271, y=337)
         CreateToolTip(self.export_button, text="Export to PDF")
         #self.export_button.pack(side=tkinter.BOTTOM, fill=tkinter.BOTH, expand=1)
 
         close_image = PhotoImage(file=r"./res/close_img.png").subsample(8, 8)
         self.close_button = Button(master, command=master.quit, image=close_image)
         self.close_button.image = close_image
-        self.close_button.place(x=306, y=301)
+        self.close_button.place(x=302, y=337)
         CreateToolTip(self.close_button, text="Close Application")
         #self.close_button.pack(side=tkinter.BOTTOM, fill=tkinter.BOTH, expand=1)
 
         master.iconbitmap(r"./res/favicon.ico")
+        master.state('zoomed')
+        #master.resizable(0, 1)
+        master.protocol("WM_DELETE_WINDOW", master.quit)
 
     # callback method for the annotate button activates the span selector
     def butrelease(self, event):

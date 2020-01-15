@@ -3,7 +3,7 @@ stages:
     - Test
 before_script:
     - python3 -m pip install --upgrade pip
-    - python3 -m pip install -r --user requirements.txt
+    - python3 -m pip install -r requirements.txt --user
 unittest:
   only: [develop]
   script: 

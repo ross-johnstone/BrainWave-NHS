@@ -11,22 +11,22 @@ class TestAnnotations(unittest.TestCase):
 
     def setUp(self):
         annotations = []
-        annotations.append(Annotation("Test annotation 1", "This is the first test annotation.", datetime.fromtimestamp(100), datetime.fromtimestamp(250)))
+        annotations.append(Annotation("Test annotation 1", "This is the first test annotation.", datetime.fromtimestamp(100.5), datetime.fromtimestamp(250.5)))
         annotations.append(Annotation("Test annotation 2",
                                       "This is the second test annotation, but it's a little bit longer just as an edge case.",
-                                      datetime.fromtimestamp(300), datetime.fromtimestamp(350)))
-        annotations.append(Annotation("Test annotation 3", "This is the third test annotation.", datetime.fromtimestamp(455), datetime.fromtimestamp(500)))
+                                      datetime.fromtimestamp(300.5), datetime.fromtimestamp(350.5)))
+        annotations.append(Annotation("Test annotation 3", "This is the third test annotation.", datetime.fromtimestamp(455.5), datetime.fromtimestamp(500.5)))
         annotations.append(Annotation("Test annotation 4",
                                       "This is in fact not the fourth test annotation, just kidding it actually is.",
-                                      datetime.fromtimestamp(600), datetime.fromtimestamp(700)))
+                                      datetime.fromtimestamp(600.5), datetime.fromtimestamp(700.5)))
         self.annotations = annotations
 
     def test_generate_annotations(self):
         annotation = self.annotations[0]
         self.assertEqual(annotation.title, "Test annotation 1", "Should be Annotation 1")
         self.assertEqual(annotation.content, "This is the first test annotation.", "Should be: This is the first test annotation." )
-        self.assertEqual(annotation.start, datetime.fromtimestamp(100), "Should be 100")
-        self.assertEqual(annotation.end, datetime.fromtimestamp(250), "Should be 250")
+        self.assertEqual(annotation.start, datetime.fromtimestamp(100.5), "Should be 100")
+        self.assertEqual(annotation.end, datetime.fromtimestamp(250.5), "Should be 250")
 
     def test_encode_decode_annotation(self):
         annotation = self.annotations[0]

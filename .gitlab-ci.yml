@@ -2,6 +2,7 @@ image: python:3.7
 stages: 
     - Test
 before_script:
+    - sudo apt-get install python3
     - pip3 install --upgrade pip
     - pip3 install -r requirements.txt
 unittest:

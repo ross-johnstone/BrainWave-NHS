@@ -81,7 +81,7 @@ class TkBase:
         self.annotate_button = Button(master, text="Annotate", command=self.annotate, bg='white')
         self.annotate_button.pack(side=tkinter.LEFT, fill=tkinter.BOTH, expand=1)
 
-        self.compare_button = Button(master, text="Compare", command=self.compare, bg='white')
+        self.compare_button = Button(master, text="Export", command=self.export, bg='white')
         self.compare_button.pack(side=tkinter.LEFT, fill=tkinter.BOTH, expand=1)
 
         self.close_button = Button(master, text="Quit", command=master.quit, bg='white')
@@ -98,6 +98,10 @@ class TkBase:
 
     def compare(self):
         pass
+
+    def export(self):
+        plt.figure(1)
+        plt.savefig('fig.pdf')
 
     def annotate(self):
 
@@ -142,9 +146,6 @@ class TkBase:
                 #set spans back to none after the annotation is saved to prevent buggy behavior
                 self.span_min=None
                 self.span_max=None
-
-                plt.figure(1)
-                plt.savefig('fig.pdf')
 
                 #destroy popup after annotation is saved
                 cancel()

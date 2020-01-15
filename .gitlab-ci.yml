@@ -7,5 +7,5 @@ before_script:
 unittest:
   only: [develop]
   script: 
-    - python3 -m unittest discover --verbose -s "." "test_*.py"
+    - python3 -m unittest discover --verbose -s "./" -p "test_*.py"
   stage: Test

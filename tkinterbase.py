@@ -126,27 +126,27 @@ class TkBase:
         annotate_image = PhotoImage(file=r"./res/annotation_img.png").subsample(8, 8)
         self.annotate_button = Button(master, command=self.annotate, image=annotate_image)
         self.annotate_button.image = annotate_image
-        self.annotate_button.place(x=240, y=337)
+        self.annotate_button.place(x=240, y=357)
         CreateToolTip(self.annotate_button, text="Create an annotation")
         #self.annotate_button.pack(side=tkinter.BOTTOM, fill=tkinter.BOTH, expand=1)
 
         export_image = PhotoImage(file=r"./res/export_img.png").subsample(8, 8)
         self.export_button = Button(master, command=self.export, image=export_image)
         self.export_button.image = export_image
-        self.export_button.place(x=271, y=337)
+        self.export_button.place(x=271, y=357)
         CreateToolTip(self.export_button, text="Export to PDF")
         #self.export_button.pack(side=tkinter.BOTTOM, fill=tkinter.BOTH, expand=1)
 
         close_image = PhotoImage(file=r"./res/close_img.png").subsample(8, 8)
         self.close_button = Button(master, command=master.quit, image=close_image)
         self.close_button.image = close_image
-        self.close_button.place(x=302, y=337)
+        self.close_button.place(x=302, y=357)
         CreateToolTip(self.close_button, text="Close Application")
         #self.close_button.pack(side=tkinter.BOTTOM, fill=tkinter.BOTH, expand=1)
 
         master.iconbitmap(r"./res/favicon.ico")
         master.state('zoomed')
-        #master.resizable(0, 1)
+        master.resizable(0, 0)
         master.protocol("WM_DELETE_WINDOW", master.quit)
 
     # callback method for the annotate button activates the span selector

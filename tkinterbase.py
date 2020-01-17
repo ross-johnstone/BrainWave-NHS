@@ -114,39 +114,35 @@ class TkBase:
         self.canvas2.draw()
         self.canvas2.get_tk_widget().pack(side=tkinter.BOTTOM, fill=tkinter.BOTH, expand=1)
 
-        # variables for storing min and max of the current span selection
-        self.span_min = None
-        self.span_max = None
-
-        # variables for storing min and max of the current span selection
-        self.span_min = None
-        self.span_max = None
-
         # create buttons for interaction
         annotate_image = PhotoImage(file=r"./res/annotation_img.png").subsample(8, 8)
-        self.annotate_button = Button(master, command=self.annotate, image=annotate_image)
+        self.annotate_button = Button(master, command=self.annotate, image=annotate_image, text="Annotate",
+                                      compound="left", font="Consolas")
         self.annotate_button.image = annotate_image
-        self.annotate_button.place(x=240, y=357)
-        CreateToolTip(self.annotate_button, text="Create an annotation")
-        #self.annotate_button.pack(side=tkinter.BOTTOM, fill=tkinter.BOTH, expand=1)
+        self.annotate_button.pack(side=tkinter.LEFT, fill=tkinter.BOTH, expand=1)
 
         export_image = PhotoImage(file=r"./res/export_img.png").subsample(8, 8)
-        self.export_button = Button(master, command=self.export, image=export_image)
+        self.export_button = Button(master, command=self.export, image=export_image, text="Export to PDF",
+                                    compound="left", font="Consolas")
         self.export_button.image = export_image
-        self.export_button.place(x=271, y=357)
-        CreateToolTip(self.export_button, text="Export to PDF")
-        #self.export_button.pack(side=tkinter.BOTTOM, fill=tkinter.BOTH, expand=1)
+        self.export_button.pack(side=tkinter.LEFT, fill=tkinter.BOTH, expand=1)
 
         close_image = PhotoImage(file=r"./res/close_img.png").subsample(8, 8)
-        self.close_button = Button(master, command=master.quit, image=close_image)
+        self.close_button = Button(master, command=master.quit, image=close_image, text="Quit", compound="left",
+                                   font="Consolas")
         self.close_button.image = close_image
-        self.close_button.place(x=302, y=357)
-        CreateToolTip(self.close_button, text="Close Application")
-        #self.close_button.pack(side=tkinter.BOTTOM, fill=tkinter.BOTH, expand=1)
+        self.close_button.pack(side=tkinter.LEFT, fill=tkinter.BOTH, expand=1)
+
+        # variables for storing min and max of the current span selection
+        self.span_min = None
+        self.span_max = None
+
+        # variables for storing min and max of the current span selection
+        self.span_min = None
+        self.span_max = None
 
         master.iconbitmap(r"./res/favicon.ico")
         master.state('zoomed')
-        master.resizable(0, 0)
         master.protocol("WM_DELETE_WINDOW", master.quit)
 
     # callback method for the annotate button activates the span selector

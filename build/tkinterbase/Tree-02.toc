@@ -1,0 +1,43 @@
+('C:\\Users\\Pedro '
+ 'Castro\\PycharmProjects\\PSDproject\\cs19-main\\build\\tkinterbase\\setuptools-28.8.0-py3.6.egg',
+ None,
+ {'*.pyd', '*.py', '*.pyw', '*.pyc', '*.cp36-win32.pyd', 'EGG-INFO'},
+ 'DATA',
+ [('setuptools\\cli-32.exe',
+   'C:\\Users\\Pedro '
+   'Castro\\PycharmProjects\\PSDproject\\cs19-main\\build\\tkinterbase\\setuptools-28.8.0-py3.6.egg\\setuptools\\cli-32.exe',
+   'DATA'),
+  ('setuptools\\cli-64.exe',
+   'C:\\Users\\Pedro '
+   'Castro\\PycharmProjects\\PSDproject\\cs19-main\\build\\tkinterbase\\setuptools-28.8.0-py3.6.egg\\setuptools\\cli-64.exe',
+   'DATA'),
+  ('setuptools\\cli.exe',
+   'C:\\Users\\Pedro '
+   'Castro\\PycharmProjects\\PSDproject\\cs19-main\\build\\tkinterbase\\setuptools-28.8.0-py3.6.egg\\setuptools\\cli.exe',
+   'DATA'),
+  ('setuptools\\gui-32.exe',
+   'C:\\Users\\Pedro '
+   'Castro\\PycharmProjects\\PSDproject\\cs19-main\\build\\tkinterbase\\setuptools-28.8.0-py3.6.egg\\setuptools\\gui-32.exe',
+   'DATA'),
+  ('setuptools\\gui-64.exe',
+   'C:\\Users\\Pedro '
+   'Castro\\PycharmProjects\\PSDproject\\cs19-main\\build\\tkinterbase\\setuptools-28.8.0-py3.6.egg\\setuptools\\gui-64.exe',
+   'DATA'),
+  ('setuptools\\gui.exe',
+   'C:\\Users\\Pedro '
+   'Castro\\PycharmProjects\\PSDproject\\cs19-main\\build\\tkinterbase\\setuptools-28.8.0-py3.6.egg\\setuptools\\gui.exe',
+   'DATA'),
+  ('setuptools\\script (dev).tmpl',
+   'C:\\Users\\Pedro '
+   'Castro\\PycharmProjects\\PSDproject\\cs19-main\\build\\tkinterbase\\setuptools-28.8.0-py3.6.egg\\setuptools\\script '
+   '(dev).tmpl',
+   'DATA'),
+  ('setuptools\\script.tmpl',
+   'C:\\Users\\Pedro '
+   'Castro\\PycharmProjects\\PSDproject\\cs19-main\\build\\tkinterbase\\setuptools-28.8.0-py3.6.egg\\setuptools\\script.tmpl',
+   'DATA'),
+  ('setuptools\\command\\launcher manifest.xml',
+   'C:\\Users\\Pedro '
+   'Castro\\PycharmProjects\\PSDproject\\cs19-main\\build\\tkinterbase\\setuptools-28.8.0-py3.6.egg\\setuptools\\command\\launcher '
+   'manifest.xml',
+   'DATA')])

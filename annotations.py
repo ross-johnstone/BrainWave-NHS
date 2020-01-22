@@ -1,13 +1,15 @@
 import json
 import datetime as dt
-
+import itertools
 
 class Annotation:
+    id_generator = itertools.count(1)
     def __init__(self, title, content, start_time, end_time):
         self.title = title
         self.content = content
         self.start = start_time
         self.end = end_time
+        self.id = next(self.id_generator)
 
     def __str__(self):
         return str(vars(self))
@@ -58,3 +60,14 @@ def open_json(filename):
     """
     with open(filename) as infile:
         return json.load(infile, object_hook=decode_annotation)
+
+def main():
+    annotation1 = Annotation("A1", "text", "start_time", "end_time")
+    annotation2 = Annotation("A2", "text", "start_time", "end_time")
+    print(annotation1.id)
+    print(annotation2.id)
+
+# do whatever with the data in testing
+
+if __name__ == "__main__":
+    main()

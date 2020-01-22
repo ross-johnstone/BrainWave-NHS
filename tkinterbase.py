@@ -27,8 +27,8 @@ class ToolTip(object):
         if self.tipwindow or not self.text:
             return
         x, y, cx, cy = self.widget.bbox("insert")
-        x = x + self.widget.winfo_rootx() + 28
-        y = y + cy + self.widget.winfo_rooty()
+        x = x + self.widget.winfo_rootx() + 250
+        y = y + self.widget.winfo_rooty() + 28
         self.tipwindow = tw = Toplevel(self.widget)
         tw.wm_overrideredirect(1)
         tw.wm_geometry("+%d+%d" % (x, y))
@@ -93,7 +93,7 @@ class TkBase:
         self.canvas.get_tk_widget().pack(side=tkinter.BOTTOM, fill=tkinter.BOTH, expand=1)
         self.canvas.mpl_connect('button_release_event', self.butrelease)
 
-        self.toolbar = NavigationToolbar2Tk(self.canvas, root)
+        self.toolbar = NavigationToolbar(self.canvas, root)
         self.toolbar.update()
         self.canvas.get_tk_widget().pack(side=tkinter.BOTTOM, fill=tkinter.BOTH, expand=1)
 
@@ -119,19 +119,22 @@ class TkBase:
         self.annotate_button = Button(master, command=self.annotate, image=annotate_image, text="Annotate",
                                       compound="left", font="Consolas")
         self.annotate_button.image = annotate_image
-        self.annotate_button.pack(side=tkinter.LEFT, fill=tkinter.BOTH, expand=1)
+        #self.annotate_button.pack(side=tkinter.LEFT, fill=tkinter.BOTH, expand=1)
+        CreateToolTip(self.annotate_button, "Create an annotation")
 
         export_image = PhotoImage(file=r"./res/export_img.png").subsample(8, 8)
         self.export_button = Button(master, command=self.export, image=export_image, text="Export to PDF",
                                     compound="left", font="Consolas")
         self.export_button.image = export_image
-        self.export_button.pack(side=tkinter.LEFT, fill=tkinter.BOTH, expand=1)
+        #self.export_button.pack(side=tkinter.LEFT, fill=tkinter.BOTH, expand=1)
+        CreateToolTip(self.export_button, "Export graph as PDF")
 
         close_image = PhotoImage(file=r"./res/close_img.png").subsample(8, 8)
         self.close_button = Button(master, command=master.quit, image=close_image, text="Quit", compound="left",
                                    font="Consolas")
         self.close_button.image = close_image
-        self.close_button.pack(side=tkinter.LEFT, fill=tkinter.BOTH, expand=1)
+        #self.close_button.pack(side=tkinter.LEFT, fill=tkinter.BOTH, expand=1)
+        CreateToolTip(self.close_button, "Quit the application")
 
         # variables for storing min and max of the current span selection
         self.span_min = None
@@ -162,7 +165,6 @@ class TkBase:
         plt.savefig('fig.pdf')
 
     def annotate(self):
-
         # activate the span selector
         self.span.set_visible(True)
 
@@ -172,8 +174,6 @@ class TkBase:
 
         if (self.toolbar._active == 'ZOOM'):
             self.toolbar.zoom()
-
-        self.annotate_button.config(text='confirm', command=self.confirm)
 
         self.annotate_button.config(text='Confirm', command=self.confirm)
 
@@ -239,6 +239,8 @@ class TkBase:
             self.span.stay_rect.set_visible(False)
             self.canvas.draw()
 
+            top.iconbitmap(r"./res/favicon.ico")
+
     # callback method of the span selector, after every selection it writes
     # the selected range to class variables
     def onselect(self, min, max):
@@ -270,6 +272,47 @@ class TkBase:
             plt.figure(1)
             plt.axvline(x=matplotlib.dates.date2num(annotation.start))
         self.fig.canvas.draw()
+
+
+class NavigationToolbar(NavigationToolbar2Tk):
+
+    def _Button(self, text, file, command, extension='.gif'):
+        img_file = ("./res/images/" + file + extension)
+        im = tkinter.PhotoImage(master=self, file=img_file)
+        b = tkinter.Button(
+            master=self, text=text, padx=2, pady=2, image=im, command=command)
+        b._ntimage = im
+        b.pack(side=tkinter.LEFT)
+        return b
+
+    toolitems = (
+        ('Home', 'Reset original view', 'home', 'home'),
+        ('Back', 'Back to previous view', 'back', 'back'),
+        ('Forward', 'Forward to next view', 'forward', 'forward'),
+        (None, None, None, None),
+        ('Pan', 'Pan axes with left mouse, zoom with right', 'move', 'pan'),
+        ('Zoom', 'Zoom to rectangle', 'zoom_to_rect', 'zoom'),
+        ('Subplots', 'Configure subplots', 'subplots', 'configure_subplots'),
+        (None, None, None, None),
+        ('Annotate', 'Create an annotation', 'annotate', 'call_annotate'),
+        ('Confirm', 'Confirm annotation', 'confirm', 'call_confirm'),
+        ('Export', 'Export to PDF', 'export', 'call_export'),
+        ('Save', 'Save the figure', 'filesave', 'save_figure'),
+        (None, None, None, None),
+        ('Quit', 'Quit application', 'quit', 'call_quit'),
+    )
+
+    def call_annotate(self):
+        TkBase.annotate(my_gui)
+
+    def call_confirm(self):
+        TkBase.confirm(my_gui)
+
+    def call_export(self):
+        TkBase.export(my_gui)
+
+    def call_quit(self):
+        root.quit()
 
 
 root = Tk()

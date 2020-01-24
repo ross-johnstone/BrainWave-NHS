@@ -13,47 +13,6 @@ from annotations import Annotation, save_json
 import data
 
 
-class ToolTip(object):
-
-    def __init__(self, widget):
-        self.widget = widget
-        self.tipwindow = None
-        self.id = None
-        self.x = self.y = 0
-
-    def showtip(self, text):
-        "Display text in tooltip window"
-        self.text = text
-        if self.tipwindow or not self.text:
-            return
-        x, y, cx, cy = self.widget.bbox("insert")
-        x = x + self.widget.winfo_rootx() + 250
-        y = y + self.widget.winfo_rooty() + 28
-        self.tipwindow = tw = Toplevel(self.widget)
-        tw.wm_overrideredirect(1)
-        tw.wm_geometry("+%d+%d" % (x, y))
-        label = Label(tw, text=self.text, justify="left",
-                      background="#ffffe0", relief="solid", borderwidth=1,
-                      font=("tahoma", "8", "normal"))
-        label.pack(ipadx=1, ipady=1)
-
-    def hidetip(self):
-        tw = self.tipwindow
-        self.tipwindow = None
-        if tw:
-            tw.destroy()
-
-
-def CreateToolTip(widget, text):
-    toolTip = ToolTip(widget)
-    def enter(event):
-        toolTip.showtip(text)
-    def leave(event):
-        toolTip.hidetip()
-    widget.bind('<Enter>', enter)
-    widget.bind('<Leave>', leave)
-
-
 class TkBase:
     def __init__(self, master, times, values):
 
@@ -119,22 +78,16 @@ class TkBase:
         self.annotate_button = Button(master, command=self.annotate, image=annotate_image, text="Annotate",
                                       compound="left", font="Consolas")
         self.annotate_button.image = annotate_image
-        #self.annotate_button.pack(side=tkinter.LEFT, fill=tkinter.BOTH, expand=1)
-        CreateToolTip(self.annotate_button, "Create an annotation")
 
         export_image = PhotoImage(file=r"./res/export_img.png").subsample(8, 8)
         self.export_button = Button(master, command=self.export, image=export_image, text="Export to PDF",
                                     compound="left", font="Consolas")
         self.export_button.image = export_image
-        #self.export_button.pack(side=tkinter.LEFT, fill=tkinter.BOTH, expand=1)
-        CreateToolTip(self.export_button, "Export graph as PDF")
 
         close_image = PhotoImage(file=r"./res/close_img.png").subsample(8, 8)
         self.close_button = Button(master, command=master.quit, image=close_image, text="Quit", compound="left",
                                    font="Consolas")
         self.close_button.image = close_image
-        #self.close_button.pack(side=tkinter.LEFT, fill=tkinter.BOTH, expand=1)
-        CreateToolTip(self.close_button, "Quit the application")
 
         # variables for storing min and max of the current span selection
         self.span_min = None
@@ -186,6 +139,7 @@ class TkBase:
 
             # method called when cancel button on popup is pressed
             def cancel():
+                self.span_min = False
                 top.destroy()
                 top.update()
 
@@ -240,6 +194,7 @@ class TkBase:
             self.canvas.draw()
 
             top.iconbitmap(r"./res/favicon.ico")
+            top.protocol("WM_DELETE_WINDOW", cancel)
 
     # callback method of the span selector, after every selection it writes
     # the selected range to class variables

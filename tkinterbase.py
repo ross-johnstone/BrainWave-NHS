@@ -170,20 +170,24 @@ class TkBase:
             # labels in top level window showing annotation start time and end time
             annotation_start_label = Label(top, text='Annotation start time: ' + str(self.span_min))
             annotation_end_label = Label(top, text='Annotation end time: ' + str(self.span_max))
-            annotation_start_label.pack()
-            annotation_end_label.pack()
+            annotation_start_label.grid(row=0)
+            annotation_end_label.grid(row=1)
 
-            title_entry = Entry(top)
-            title_entry.pack()
+            annotation_title_label = Label(top, text='Title')
+            annotation_title_label.grid(row=2)
+            title_entry = Entry(top, font=("Courier", 12))
+            title_entry.grid(row=3)
 
-            description_entry = Entry(top)
-            description_entry.pack()
-
-            cancel_button = Button(master=top, text="Cancel", command=cancel, bg='white')
-            cancel_button.pack()
+            description_label = Label(top, text='Description')
+            description_label.grid(row=4)
+            description_entry = tkinter.Text(top, height=6, width=30)
+            description_entry.grid(row=5)
 
             save_button = Button(master=top, text="Save", command=save, bg='white')
-            save_button.pack()
+            save_button.grid(row=6)
+
+            cancel_button = Button(master=top, text="Cancel", command=cancel, bg='white')
+            cancel_button.grid(row=7)
 
             # change button back to annotate button and hide span selector again
             self.annotate_button.config(text='Annotate', command=self.annotate)
@@ -193,6 +197,7 @@ class TkBase:
             self.span.stay_rect.set_visible(False)
             self.canvas.draw()
 
+            top.resizable(False, False)
             top.iconbitmap(r"./res/favicon.ico")
             top.protocol("WM_DELETE_WINDOW", cancel)
 

@@ -22,8 +22,8 @@ class TkBase:
         self.master = master
         master.title("BrainWave Visualization")
 
-        #list of all annotations
-        self.data, self.timestamps, self.annotations = data.open_project('data/recording2/pat2/')
+        # list of all annotations
+        self.data, self.timestamps, self.annotations = data.open_project('data/recording1/pat1/')
 
         # create a matplotlib figure with a single axes on which the data will be displayed
         self.fig, self.ax = plt.subplots(figsize=FIGSIZE)
@@ -45,7 +45,7 @@ class TkBase:
         self.ax.spines['right'].set_visible(False)
 
         line = self.ax.lines[0]
-        
+
         # put the plot with navbar on the tkinter window
         self.canvas = FigureCanvasTkAgg(self.fig, master=root)
         self.canvas.draw()
@@ -74,50 +74,43 @@ class TkBase:
         self.canvas2.get_tk_widget().pack(side=tkinter.BOTTOM, fill=tkinter.BOTH, expand=1)
 
         # create buttons for interaction
-        annotate_image = PhotoImage(file=r"./res/annotation_img.png").subsample(8, 8)
-        self.annotate_button = Button(master, command=self.annotate, image=annotate_image, text="Annotate",
+        self.annotate_button = Button(master, command=self.annotate, text="Annotate",
                                       compound="left", font="Consolas")
-        self.annotate_button.image = annotate_image
 
-        export_image = PhotoImage(file=r"./res/export_img.png").subsample(8, 8)
-        self.export_button = Button(master, command=self.export, image=export_image, text="Export to PDF",
+        self.export_button = Button(master, command=self.export, text="Export to PDF",
                                     compound="left", font="Consolas")
-        self.export_button.image = export_image
 
-        close_image = PhotoImage(file=r"./res/close_img.png").subsample(8, 8)
-        self.close_button = Button(master, command=master.quit, image=close_image, text="Quit", compound="left",
+        self.close_button = Button(master, command=master.quit, text="Quit", compound="left",
                                    font="Consolas")
-        self.close_button.image = close_image
 
         # variables for storing min and max of the current span selection
         self.span_min = None
         self.span_max = None
 
-        self.open_button = Button(master, text="Open", command=self.open, bg='white')
-        self.open_button.pack(side=tkinter.LEFT, fill=tkinter.BOTH, expand=1)
+        # self.open_button = Button(master, text="Open", command=self.open, bg='white')
+        # self.open_button.pack(side=tkinter.LEFT, fill=tkinter.BOTH, expand=1)
 
+        master.iconbitmap(r'res/general_images/favicon.ico')
+        master.state('zoomed')
 
-        self.close_button = Button(master, text="Quit", command=master.quit, bg='white')
-        self.close_button.pack(side=tkinter.LEFT, fill=tkinter.BOTH, expand=1)
-
-    #callback method for the open button, opens an existing project
+    # callback method for the open button, opens an existing project
     def open(self):
-        FIGSIZE = (8,3)
+        FIGSIZE = (8, 3)
         path = filedialog.askdirectory()
         path = path + "/"
         self.data, self.timestamps, self.annotations = data.open_project(path)
 
         self.ax.clear()
-        self.ax.plot(self.timestamps,self.data, color='#5436ff')
-        #draw all saved annotations
+        self.ax.plot(self.timestamps, self.data, color='#5436ff')
+        # draw all saved annotations
         for annotation in self.annotations:
             self.draw_annotation(annotation)
 
         self.ax.xaxis_date()
         plt.gcf().autofmt_xdate()
-        #adding grid
-        self.ax.grid(color='grey',linestyle='-', linewidth=0.25, alpha=0.5)
-        #removing top and right borders
+        # adding grid
+        self.ax.grid(color='grey', linestyle='-', linewidth=0.25, alpha=0.5)
+        # removing top and right borders
         self.ax.spines['top'].set_visible(False)
         self.ax.spines['right'].set_visible(False)
 
@@ -130,10 +123,11 @@ class TkBase:
 
         self.canvas2.draw()
         self.canvas2.get_tk_widget().pack(side=tkinter.BOTTOM, fill=tkinter.BOTH, expand=1)
-    #callback method for the anotate button activates the span selector
-    def butrelease(self,event):
-        #deactivate toolbar functionalities if any are active
-        if(self.toolbar._active=='PAN'):
+
+    # callback method for the anotate button activates the span selector
+    def butrelease(self, event):
+        # deactivate toolbar functionalities if any are active
+        if (self.toolbar._active == 'PAN'):
             self.toolbar.pan()
 
         if (self.toolbar._active == 'ZOOM'):
@@ -164,7 +158,6 @@ class TkBase:
     def confirm(self):
         # if something is selected
         if (self.span_min):
-
             # method called when cancel button on popup is pressed
             def cancel():
                 self.span_min = False
@@ -173,20 +166,23 @@ class TkBase:
 
             # method called when save button on popup is pressed
             def save():
+                if not title_entry.get().strip():
+                    error_label = Label(top, text="Please add a title!", fg="red")
+                    error_label.grid(row=3)
+                else:
+                    new_annotation = Annotation(title_entry.get(), description_entry.get(1.0, tkinter.END),
+                                                self.span_min, self.span_max)
 
-                new_annotation = Annotation(title_entry.get(), description_entry.get(1.0, tkinter.END),
-                                            self.span_min, self.span_max)
+                    self.annotations.append(new_annotation)
+                    save_json(self.annotations, 'data/recording1/pat1/annotations.json')
+                    self.draw_annotation(new_annotation)
 
-                self.annotations.append(new_annotation)
-                save_json(self.annotations, 'data/pat1/annotations.json')
-                self.draw_annotation(new_annotation)
+                    # set spans back to none after the annotation is saved to prevent buggy behavior
+                    self.span_min = None
+                    self.span_max = None
 
-                # set spans back to none after the annotation is saved to prevent buggy behavior
-                self.span_min = None
-                self.span_max = None
-
-                # destroy popup after annotation is saved
-                cancel()
+                    # destroy popup after annotation is saved
+                    cancel()
 
             # create popup where you add text to the annotation
             top = Toplevel(root)
@@ -202,18 +198,18 @@ class TkBase:
             annotation_title_label = Label(top, text='Title')
             annotation_title_label.grid(row=2)
             title_entry = Entry(top, font=("Courier", 12))
-            title_entry.grid(row=3)
+            title_entry.grid(row=4)
 
             description_label = Label(top, text='Description')
-            description_label.grid(row=4)
+            description_label.grid(row=5)
             description_entry = tkinter.Text(top, height=6, width=30)
-            description_entry.grid(row=5)
+            description_entry.grid(row=6)
 
             save_button = Button(master=top, text="Save", command=save, bg='white')
-            save_button.grid(row=6)
+            save_button.grid(row=7)
 
             cancel_button = Button(master=top, text="Cancel", command=cancel, bg='white')
-            cancel_button.grid(row=7)
+            cancel_button.grid(row=8)
 
             # change button back to annotate button and hide span selector again
             self.annotate_button.config(text='Annotate', command=self.annotate)
@@ -224,7 +220,7 @@ class TkBase:
             self.canvas.draw()
 
             top.resizable(False, False)
-            top.iconbitmap(r"./res/favicon.ico")
+            top.iconbitmap(r"./res/general_images/favicon.ico")
             top.protocol("WM_DELETE_WINDOW", cancel)
 
     # callback method of the span selector, after every selection it writes
@@ -261,7 +257,7 @@ class TkBase:
 class NavigationToolbar(NavigationToolbar2Tk):
 
     def _Button(self, text, file, command, extension='.gif'):
-        img_file = ("./res/images/" + file + extension)
+        img_file = ("./res/button_images/" + file + extension)
         im = tkinter.PhotoImage(master=self, file=img_file)
         b = tkinter.Button(
             master=self, text=text, padx=2, pady=2, image=im, command=command)
@@ -280,6 +276,8 @@ class NavigationToolbar(NavigationToolbar2Tk):
         (None, None, None, None),
         ('Annotate', 'Create an annotation', 'annotate', 'call_annotate'),
         ('Confirm', 'Confirm annotation', 'confirm', 'call_confirm'),
+        (None, None, None, None),
+        ('Open', 'Opens a new project', 'open', 'call_open'),
         ('Export', 'Export to PDF', 'export', 'call_export'),
         ('Save', 'Save the figure', 'filesave', 'save_figure'),
         (None, None, None, None),
@@ -291,6 +289,9 @@ class NavigationToolbar(NavigationToolbar2Tk):
 
     def call_confirm(self):
         TkBase.confirm(my_gui)
+
+    def call_open(self):
+        TkBase.open(my_gui)
 
     def call_export(self):
         TkBase.export(my_gui)

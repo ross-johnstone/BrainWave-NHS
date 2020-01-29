@@ -99,7 +99,6 @@ class TkBase:
         path = path + "/"
         self.data, self.timestamps, self.annotations = data.open_project(path)
 
-        # self.ax.lines[0].set_data(self.data, self.timestamps)
         self.ax.clear()
         self.ax.plot(self.timestamps,self.data, color='#5436ff')
         #draw all saved annotations
@@ -118,7 +117,6 @@ class TkBase:
         self.canvas.draw()
 
         print(line.get_xdata())        
-        # self.ax2.lines[0].set_data(self.data, self.timestamps)
         self.ax2.clear()
         self.ax2.plot(self.timestamps, self.data)
         self.ax2.xaxis_date()

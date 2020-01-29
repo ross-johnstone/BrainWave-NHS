@@ -23,7 +23,7 @@ class TkBase:
         master.title("tkinter barebones")
 
         #list of all annotations
-        self.data, self.timestamps, self.annotations = data.open_project('data/recording1/pat1/')
+        self.data, self.timestamps, self.annotations = data.open_project('data/recording2/pat2/')
 
         # create a matplotlib figure with a single axes on which the data will be displayed
         self.fig, self.ax = plt.subplots(figsize = FIGSIZE)
@@ -94,9 +94,37 @@ class TkBase:
 
     #callback method for the open button, opens an existing project
     def open(self):
+        FIGSIZE = (8,3)
         path = filedialog.askdirectory()
         path = path + "/"
         self.data, self.timestamps, self.annotations = data.open_project(path)
+
+        # self.ax.lines[0].set_data(self.data, self.timestamps)
+        self.ax.clear()
+        self.ax.plot(self.timestamps,self.data, color='#5436ff')
+        #draw all saved annotations
+        for annotation in self.annotations:
+            self.draw_annotation(annotation)
+
+        self.ax.xaxis_date()
+        plt.gcf().autofmt_xdate()
+        #adding grid
+        self.ax.grid(color='grey',linestyle='-', linewidth=0.25, alpha=0.5)
+        #removing top and right borders
+        self.ax.spines['top'].set_visible(False)
+        self.ax.spines['right'].set_visible(False)
+
+        line = self.ax.lines[0]
+        self.canvas.draw()
+
+        print(line.get_xdata())        
+        # self.ax2.lines[0].set_data(self.data, self.timestamps)
+        self.ax2.clear()
+        self.ax2.plot(self.timestamps, self.data)
+        self.ax2.xaxis_date()
+
+        self.canvas2.draw()
+        self.canvas2.get_tk_widget().pack(side=tkinter.BOTTOM, fill=tkinter.BOTH, expand=1)
     #callback method for the anotate button activates the span selector
     def butrelease(self,event):
         #deactivate toolbar functionalities if any are active

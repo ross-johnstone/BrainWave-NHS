@@ -1,5 +1,5 @@
 /TestApp/__pycache__/*
-/data/*
+/data/*.zip
 test.txt
 *.csv
 *.pyc

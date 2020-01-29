@@ -1,6 +1,7 @@
 from tkinter import Tk, Label, Button, Toplevel, Entry, PhotoImage
 import tkinter
 import matplotlib.pyplot as plt
+import re
 from matplotlib.backends.backend_tkagg import (
     FigureCanvasTkAgg, NavigationToolbar2Tk)
 from matplotlib.widgets import SpanSelector
@@ -74,20 +75,14 @@ class TkBase:
         self.canvas2.get_tk_widget().pack(side=tkinter.BOTTOM, fill=tkinter.BOTH, expand=1)
 
         # create buttons for interaction
-        annotate_image = PhotoImage(file=r"./res/annotation_img.png").subsample(8, 8)
-        self.annotate_button = Button(master, command=self.annotate, image=annotate_image, text="Annotate",
+        self.annotate_button = Button(master, command=self.annotate, text="Annotate",
                                       compound="left", font="Consolas")
-        self.annotate_button.image = annotate_image
 
-        export_image = PhotoImage(file=r"./res/export_img.png").subsample(8, 8)
-        self.export_button = Button(master, command=self.export, image=export_image, text="Export to PDF",
+        self.export_button = Button(master, command=self.export, text="Export to PDF",
                                     compound="left", font="Consolas")
-        self.export_button.image = export_image
 
-        close_image = PhotoImage(file=r"./res/close_img.png").subsample(8, 8)
-        self.close_button = Button(master, command=master.quit, image=close_image, text="Quit", compound="left",
+        self.close_button = Button(master, command=master.quit, text="Quit", compound="left",
                                    font="Consolas")
-        self.close_button.image = close_image
 
         # variables for storing min and max of the current span selection
         self.span_min = None
@@ -96,7 +91,7 @@ class TkBase:
         # self.open_button = Button(master, text="Open", command=self.open, bg='white')
         # self.open_button.pack(side=tkinter.LEFT, fill=tkinter.BOTH, expand=1)
 
-        master.iconbitmap(r'res/favicon.ico')
+        master.iconbitmap(r'res/general_images/favicon.ico')
         master.state('zoomed')
 
     # callback method for the open button, opens an existing project
@@ -172,19 +167,23 @@ class TkBase:
 
             # method called when save button on popup is pressed
             def save():
-                new_annotation = Annotation(title_entry.get(), description_entry.get(1.0, tkinter.END),
-                                            self.span_min, self.span_max)
+                if not title_entry.get().strip():
+                    error_label = Label(top, text="Please add a title!", fg="red")
+                    error_label.grid(row=3)
+                else:
+                    new_annotation = Annotation(title_entry.get(), description_entry.get(1.0, tkinter.END),
+                                                self.span_min, self.span_max)
 
-                self.annotations.append(new_annotation)
-                save_json(self.annotations, 'data/pat1/annotations.json')
-                self.draw_annotation(new_annotation)
+                    self.annotations.append(new_annotation)
+                    save_json(self.annotations, 'data/recording1/pat1/annotations.json')
+                    self.draw_annotation(new_annotation)
 
-                # set spans back to none after the annotation is saved to prevent buggy behavior
-                self.span_min = None
-                self.span_max = None
+                    # set spans back to none after the annotation is saved to prevent buggy behavior
+                    self.span_min = None
+                    self.span_max = None
 
-                # destroy popup after annotation is saved
-                cancel()
+                    # destroy popup after annotation is saved
+                    cancel()
 
             # create popup where you add text to the annotation
             top = Toplevel(root)
@@ -200,18 +199,18 @@ class TkBase:
             annotation_title_label = Label(top, text='Title')
             annotation_title_label.grid(row=2)
             title_entry = Entry(top, font=("Courier", 12))
-            title_entry.grid(row=3)
+            title_entry.grid(row=4)
 
             description_label = Label(top, text='Description')
-            description_label.grid(row=4)
+            description_label.grid(row=5)
             description_entry = tkinter.Text(top, height=6, width=30)
-            description_entry.grid(row=5)
+            description_entry.grid(row=6)
 
             save_button = Button(master=top, text="Save", command=save, bg='white')
-            save_button.grid(row=6)
+            save_button.grid(row=7)
 
             cancel_button = Button(master=top, text="Cancel", command=cancel, bg='white')
-            cancel_button.grid(row=7)
+            cancel_button.grid(row=8)
 
             # change button back to annotate button and hide span selector again
             self.annotate_button.config(text='Annotate', command=self.annotate)
@@ -222,7 +221,7 @@ class TkBase:
             self.canvas.draw()
 
             top.resizable(False, False)
-            top.iconbitmap(r"./res/favicon.ico")
+            top.iconbitmap(r"./res/general_images/favicon.ico")
             top.protocol("WM_DELETE_WINDOW", cancel)
 
     # callback method of the span selector, after every selection it writes
@@ -259,7 +258,7 @@ class TkBase:
 class NavigationToolbar(NavigationToolbar2Tk):
 
     def _Button(self, text, file, command, extension='.gif'):
-        img_file = ("./res/images/" + file + extension)
+        img_file = ("./res/button_images/" + file + extension)
         im = tkinter.PhotoImage(master=self, file=img_file)
         b = tkinter.Button(
             master=self, text=text, padx=2, pady=2, image=im, command=command)

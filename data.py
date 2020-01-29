@@ -32,32 +32,34 @@ def open_project(path):
 
     # create a numpy array from the datafiles
     for file in datafiles:
-        raw_data.append(read_wav(file))
+        try:
+            tmp_data = read_wav(file)
+        except Exception:
+            raise Exception("One of the data files could not be read.")
+        raw_data.append(tmp_data)
     data = np.hstack(raw_data)
 
-    # create timestamps
-    timestamps = None
-    if calfile != "":
-        initial_time = get_initial_timestamp(calfile)
-        # timestamps = np.fromfunction(lambda i: np.datetime64(initial_time + datetime.timedelta(seconds = i/50)), data.shape)
-        timestamps = list(initial_time + datetime.timedelta(microseconds=1000 * 20 * i) for i in range(data.shape[0]))
     # load annotations
     annotations = []
     if jsonfile != "":
         annotations = open_json(jsonfile)
-
     # create timestamps
     timestamps = None
     if calfile != "":
-        initial_time = get_initial_timestamp(calfile)
+        try:
+            initial_time = get_initial_timestamp(calfile)
+        except Exception: 
+            raise Exception("One of the data files could not be read.")
         timestamps = np.arange(data.shape[0])*datetime.timedelta(microseconds=1000*20)
         timestamps += initial_time
-        # timestamps = np.fromfunction(lambda i: np.datetime64(initial_time + datetime.timedelta(seconds = i/50)), data.shape)
-        # timestamps = list(initial_time + datetime.timedelta(microseconds=1000*20*i) for i in range(data.shape[0]))
     # load annotations
     annotations = []
     if jsonfile != "":
-        annotations = open_json(jsonfile)
+        try:
+            annotations = open_json(jsonfile)
+        except Exception:
+            annotations = []
+
 
     return data, timestamps, annotations
 

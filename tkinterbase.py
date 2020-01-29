@@ -43,8 +43,7 @@ class TkBase:
         self.ax.spines['right'].set_visible(False)
 
         line = self.ax.lines[0]
-        print(line.get_xdata())
-
+        
         # put the plot with navbar on the tkinter window
         self.canvas = FigureCanvasTkAgg(self.fig, master=root)
         self.canvas.draw()
@@ -116,7 +115,6 @@ class TkBase:
         line = self.ax.lines[0]
         self.canvas.draw()
 
-        print(line.get_xdata())        
         self.ax2.clear()
         self.ax2.plot(self.timestamps, self.data)
         self.ax2.xaxis_date()
@@ -160,7 +158,6 @@ class TkBase:
     def confirm(self):
         # if something is selected
         if (self.span_min):
-            print(self.span_min, self.span_max)
 
             # method called when cancel button on popup is pressed
             def cancel():
@@ -169,9 +166,6 @@ class TkBase:
 
             # method called when save button on popup is pressed
             def save():
-                #new_annotation = Annotation(title_entry.text)
-                print(title_entry.get())
-                print(description_entry.get())
 
                 new_annotation = Annotation(title_entry.get(),description_entry.get(),self.span_min,self.span_max)
 
@@ -222,8 +216,6 @@ class TkBase:
     # callback method of the span selector, after every selection it writes
     # the selected range to class variables
     def onselect(self, min, max):
-        print(datetime.datetime.fromordinal(int(min)) + datetime.timedelta(seconds=divmod(min, 1)[1] * 86400))
-        print(datetime.datetime.fromordinal(int(max)) + datetime.timedelta(seconds=divmod(max, 1)[1] * 86400))
         self.span_min = datetime.datetime.fromordinal(int(min)) + datetime.timedelta(seconds=divmod(min, 1)[1] * 86400)
         self.span_max = datetime.datetime.fromordinal(int(max)) + datetime.timedelta(seconds=divmod(max, 1)[1] * 86400)
 

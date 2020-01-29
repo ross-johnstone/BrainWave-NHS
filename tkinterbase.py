@@ -93,10 +93,6 @@ class TkBase:
         self.span_min = None
         self.span_max = None
 
-        # variables for storing min and max of the current span selection
-        self.span_min = None
-        self.span_max = None
-
         master.iconbitmap(r"./res/favicon.ico")
         master.state('zoomed')
         master.protocol("WM_DELETE_WINDOW", master.quit)
@@ -147,9 +143,10 @@ class TkBase:
             def save():
                 # new_annotation = Annotation(title_entry.text)
                 print(title_entry.get())
-                print(description_entry.get())
+                print(description_entry.get(1.0, tkinter.END))
 
-                new_annotation = Annotation(title_entry.get(), description_entry.get(), self.span_min, self.span_max)
+                new_annotation = Annotation(title_entry.get(), description_entry.get(1.0, tkinter.END),
+                                            self.span_min, self.span_max)
 
                 self.annotations.append(new_annotation)
                 save_json(self.annotations, 'data/pat1/annotations.json')
@@ -193,7 +190,7 @@ class TkBase:
             self.annotate_button.config(text='Annotate', command=self.annotate)
             self.span.set_visible(False)
 
-            # hide the rectagle after confirm button is pressed
+            # hide the rectangle after confirm button is pressed
             self.span.stay_rect.set_visible(False)
             self.canvas.draw()
 

@@ -1,7 +1,6 @@
 from tkinter import Tk, Label, Button, Toplevel, Entry, PhotoImage
 import tkinter
 import matplotlib.pyplot as plt
-import re
 from matplotlib.backends.backend_tkagg import (
     FigureCanvasTkAgg, NavigationToolbar2Tk)
 from matplotlib.widgets import SpanSelector

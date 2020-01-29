@@ -9,6 +9,7 @@ from matplotlib.patches import PathPatch
 import datetime
 import numpy as np
 import matplotlib
+from tkinter import filedialog
 from annotations import Annotation, save_json
 import data
 
@@ -21,8 +22,8 @@ class TkBase:
         self.master = master
         master.title("BrainWave Visualization")
 
-        # list of all annotations
-        self.data, self.timestamps, self.annotations = data.open_project('data/pat1/')
+        #list of all annotations
+        self.data, self.timestamps, self.annotations = data.open_project('data/recording2/pat2/')
 
         # create a matplotlib figure with a single axes on which the data will be displayed
         self.fig, self.ax = plt.subplots(figsize=FIGSIZE)
@@ -44,8 +45,7 @@ class TkBase:
         self.ax.spines['right'].set_visible(False)
 
         line = self.ax.lines[0]
-        print(line.get_xdata())
-
+        
         # put the plot with navbar on the tkinter window
         self.canvas = FigureCanvasTkAgg(self.fig, master=root)
         self.canvas.draw()
@@ -93,14 +93,47 @@ class TkBase:
         self.span_min = None
         self.span_max = None
 
-        master.iconbitmap(r"./res/favicon.ico")
-        master.state('zoomed')
-        master.protocol("WM_DELETE_WINDOW", master.quit)
+        self.open_button = Button(master, text="Open", command=self.open, bg='white')
+        self.open_button.pack(side=tkinter.LEFT, fill=tkinter.BOTH, expand=1)
 
-    # callback method for the annotate button activates the span selector
-    def butrelease(self, event):
-        # deactivate toolbar functionalities if any are active
-        if (self.toolbar._active == 'PAN'):
+
+        self.close_button = Button(master, text="Quit", command=master.quit, bg='white')
+        self.close_button.pack(side=tkinter.LEFT, fill=tkinter.BOTH, expand=1)
+
+    #callback method for the open button, opens an existing project
+    def open(self):
+        FIGSIZE = (8,3)
+        path = filedialog.askdirectory()
+        path = path + "/"
+        self.data, self.timestamps, self.annotations = data.open_project(path)
+
+        self.ax.clear()
+        self.ax.plot(self.timestamps,self.data, color='#5436ff')
+        #draw all saved annotations
+        for annotation in self.annotations:
+            self.draw_annotation(annotation)
+
+        self.ax.xaxis_date()
+        plt.gcf().autofmt_xdate()
+        #adding grid
+        self.ax.grid(color='grey',linestyle='-', linewidth=0.25, alpha=0.5)
+        #removing top and right borders
+        self.ax.spines['top'].set_visible(False)
+        self.ax.spines['right'].set_visible(False)
+
+        line = self.ax.lines[0]
+        self.canvas.draw()
+
+        self.ax2.clear()
+        self.ax2.plot(self.timestamps, self.data)
+        self.ax2.xaxis_date()
+
+        self.canvas2.draw()
+        self.canvas2.get_tk_widget().pack(side=tkinter.BOTTOM, fill=tkinter.BOTH, expand=1)
+    #callback method for the anotate button activates the span selector
+    def butrelease(self,event):
+        #deactivate toolbar functionalities if any are active
+        if(self.toolbar._active=='PAN'):
             self.toolbar.pan()
 
         if (self.toolbar._active == 'ZOOM'):
@@ -131,7 +164,6 @@ class TkBase:
     def confirm(self):
         # if something is selected
         if (self.span_min):
-            print(self.span_min, self.span_max)
 
             # method called when cancel button on popup is pressed
             def cancel():
@@ -141,9 +173,6 @@ class TkBase:
 
             # method called when save button on popup is pressed
             def save():
-                # new_annotation = Annotation(title_entry.text)
-                print(title_entry.get())
-                print(description_entry.get(1.0, tkinter.END))
 
                 new_annotation = Annotation(title_entry.get(), description_entry.get(1.0, tkinter.END),
                                             self.span_min, self.span_max)
@@ -201,8 +230,6 @@ class TkBase:
     # callback method of the span selector, after every selection it writes
     # the selected range to class variables
     def onselect(self, min, max):
-        print(datetime.datetime.fromordinal(int(min)) + datetime.timedelta(seconds=divmod(min, 1)[1] * 86400))
-        print(datetime.datetime.fromordinal(int(max)) + datetime.timedelta(seconds=divmod(max, 1)[1] * 86400))
         self.span_min = datetime.datetime.fromordinal(int(min)) + datetime.timedelta(seconds=divmod(min, 1)[1] * 86400)
         self.span_max = datetime.datetime.fromordinal(int(max)) + datetime.timedelta(seconds=divmod(max, 1)[1] * 86400)
 

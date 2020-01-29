@@ -22,7 +22,7 @@ class TkBase:
         self.master = master
         master.title("BrainWave Visualization")
 
-        #list of all annotations
+        # list of all annotations
         self.data, self.timestamps, self.annotations = data.open_project('data/recording2/pat2/')
 
         # create a matplotlib figure with a single axes on which the data will be displayed
@@ -45,7 +45,7 @@ class TkBase:
         self.ax.spines['right'].set_visible(False)
 
         line = self.ax.lines[0]
-        
+
         # put the plot with navbar on the tkinter window
         self.canvas = FigureCanvasTkAgg(self.fig, master=root)
         self.canvas.draw()
@@ -96,28 +96,30 @@ class TkBase:
         self.open_button = Button(master, text="Open", command=self.open, bg='white')
         self.open_button.pack(side=tkinter.LEFT, fill=tkinter.BOTH, expand=1)
 
-
         self.close_button = Button(master, text="Quit", command=master.quit, bg='white')
         self.close_button.pack(side=tkinter.LEFT, fill=tkinter.BOTH, expand=1)
 
-    #callback method for the open button, opens an existing project
+        master.iconbitmap(r'res/favicon.ico')
+        master.state('zoomed')
+
+    # callback method for the open button, opens an existing project
     def open(self):
-        FIGSIZE = (8,3)
+        FIGSIZE = (8, 3)
         path = filedialog.askdirectory()
         path = path + "/"
         self.data, self.timestamps, self.annotations = data.open_project(path)
 
         self.ax.clear()
-        self.ax.plot(self.timestamps,self.data, color='#5436ff')
-        #draw all saved annotations
+        self.ax.plot(self.timestamps, self.data, color='#5436ff')
+        # draw all saved annotations
         for annotation in self.annotations:
             self.draw_annotation(annotation)
 
         self.ax.xaxis_date()
         plt.gcf().autofmt_xdate()
-        #adding grid
-        self.ax.grid(color='grey',linestyle='-', linewidth=0.25, alpha=0.5)
-        #removing top and right borders
+        # adding grid
+        self.ax.grid(color='grey', linestyle='-', linewidth=0.25, alpha=0.5)
+        # removing top and right borders
         self.ax.spines['top'].set_visible(False)
         self.ax.spines['right'].set_visible(False)
 
@@ -130,10 +132,11 @@ class TkBase:
 
         self.canvas2.draw()
         self.canvas2.get_tk_widget().pack(side=tkinter.BOTTOM, fill=tkinter.BOTH, expand=1)
-    #callback method for the anotate button activates the span selector
-    def butrelease(self,event):
-        #deactivate toolbar functionalities if any are active
-        if(self.toolbar._active=='PAN'):
+
+    # callback method for the anotate button activates the span selector
+    def butrelease(self, event):
+        # deactivate toolbar functionalities if any are active
+        if (self.toolbar._active == 'PAN'):
             self.toolbar.pan()
 
         if (self.toolbar._active == 'ZOOM'):
@@ -164,7 +167,6 @@ class TkBase:
     def confirm(self):
         # if something is selected
         if (self.span_min):
-
             # method called when cancel button on popup is pressed
             def cancel():
                 self.span_min = False
@@ -173,7 +175,6 @@ class TkBase:
 
             # method called when save button on popup is pressed
             def save():
-
                 new_annotation = Annotation(title_entry.get(), description_entry.get(1.0, tkinter.END),
                                             self.span_min, self.span_max)
 

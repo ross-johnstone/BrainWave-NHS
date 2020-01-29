@@ -23,7 +23,7 @@ class TkBase:
         master.title("BrainWave Visualization")
 
         # list of all annotations
-        self.data, self.timestamps, self.annotations = data.open_project('data/recording2/pat2/')
+        self.data, self.timestamps, self.annotations = data.open_project('data/recording1/pat1/')
 
         # create a matplotlib figure with a single axes on which the data will be displayed
         self.fig, self.ax = plt.subplots(figsize=FIGSIZE)
@@ -93,11 +93,8 @@ class TkBase:
         self.span_min = None
         self.span_max = None
 
-        self.open_button = Button(master, text="Open", command=self.open, bg='white')
-        self.open_button.pack(side=tkinter.LEFT, fill=tkinter.BOTH, expand=1)
-
-        self.close_button = Button(master, text="Quit", command=master.quit, bg='white')
-        self.close_button.pack(side=tkinter.LEFT, fill=tkinter.BOTH, expand=1)
+        # self.open_button = Button(master, text="Open", command=self.open, bg='white')
+        # self.open_button.pack(side=tkinter.LEFT, fill=tkinter.BOTH, expand=1)
 
         master.iconbitmap(r'res/favicon.ico')
         master.state('zoomed')
@@ -281,6 +278,8 @@ class NavigationToolbar(NavigationToolbar2Tk):
         (None, None, None, None),
         ('Annotate', 'Create an annotation', 'annotate', 'call_annotate'),
         ('Confirm', 'Confirm annotation', 'confirm', 'call_confirm'),
+        (None, None, None, None),
+        ('Open', 'Opens a new project', 'open', 'call_open'),
         ('Export', 'Export to PDF', 'export', 'call_export'),
         ('Save', 'Save the figure', 'filesave', 'save_figure'),
         (None, None, None, None),
@@ -292,6 +291,9 @@ class NavigationToolbar(NavigationToolbar2Tk):
 
     def call_confirm(self):
         TkBase.confirm(my_gui)
+
+    def call_open(self):
+        TkBase.open(my_gui)
 
     def call_export(self):
         TkBase.export(my_gui)

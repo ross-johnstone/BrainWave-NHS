@@ -12,6 +12,7 @@ import matplotlib
 from tkinter import filedialog
 from annotations import Annotation, save_json
 import data
+from tkinter import messagebox
 
 
 class TkBase:
@@ -21,13 +22,16 @@ class TkBase:
 
         self.master = master
         master.title("tkinter barebones")
-
-        #list of all annotations
-        self.data, self.timestamps, self.annotations = data.open_project('data/pat1/')
-
-        # create a matplotlib figure with a single axes on which the data will be displayed
         self.fig, self.ax = plt.subplots(figsize = FIGSIZE)
-
+        #list of all annotations
+        try:
+            self.data, self.timestamps, self.annotations = data.open_project('data/pat1/')
+            self.draw_graph(self.data, self.timestamps, self.annotations)
+        except Exception as e:
+            messagebox.showerror("Error:", e)
+            # TODO Handle this, NEED A NON ERROR STATE, ALSO MAKE A FUNCTION TO DRAW THE GRAPHS
+        # create a matplotlib figure with a single axes on which the data will be displayed
+        
         #plot values on the axe and set plot hue to NHS blue
         self.ax.plot(self.timestamps,self.data, color='#5436ff')
         #draw all saved annotations
@@ -95,34 +99,36 @@ class TkBase:
     def open(self):
         path = filedialog.askdirectory()
         path = path + "/"
-        self.data, self.timestamps, self.annotations = data.open_project(path)
+        try:
+            self.data, self.timestamps, self.annotations = data.open_project(path)
+            self.draw_graph(self.data, self.timestamps, self.annotations)
+        except Exception as e:
+            messagebox.showerror("Error:", e)
+        # self.ax.clear()
+        # self.ax.plot(self.timestamps,self.data, color='#5436ff')
+        # #draw all saved annotations
+        # for annotation in self.annotations:
+        #     self.draw_annotation(annotation)
 
-        # self.ax.lines[0].set_data(self.data, self.timestamps)
-        self.ax.clear()
-        self.ax.plot(self.timestamps,self.data, color='#5436ff')
-        #draw all saved annotations
-        for annotation in self.annotations:
-            self.draw_annotation(annotation)
+        # self.ax.xaxis_date()
+        # plt.gcf().autofmt_xdate()
+        # #adding grid
+        # self.ax.grid(color='grey',linestyle='-', linewidth=0.25, alpha=0.5)
+        # #removing top and right borders
+        # self.ax.spines['top'].set_visible(False)
+        # self.ax.spines['right'].set_visible(False)
 
-        self.ax.xaxis_date()
-        plt.gcf().autofmt_xdate()
-        #adding grid
-        self.ax.grid(color='grey',linestyle='-', linewidth=0.25, alpha=0.5)
-        #removing top and right borders
-        self.ax.spines['top'].set_visible(False)
-        self.ax.spines['right'].set_visible(False)
+        # line = self.ax.lines[0]
+        # self.canvas.draw()
 
-        line = self.ax.lines[0]
-        self.canvas.draw()
+        # print(line.get_xdata())        
+        # # self.ax2.lines[0].set_data(self.data, self.timestamps)
+        # self.ax2.clear()
+        # self.ax2.plot(self.timestamps, self.data)
+        # self.ax2.xaxis_date()
 
-        print(line.get_xdata())        
-        # self.ax2.lines[0].set_data(self.data, self.timestamps)
-        self.ax2.clear()
-        self.ax2.plot(self.timestamps, self.data)
-        self.ax2.xaxis_date()
-
-        self.canvas2.draw()
-        self.canvas2.get_tk_widget().pack(side=tkinter.BOTTOM, fill=tkinter.BOTH, expand=1)
+        # self.canvas2.draw()
+        # self.canvas2.get_tk_widget().pack(side=tkinter.BOTTOM, fill=tkinter.BOTH, expand=1)
 
     #callback method for the annotate button activates the span selector
     def butrelease(self,event):
@@ -249,6 +255,32 @@ class TkBase:
             plt.figure(1)
             plt.axvline(x=matplotlib.dates.date2num(annotation.start))
         self.fig.canvas.draw()
+
+    def draw_graph(self, data, timestamps, annotations):
+        self.ax.clear()
+        self.ax.plot(timestamps, data, color='#5436ff')
+        #draw all saved annotations
+        for annotation in annotations:
+            self.draw_annotation(annotation)
+
+        self.ax.xaxis_date()
+        plt.gcf().autofmt_xdate()
+        #adding grid
+        self.ax.grid(color='grey',linestyle='-', linewidth=0.25, alpha=0.5)
+        #removing top and right borders
+        self.ax.spines['top'].set_visible(False)
+        self.ax.spines['right'].set_visible(False)
+
+        line = self.ax.lines[0]
+        self.canvas.draw()
+
+        print(line.get_xdata())        
+        self.ax2.clear()
+        self.ax2.plot(timestamps, data)
+        self.ax2.xaxis_date()
+
+        self.canvas2.draw()
+        self.canvas2.get_tk_widget().pack(side=tkinter.BOTTOM, fill=tkinter.BOTH, expand=1)
 
 root = Tk()
 my_gui = TkBase(root, [datetime.datetime.now() - datetime.timedelta(hours=x) for x in range(10)],

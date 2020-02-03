@@ -23,6 +23,10 @@ class TkBase:
         self.master = master
         master.title("tkinter barebones")
         self.fig, self.ax = plt.subplots(figsize = FIGSIZE)
+        # second, reference graph displayed
+        self.fig2, self.ax2 = plt.subplots(figsize=FIGSIZE)
+        self.canvas = FigureCanvasTkAgg(self.fig, master=root)
+        self.canvas2 = FigureCanvasTkAgg(self.fig2, master=root)
         #list of all annotations
         try:
             self.data, self.timestamps, self.annotations = data.open_project('data/pat1/')
@@ -30,29 +34,30 @@ class TkBase:
         except Exception as e:
             messagebox.showerror("Error:", e)
             # TODO Handle this, NEED A NON ERROR STATE, ALSO MAKE A FUNCTION TO DRAW THE GRAPHS
+ 
         # create a matplotlib figure with a single axes on which the data will be displayed
         
         #plot values on the axe and set plot hue to NHS blue
-        self.ax.plot(self.timestamps,self.data, color='#5436ff')
-        #draw all saved annotations
-        for annotation in self.annotations:
-            self.draw_annotation(annotation)
+        # self.ax.plot(self.timestamps,self.data, color='#5436ff')
+        # #draw all saved annotations
+        # for annotation in self.annotations:
+        #     self.draw_annotation(annotation)
 
-        self.ax.xaxis_date()
-        plt.gcf().autofmt_xdate()
-        #adding grid
-        self.ax.grid(color='grey',linestyle='-', linewidth=0.25, alpha=0.5)
-        #removing top and right borders
-        self.ax.spines['top'].set_visible(False)
-        self.ax.spines['right'].set_visible(False)
+        # self.ax.xaxis_date()
+        # plt.gcf().autofmt_xdate()
+        # #adding grid
+        # self.ax.grid(color='grey',linestyle='-', linewidth=0.25, alpha=0.5)
+        # #removing top and right borders
+        # self.ax.spines['top'].set_visible(False)
+        # self.ax.spines['right'].set_visible(False)
 
-        line = self.ax.lines[0]
-        print(line.get_xdata())
+        # line = self.ax.lines[0]
+        # print(line.get_xdata())
 
         # put the plot with navbar on the tkinter window
-        self.canvas = FigureCanvasTkAgg(self.fig, master=root)
-        self.canvas.draw()
-        self.canvas.get_tk_widget().pack(side=tkinter.BOTTOM, fill=tkinter.BOTH, expand=1)
+        # self.canvas = FigureCanvasTkAgg(self.fig, master=root)
+        # self.canvas.draw()
+        # self.canvas.get_tk_widget().pack(side=tkinter.BOTTOM, fill=tkinter.BOTH, expand=1)
         self.canvas.mpl_connect('button_release_event', self.butrelease)
 
         self.toolbar = NavigationToolbar2Tk(self.canvas, root)
@@ -66,12 +71,12 @@ class TkBase:
         self.span.set_visible(False)
 
         # second, reference graph displayed
-        self.fig2, self.ax2 = plt.subplots(figsize=FIGSIZE)
-        self.ax2.plot(self.timestamps, self.data)
-        self.ax2.xaxis_date()
+        # self.fig2, self.ax2 = plt.subplots(figsize=FIGSIZE)
+        # self.ax2.plot(self.timestamps, self.data)
+        # self.ax2.xaxis_date()
 
-        self.canvas2 = FigureCanvasTkAgg(self.fig2, master=root)
-        self.canvas2.draw()
+        # self.canvas2 = FigureCanvasTkAgg(self.fig2, master=root)
+        # self.canvas2.draw()
         self.canvas2.get_tk_widget().pack(side=tkinter.BOTTOM, fill=tkinter.BOTH, expand=1)
 
         # variables for storing min and max of the current span selection
@@ -273,6 +278,7 @@ class TkBase:
 
         line = self.ax.lines[0]
         self.canvas.draw()
+        self.canvas.get_tk_widget().pack(side=tkinter.BOTTOM, fill=tkinter.BOTH, expand=1)
 
         print(line.get_xdata())        
         self.ax2.clear()

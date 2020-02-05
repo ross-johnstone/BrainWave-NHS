@@ -3,6 +3,7 @@ import tkinter
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_tkagg import (
     FigureCanvasTkAgg, NavigationToolbar2Tk)
+from matplotlib.backends.backend_pdf import PdfPages
 from matplotlib.widgets import SpanSelector
 from matplotlib.textpath import TextPath
 from matplotlib.patches import PathPatch
@@ -138,7 +139,32 @@ class TkBase:
 
     def export(self):
         plt.figure(1)
-        plt.savefig('fig.pdf')
+
+        def cancel():
+            self.span_min = False
+            popup.destroy()
+            popup.update()
+
+        def save():
+            filename = export_popup_entry.get() + '.pdf'
+
+            plt.savefig(filename)
+
+            cancel()
+
+        popup = Toplevel(root)
+        popup.title('')
+        popup.iconbitmap(r'res/general_images/favicon.ico')
+        popup.grab_set()
+
+        export_popup_label = Label(popup, text="Enter desired file name: ")
+        export_popup_label.grid(row=0, column=0)
+
+        export_popup_entry = Entry(popup)
+        export_popup_entry.grid(row=0, column=1)
+
+        close_export_popup_button = Button(popup, text="Confirm", command=save)
+        close_export_popup_button.grid(row=1, column=1)
 
     def annotate(self):
         # activate the span selector

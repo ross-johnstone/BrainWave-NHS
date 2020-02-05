@@ -27,52 +27,52 @@ class TkBase:
         self.data, self.timestamps, self.annotations = data.open_project('data/recording1/pat1/')
 
         # create a matplotlib figure with a single axes on which the data will be displayed
-        self.fig, self.ax = plt.subplots(figsize=FIGSIZE)
-        self.fig.set_facecolor('xkcd:grey')
-        self.ax.set_facecolor('xkcd:dark grey')
+        self.main_graph, self.main_graph_ax = plt.subplots(figsize=FIGSIZE)
+        self.main_graph.set_facecolor('xkcd:grey')
+        self.main_graph_ax.set_facecolor('xkcd:dark grey')
 
         # plot values on the axe and set plot hue to NHS blue
-        self.ax.plot(self.timestamps, self.data, color='#5436ff')
+        self.main_graph_ax.plot(self.timestamps, self.data, color='#5436ff', linewidth=1)
         # draw all saved annotations
         for annotation in self.annotations:
             self.draw_annotation(annotation)
 
-        self.ax.xaxis_date()
+        self.main_graph_ax.xaxis_date()
         plt.gcf().autofmt_xdate()
         # adding grid
-        self.ax.grid(color='grey', linestyle='-', linewidth=0.25, alpha=0.5)
+        self.main_graph_ax.grid(color='grey', linestyle='-', linewidth=0.25, alpha=0.5)
         # removing top and right borders
-        self.ax.spines['top'].set_visible(False)
-        self.ax.spines['right'].set_visible(False)
+        self.main_graph_ax.spines['top'].set_visible(False)
+        self.main_graph_ax.spines['right'].set_visible(False)
 
-        line = self.ax.lines[0]
+        line = self.main_graph_ax.lines[0]
 
         # put the plot with navbar on the tkinter window
-        self.canvas = FigureCanvasTkAgg(self.fig, master=root)
-        self.canvas.draw()
-        self.canvas.get_tk_widget().pack(side=tkinter.BOTTOM, fill=tkinter.BOTH, expand=1)
-        self.canvas.mpl_connect('button_release_event', self.butrelease)
+        self.main_canvas = FigureCanvasTkAgg(self.main_graph, master=master)
+        self.main_canvas.draw()
+        self.main_canvas.get_tk_widget().pack(side=tkinter.BOTTOM, fill=tkinter.BOTH, expand=1)
+        self.main_canvas.mpl_connect('button_release_event', self.butrelease)
 
-        self.toolbar = NavigationToolbar(self.canvas, root)
+        self.toolbar = NavigationToolbar(self.main_canvas, master)
         self.toolbar.update()
-        self.canvas.get_tk_widget().pack(side=tkinter.BOTTOM, fill=tkinter.BOTH, expand=1)
+        self.main_canvas.get_tk_widget().pack(side=tkinter.BOTTOM, fill=tkinter.BOTH, expand=1)
 
         # add span selector to the axes but set it defaultly to not visible,
         # only activate it when the button annotate is pressed
-        self.span = SpanSelector(self.ax, self.onselect, 'horizontal', useblit=True,
+        self.span = SpanSelector(self.main_graph_ax, self.onselect, 'horizontal', useblit=True,
                                  rectprops=dict(alpha=0.5, facecolor='red'), span_stays=True)
         self.span.set_visible(False)
 
         # second, reference graph displayed
-        self.fig2, self.ax2 = plt.subplots(figsize=FIGSIZE)
-        self.fig2.set_facecolor('xkcd:grey')
-        self.ax2.plot(self.timestamps, self.data, color="cyan")
-        self.ax2.set_facecolor('xkcd:dark grey')
-        self.ax2.xaxis_date()
+        self.reference_graph, self.reference_graph_ax = plt.subplots(figsize=FIGSIZE)
+        self.reference_graph.set_facecolor('xkcd:grey')
+        self.reference_graph_ax.plot(self.timestamps, self.data, color="cyan", linewidth=1)
+        self.reference_graph_ax.set_facecolor('xkcd:dark grey')
+        self.reference_graph_ax.xaxis_date()
 
-        self.canvas2 = FigureCanvasTkAgg(self.fig2, master=root)
-        self.canvas2.draw()
-        self.canvas2.get_tk_widget().pack(side=tkinter.BOTTOM, fill=tkinter.BOTH, expand=1)
+        self.reference_canvas = FigureCanvasTkAgg(self.reference_graph, master=master)
+        self.reference_canvas.draw()
+        self.reference_canvas.get_tk_widget().pack(side=tkinter.BOTTOM, fill=tkinter.BOTH, expand=1)
 
         # create buttons for interaction
         self.annotate_button = Button(master, command=self.annotate, text="Annotate",
@@ -101,29 +101,37 @@ class TkBase:
         path = path + "/"
         self.data, self.timestamps, self.annotations = data.open_project(path)
 
-        self.ax.clear()
-        self.ax.plot(self.timestamps, self.data, color='#5436ff')
+        self.main_graph_ax.clear()
+        self.main_graph_ax.plot(self.timestamps, self.data, color='#5436ff', linewidth=1)
         # draw all saved annotations
         for annotation in self.annotations:
             self.draw_annotation(annotation)
 
-        self.ax.xaxis_date()
+        self.main_graph_ax.xaxis_date()
         plt.gcf().autofmt_xdate()
         # adding grid
-        self.ax.grid(color='grey', linestyle='-', linewidth=0.25, alpha=0.5)
+        self.main_graph_ax.grid(color='grey', linestyle='-', linewidth=0.25, alpha=0.5)
         # removing top and right borders
-        self.ax.spines['top'].set_visible(False)
-        self.ax.spines['right'].set_visible(False)
+        self.main_graph_ax.spines['top'].set_visible(False)
+        self.main_graph_ax.spines['right'].set_visible(False)
 
-        line = self.ax.lines[0]
-        self.canvas.draw()
+        line = self.main_graph_ax.lines[0]
+        self.main_canvas.draw()
 
-        self.ax2.clear()
-        self.ax2.plot(self.timestamps, self.data)
-        self.ax2.xaxis_date()
+        self.reference_graph_ax.clear()
+        self.reference_graph_ax.plot(self.timestamps, self.data, color="cyan", linewidth=1)
+        self.reference_graph_ax.xaxis_date()
 
-        self.canvas2.draw()
-        self.canvas2.get_tk_widget().pack(side=tkinter.BOTTOM, fill=tkinter.BOTH, expand=1)
+        self.reference_canvas.draw()
+        self.reference_canvas.get_tk_widget().pack(side=tkinter.BOTTOM, fill=tkinter.BOTH, expand=1)
+
+    def open_concurrent(self):
+        second_root = Toplevel(root)
+
+        self.open()
+
+        my_gui = TkBase(second_root, [datetime.datetime.now() - datetime.timedelta(hours=x) for x in range(10)],
+                        [1, 2, 3, 5, 3, 1, 8, 6, 4, 7])
 
     # callback method for the anotate button activates the span selector
     def butrelease(self, event):
@@ -243,7 +251,7 @@ class TkBase:
 
             # hide the rectangle after confirm button is pressed
             self.span.stay_rect.set_visible(False)
-            self.canvas.draw()
+            self.main_canvas.draw()
 
             top.resizable(False, False)
             top.iconbitmap(r"./res/general_images/favicon.ico")
@@ -269,15 +277,18 @@ class TkBase:
         if (annotation.start != annotation.end):
             vmax, vmin = self.get_vertical_range(annotation)
             tp = TextPath((matplotlib.dates.date2num(annotation.start) + 6000, 300), annotation.title, size=100000)
-            self.ax.add_patch(PathPatch(tp, color="black"))
-            self.ax.add_patch(plt.Rectangle((matplotlib.dates.date2num(annotation.start), vmin - 10),
+            self.main_graph_ax.add_patch(PathPatch(tp, color="black"))
+            self.main_graph_ax.add_patch(plt.Rectangle((matplotlib.dates.date2num(annotation.start), vmin - 10),
                                             matplotlib.dates.date2num(annotation.end) - matplotlib.dates.date2num(
                                                 annotation.start), vmax - vmin + 20, fc='r'))
         # if point annotation draw a vertical line
         if (annotation.start == annotation.end):
             plt.figure(1)
             plt.axvline(x=matplotlib.dates.date2num(annotation.start))
-        self.fig.canvas.draw()
+        self.main_graph.main_canvas.draw()
+
+    def close(self):
+        self.master.quit()
 
 
 class NavigationToolbar(NavigationToolbar2Tk):
@@ -306,6 +317,7 @@ class NavigationToolbar(NavigationToolbar2Tk):
         ('Open', 'Opens a new project', 'open', 'call_open'),
         ('Export', 'Export to PDF', 'export', 'call_export'),
         ('Save', 'Save the figure', 'filesave', 'save_figure'),
+        ('Open Concurrent', 'Open a concurrent graph view', 'compare', 'call_open_concurrent'),
         (None, None, None, None),
         ('Quit', 'Quit application', 'quit', 'call_quit'),
     )
@@ -319,11 +331,14 @@ class NavigationToolbar(NavigationToolbar2Tk):
     def call_open(self):
         TkBase.open(my_gui)
 
+    def call_open_concurrent(self):
+        TkBase.open_concurrent(my_gui)
+
     def call_export(self):
         TkBase.export(my_gui)
 
     def call_quit(self):
-        root.quit()
+        TkBase.close(my_gui)
 
 
 root = Tk()

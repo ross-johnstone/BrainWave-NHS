@@ -22,7 +22,7 @@ class TkBase:
         master.title("tkinter barebones")
 
         #list of all annotations
-        self.data, self.timestamps, self.annotations = data.open_project('data/pat1/')
+        self.data, self.timestamps, self.annotations = data.open_project('data/recording1/pat1/')
 
         # create a matplotlib figure with a single axes on which the data will be displayed
         self.fig, self.ax = plt.subplots(figsize = FIGSIZE)
@@ -140,7 +140,7 @@ class TkBase:
                 new_annotation = Annotation(title_entry.get(),description_entry.get(),self.span_min,self.span_max)
 
                 self.annotations.append(new_annotation)
-                save_json(self.annotations,'data/pat1/annotations.json')
+                save_json(self.annotations,'data/recording1/pat1/annotations.json')
                 self.draw_annotation(new_annotation)
 
                 #set spans back to none after the annotation is saved to prevent buggy behavior

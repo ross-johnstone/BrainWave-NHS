@@ -21,7 +21,8 @@ class TkBase:
         FIGSIZE = (8,3)
 
         self.master = master
-        master.title("tkinter barebones")
+        master.title("tkinter barebones")        
+        # create matplotlib figures with single axes on which the data will be displayed
         self.fig, self.ax = plt.subplots(figsize = FIGSIZE)
         # second, reference graph displayed
         self.fig2, self.ax2 = plt.subplots(figsize=FIGSIZE)
@@ -33,27 +34,6 @@ class TkBase:
             self.draw_graph(self.data, self.timestamps, self.annotations)
         except Exception as e:
             messagebox.showerror("Error:", e)
-            # TODO Handle this, NEED A NON ERROR STATE, ALSO MAKE A FUNCTION TO DRAW THE GRAPHS
- 
-        # create a matplotlib figure with a single axes on which the data will be displayed
-        
-        #plot values on the axe and set plot hue to NHS blue
-        # self.ax.plot(self.timestamps,self.data, color='#5436ff')
-        # #draw all saved annotations
-        # for annotation in self.annotations:
-        #     self.draw_annotation(annotation)
-
-        # self.ax.xaxis_date()
-        # plt.gcf().autofmt_xdate()
-        # #adding grid
-        # self.ax.grid(color='grey',linestyle='-', linewidth=0.25, alpha=0.5)
-        # #removing top and right borders
-        # self.ax.spines['top'].set_visible(False)
-        # self.ax.spines['right'].set_visible(False)
-
-        # line = self.ax.lines[0]
-        # print(line.get_xdata())
-
         # put the plot with navbar on the tkinter window
         # self.canvas = FigureCanvasTkAgg(self.fig, master=root)
         # self.canvas.draw()
@@ -62,22 +42,13 @@ class TkBase:
 
         self.toolbar = NavigationToolbar2Tk(self.canvas, root)
         self.toolbar.update()
-        self.canvas.get_tk_widget().pack(side=tkinter.BOTTOM, fill=tkinter.BOTH, expand=1)
+        # self.canvas.get_tk_widget().pack(side=tkinter.BOTTOM, fill=tkinter.BOTH, expand=1)
 
         #add span selector to the axes but set it defaultly to not visible,
         #only activate it when the button annotate is pressed
         self.span = SpanSelector(self.ax, self.onselect, 'horizontal', useblit=True,
                                  rectprops=dict(alpha=0.5, facecolor='red'), span_stays=True)
         self.span.set_visible(False)
-
-        # second, reference graph displayed
-        # self.fig2, self.ax2 = plt.subplots(figsize=FIGSIZE)
-        # self.ax2.plot(self.timestamps, self.data)
-        # self.ax2.xaxis_date()
-
-        # self.canvas2 = FigureCanvasTkAgg(self.fig2, master=root)
-        # self.canvas2.draw()
-        self.canvas2.get_tk_widget().pack(side=tkinter.BOTTOM, fill=tkinter.BOTH, expand=1)
 
         # variables for storing min and max of the current span selection
         self.span_min = None
@@ -109,31 +80,6 @@ class TkBase:
             self.draw_graph(self.data, self.timestamps, self.annotations)
         except Exception as e:
             messagebox.showerror("Error:", e)
-        # self.ax.clear()
-        # self.ax.plot(self.timestamps,self.data, color='#5436ff')
-        # #draw all saved annotations
-        # for annotation in self.annotations:
-        #     self.draw_annotation(annotation)
-
-        # self.ax.xaxis_date()
-        # plt.gcf().autofmt_xdate()
-        # #adding grid
-        # self.ax.grid(color='grey',linestyle='-', linewidth=0.25, alpha=0.5)
-        # #removing top and right borders
-        # self.ax.spines['top'].set_visible(False)
-        # self.ax.spines['right'].set_visible(False)
-
-        # line = self.ax.lines[0]
-        # self.canvas.draw()
-
-        # print(line.get_xdata())        
-        # # self.ax2.lines[0].set_data(self.data, self.timestamps)
-        # self.ax2.clear()
-        # self.ax2.plot(self.timestamps, self.data)
-        # self.ax2.xaxis_date()
-
-        # self.canvas2.draw()
-        # self.canvas2.get_tk_widget().pack(side=tkinter.BOTTOM, fill=tkinter.BOTH, expand=1)
 
     #callback method for the annotate button activates the span selector
     def butrelease(self,event):
@@ -263,6 +209,7 @@ class TkBase:
 
     def draw_graph(self, data, timestamps, annotations):
         self.ax.clear()
+        #plot values on the axe and set plot hue to NHS blue
         self.ax.plot(timestamps, data, color='#5436ff')
         #draw all saved annotations
         for annotation in annotations:
@@ -277,14 +224,16 @@ class TkBase:
         self.ax.spines['right'].set_visible(False)
 
         line = self.ax.lines[0]
+        # put the plot with navbar on the tkinter window
         self.canvas.draw()
         self.canvas.get_tk_widget().pack(side=tkinter.BOTTOM, fill=tkinter.BOTH, expand=1)
 
-        print(line.get_xdata())        
+        print(line.get_xdata())     
+        # second, reference graph displayed   
         self.ax2.clear()
         self.ax2.plot(timestamps, data)
         self.ax2.xaxis_date()
-
+        # put the second plot on the tkinter window
         self.canvas2.draw()
         self.canvas2.get_tk_widget().pack(side=tkinter.BOTTOM, fill=tkinter.BOTH, expand=1)
 

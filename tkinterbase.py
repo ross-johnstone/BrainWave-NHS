@@ -75,14 +75,11 @@ class TkBase:
         self.reference_canvas.get_tk_widget().pack(side=tkinter.BOTTOM, fill=tkinter.BOTH, expand=1)
 
         # create buttons for interaction
-        self.annotate_button = Button(master, command=self.annotate, text="Annotate",
-                                      compound="left", font="Consolas")
+        self.annotate_button = Button(master, command=self.annotate)
 
-        self.export_button = Button(master, command=self.export, text="Export to PDF",
-                                    compound="left", font="Consolas")
+        self.export_button = Button(master, command=self.export)
 
-        self.close_button = Button(master, command=master.quit, text="Quit", compound="left",
-                                   font="Consolas")
+        self.close_button = Button(master, command=master.quit)
 
         # variables for storing min and max of the current span selection
         self.span_min = None
@@ -126,14 +123,12 @@ class TkBase:
         self.reference_canvas.get_tk_widget().pack(side=tkinter.BOTTOM, fill=tkinter.BOTH, expand=1)
 
     def open_concurrent(self):
-        second_root = Toplevel(root)
-
-        self.open()
+        second_root = Toplevel(self.master)
 
         my_gui = TkBase(second_root, [datetime.datetime.now() - datetime.timedelta(hours=x) for x in range(10)],
                         [1, 2, 3, 5, 3, 1, 8, 6, 4, 7])
 
-    # callback method for the anotate button activates the span selector
+    # callback method for the annotate button activates the span selector
     def butrelease(self, event):
         # deactivate toolbar functionalities if any are active
         if (self.toolbar._active == 'PAN'):
@@ -160,7 +155,7 @@ class TkBase:
 
             cancel()
 
-        popup = Toplevel(root)
+        popup = Toplevel(self.master)
         popup.title('')
         popup.iconbitmap(r'res/general_images/favicon.ico')
         popup.grab_set()
@@ -219,7 +214,7 @@ class TkBase:
                     cancel()
 
             # create popup where you add text to the annotation
-            top = Toplevel(root)
+            top = Toplevel(self.master)
             top.title('Confirm Annotation')
             top.grab_set()
 

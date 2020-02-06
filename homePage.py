@@ -1,5 +1,4 @@
 import tkinter as tk
-from tkinterbase import *
 import data
 import os
 
@@ -12,11 +11,7 @@ class Demo1:
         self.frame.pack()
 
     def open_project(self):
-        self.newWindow = tk.Toplevel(self.master)
-        path = filedialog.askdirectory()
-        path = path + "/"
-        self.data, self.timestamps, self.annotations = data.open_project(path)
-        self.app = TkBase(self.newWindow, self.data, self.timestamps)
+        os.system('tkinterbase.py')
 
 root = tk.Tk()
 app = Demo1(root)

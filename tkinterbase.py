@@ -1,16 +1,12 @@
-from tkinter import Tk, Label, Button, Toplevel, Entry, PhotoImage
+from tkinter import Tk, Label, Button, Toplevel, Entry, filedialog, PhotoImage
 import tkinter
 import matplotlib.pyplot as plt
-from matplotlib.backends.backend_tkagg import (
-    FigureCanvasTkAgg, NavigationToolbar2Tk)
-from matplotlib.backends.backend_pdf import PdfPages
+from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg, NavigationToolbar2Tk
 from matplotlib.widgets import SpanSelector
 from matplotlib.textpath import TextPath
 from matplotlib.patches import PathPatch
 import datetime
 import numpy as np
-import matplotlib
-from tkinter import filedialog
 from annotations import Annotation, save_json
 import data
 
@@ -271,15 +267,15 @@ class TkBase:
         # if date range annotation draw rectangle
         if (annotation.start != annotation.end):
             vmax, vmin = self.get_vertical_range(annotation)
-            tp = TextPath((matplotlib.dates.date2num(annotation.start) + 6000, 300), annotation.title, size=100000)
+            tp = TextPath((plt.dates.date2num(annotation.start) + 6000, 300), annotation.title, size=100000)
             self.main_graph_ax.add_patch(PathPatch(tp, color="black"))
-            self.main_graph_ax.add_patch(plt.Rectangle((matplotlib.dates.date2num(annotation.start), vmin - 10),
-                                            matplotlib.dates.date2num(annotation.end) - matplotlib.dates.date2num(
+            self.main_graph_ax.add_patch(plt.Rectangle((plt.dates.date2num(annotation.start), vmin - 10),
+                                            plt.dates.date2num(annotation.end) - plt.dates.date2num(
                                                 annotation.start), vmax - vmin + 20, fc='r'))
         # if point annotation draw a vertical line
         if (annotation.start == annotation.end):
             plt.figure(1)
-            plt.axvline(x=matplotlib.dates.date2num(annotation.start))
+            plt.axvline(x=plt.dates.date2num(annotation.start))
         self.main_graph.main_canvas.draw()
 
     def close(self):
@@ -290,8 +286,8 @@ class NavigationToolbar(NavigationToolbar2Tk):
 
     def _Button(self, text, file, command, extension='.gif'):
         img_file = ("./res/button_images/" + file + extension)
-        im = tkinter.PhotoImage(master=self, file=img_file)
-        b = tkinter.Button(
+        im = PhotoImage(master=self, file=img_file)
+        b = Button(
             master=self, text=text, padx=2, pady=2, image=im, command=command)
         b._ntimage = im
         b.pack(side=tkinter.LEFT)
@@ -337,6 +333,6 @@ class NavigationToolbar(NavigationToolbar2Tk):
 
 
 root = Tk()
-#my_gui = TkBase(root, [datetime.datetime.now() - datetime.timedelta(hours=x) for x in range(10)],
-                #[1, 2, 3, 5, 3, 1, 8, 6, 4, 7])
-#root.mainloop()
+my_gui = TkBase(root, [datetime.datetime.now() - datetime.timedelta(hours=x) for x in range(10)],
+                [1, 2, 3, 5, 3, 1, 8, 6, 4, 7])
+root.mainloop()

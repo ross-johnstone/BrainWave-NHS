@@ -1,6 +1,6 @@
 import tkinter as tk
 from matplotlib.backends.backend_tkagg import NavigationToolbar2Tk
-from tkinterbase import TkBase
+from tkinterbase import TkBase, my_gui
 
 
 class NavigationToolbar(NavigationToolbar2Tk):
@@ -34,20 +34,20 @@ class NavigationToolbar(NavigationToolbar2Tk):
         ('Quit', 'Quit application', 'quit', 'call_quit'),
     )
 
-    def call_annotate(self, tkbase):
-        TkBase.annotate(tkbase)
+    def call_annotate(self):
+        TkBase.annotate(my_gui)
 
-    def call_confirm(self, tkbase):
-        TkBase.confirm(tkbase)
+    def call_confirm(self):
+        TkBase.confirm(my_gui)
 
-    def call_open(self, tkbase):
-        TkBase.open(tkbase)
+    def call_open(self):
+        TkBase.open(my_gui)
 
-    def call_open_concurrent(self, tkbase):
-        TkBase.open_concurrent(tkbase)
+    def call_open_concurrent(self):
+        TkBase.open_concurrent(my_gui)
 
-    def call_export(self, tkbase):
-        TkBase.export(tkbase)
+    def call_export(self):
+        TkBase.export(my_gui)
 
-    def call_quit(self, tkbase):
-        TkBase.close(tkbase)
+    def call_quit(self):
+        TkBase.close(my_gui)

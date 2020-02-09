@@ -5,6 +5,7 @@ from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg, NavigationToolb
 from matplotlib.widgets import SpanSelector
 from matplotlib.textpath import TextPath
 from matplotlib.patches import PathPatch
+from matplotlib.dates import date2num
 import datetime
 import numpy as np
 from annotations import Annotation, save_json
@@ -20,6 +21,7 @@ class TkBase:
         master.title("BrainWave Visualization")
 
         # list of all annotations
+        self.project_path = path
         self.data, self.timestamps, self.annotations = data.open_project(path)
 
         # create a matplotlib figure with a single axes on which the data will be displayed
@@ -30,6 +32,7 @@ class TkBase:
         # plot values on the axe and set plot hue to NHS blue
         self.main_graph_ax.plot(self.timestamps, self.data, color='#5436ff', linewidth=1)
         # draw all saved annotations
+
         for annotation in self.annotations:
             self.draw_annotation(annotation)
 
@@ -199,7 +202,8 @@ class TkBase:
                                                 self.span_min, self.span_max)
 
                     self.annotations.append(new_annotation)
-                    save_json(self.annotations, 'data/recording1/pat1/annotations.json')
+                    json_path = self.project_path + 'annotations.json'
+                    save_json(self.annotations, json_path)
                     self.draw_annotation(new_annotation)
 
                     # set spans back to none after the annotation is saved to prevent buggy behavior
@@ -266,15 +270,15 @@ class TkBase:
         # if date range annotation draw rectangle
         if (annotation.start != annotation.end):
             vmax, vmin = self.get_vertical_range(annotation)
-            tp = TextPath((plt.dates.date2num(annotation.start) + 6000, 300), annotation.title, size=100000)
+            tp = TextPath((date2num(annotation.start) + 6000, 300), annotation.title, size=100000)
             self.main_graph_ax.add_patch(PathPatch(tp, color="black"))
-            self.main_graph_ax.add_patch(plt.Rectangle((plt.dates.date2num(annotation.start), vmin - 10),
-                                            plt.dates.date2num(annotation.end) - plt.dates.date2num(
+            self.main_graph_ax.add_patch(plt.Rectangle((date2num(annotation.start), vmin - 10),
+                                            date2num(annotation.end) - date2num(
                                                 annotation.start), vmax - vmin + 20, fc='r'))
         # if point annotation draw a vertical line
         if (annotation.start == annotation.end):
             plt.figure(1)
-            plt.axvline(x=plt.dates.date2num(annotation.start))
+            plt.axvline(x=date2num(annotation.start))
         self.main_graph.main_canvas.draw()
 
     def close(self):

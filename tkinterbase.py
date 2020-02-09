@@ -12,7 +12,7 @@ import data
 
 
 class TkBase:
-    def __init__(self, master, times, values):
+    def __init__(self, master, path):
 
         FIGSIZE = (8, 3)
 
@@ -20,7 +20,7 @@ class TkBase:
         master.title("BrainWave Visualization")
 
         # list of all annotations
-        self.data, self.timestamps, self.annotations = data.open_project('data/recording1/pat1/')
+        self.data, self.timestamps, self.annotations = data.open_project(path)
 
         # create a matplotlib figure with a single axes on which the data will be displayed
         self.main_graph, self.main_graph_ax = plt.subplots(figsize=FIGSIZE)
@@ -119,10 +119,10 @@ class TkBase:
         self.reference_canvas.get_tk_widget().pack(side=tkinter.BOTTOM, fill=tkinter.BOTH, expand=1)
 
     def open_concurrent(self):
-        second_root = Toplevel(self.master)
-
-        my_gui = TkBase(second_root, [datetime.datetime.now() - datetime.timedelta(hours=x) for x in range(10)],
-                        [1, 2, 3, 5, 3, 1, 8, 6, 4, 7])
+        path = filedialog.askdirectory()
+        path = path + "/"
+        new_root = Toplevel(self.master)
+        my_gui = TkBase(new_root, path)
 
     # callback method for the annotate button activates the span selector
     def butrelease(self, event):

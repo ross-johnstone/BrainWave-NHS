@@ -336,7 +336,7 @@ class NavigationToolbar(NavigationToolbar2Tk):
         TkBase.close(self.tkbase_)
 
 
-root = Tk()
-my_gui = TkBase(root, [datetime.datetime.now() - datetime.timedelta(hours=x) for x in range(10)],
-                [1, 2, 3, 5, 3, 1, 8, 6, 4, 7])
-root.mainloop()
+# root = Tk()
+# my_gui = TkBase(root, [datetime.datetime.now() - datetime.timedelta(hours=x) for x in range(10)],
+#                 [1, 2, 3, 5, 3, 1, 8, 6, 4, 7])
+# root.mainloop()

@@ -254,8 +254,7 @@ class TkBase:
         self.span_min = datetime.datetime.fromordinal(int(min)) + datetime.timedelta(seconds=divmod(min, 1)[1] * 86400)
         self.span_max = datetime.datetime.fromordinal(int(max)) + datetime.timedelta(seconds=divmod(max, 1)[1] * 86400)
 
-        # get vertical range for a given annotation
-
+    # get vertical range for a given annotation
     def get_vertical_range(self, annotation):
 
         range_indices = np.where(np.logical_and(self.timestamps > annotation.start, self.timestamps < annotation.end))

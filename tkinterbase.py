@@ -49,7 +49,7 @@ class TkBase:
         self.main_canvas.get_tk_widget().pack(side=tkinter.BOTTOM, fill=tkinter.BOTH, expand=1)
         self.main_canvas.mpl_connect('button_release_event', self.butrelease)
 
-        self.toolbar = NavigationToolbar(self.main_canvas, master)
+        self.toolbar = NavigationToolbar(self.main_canvas, self.master, tkbase_=self)
         self.toolbar.update()
         self.main_canvas.get_tk_widget().pack(side=tkinter.BOTTOM, fill=tkinter.BOTH, expand=1)
 
@@ -284,6 +284,30 @@ class TkBase:
 
 class NavigationToolbar(NavigationToolbar2Tk):
 
+    def __init__(self, canvas_, parent_, tkbase_):
+        self.tkbase_ = tkbase_
+        self.parent_ = parent_
+        self.toolitems = (
+            ('Home', 'Reset original view', 'home', 'home'),
+            ('Back', 'Back to previous view', 'back', 'back'),
+            ('Forward', 'Forward to next view', 'forward', 'forward'),
+            (None, None, None, None),
+            ('Pan', 'Pan axes with left mouse, zoom with right', 'move', 'pan'),
+            ('Zoom', 'Zoom to rectangle', 'zoom_to_rect', 'zoom'),
+            ('Subplots', 'Configure subplots', 'subplots', 'configure_subplots'),
+            (None, None, None, None),
+            ('Annotate', 'Create an annotation', 'annotate', 'call_annotate'),
+            ('Confirm', 'Confirm annotation', 'confirm', 'call_confirm'),
+            (None, None, None, None),
+            ('Open', 'Opens a new project', 'open', 'call_open'),
+            ('Export', 'Export to PDF', 'export', 'call_export'),
+            ('Save', 'Save the figure', 'filesave', 'save_figure'),
+            ('Open Concurrent', 'Open a concurrent graph view', 'compare', 'call_open_concurrent'),
+            (None, None, None, None),
+            ('Quit', 'Quit application', 'quit', 'call_quit'),
+        )
+        NavigationToolbar2Tk.__init__(self, canvas_, parent_)
+
     def _Button(self, text, file, command, extension='.gif'):
         img_file = ("./res/button_images/" + file + extension)
         im = PhotoImage(master=self, file=img_file)
@@ -293,43 +317,23 @@ class NavigationToolbar(NavigationToolbar2Tk):
         b.pack(side=tkinter.LEFT)
         return b
 
-    toolitems = (
-        ('Home', 'Reset original view', 'home', 'home'),
-        ('Back', 'Back to previous view', 'back', 'back'),
-        ('Forward', 'Forward to next view', 'forward', 'forward'),
-        (None, None, None, None),
-        ('Pan', 'Pan axes with left mouse, zoom with right', 'move', 'pan'),
-        ('Zoom', 'Zoom to rectangle', 'zoom_to_rect', 'zoom'),
-        ('Subplots', 'Configure subplots', 'subplots', 'configure_subplots'),
-        (None, None, None, None),
-        ('Annotate', 'Create an annotation', 'annotate', 'call_annotate'),
-        ('Confirm', 'Confirm annotation', 'confirm', 'call_confirm'),
-        (None, None, None, None),
-        ('Open', 'Opens a new project', 'open', 'call_open'),
-        ('Export', 'Export to PDF', 'export', 'call_export'),
-        ('Save', 'Save the figure', 'filesave', 'save_figure'),
-        ('Open Concurrent', 'Open a concurrent graph view', 'compare', 'call_open_concurrent'),
-        (None, None, None, None),
-        ('Quit', 'Quit application', 'quit', 'call_quit'),
-    )
-
     def call_annotate(self):
-        TkBase.annotate(my_gui)
+        TkBase.annotate(self.tkbase_)
 
     def call_confirm(self):
-        TkBase.confirm(my_gui)
+        TkBase.confirm(self.tkbase_)
 
     def call_open(self):
-        TkBase.open(my_gui)
+        TkBase.open(self.tkbase_)
 
     def call_open_concurrent(self):
-        TkBase.open_concurrent(my_gui)
+        TkBase.open_concurrent(self.tkbase_)
 
     def call_export(self):
-        TkBase.export(my_gui)
+        TkBase.export(self.tkbase_)
 
     def call_quit(self):
-        TkBase.close(my_gui)
+        TkBase.close(self.tkbase_)
 
 
 root = Tk()

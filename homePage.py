@@ -18,7 +18,7 @@ class HomePage:
         self.cv = tk.Canvas(width=self.w,height=self.h)
         self.cv.pack(side='top',fill='both',expand='yes')
         self.cv.create_image(0,0,image=self.bg_image,anchor='nw')
-        self.button1 = ttk.Button(self.cv, text = 'Start', width = 25, command = self.new_project)
+        self.button1 = tk.Button(self.cv, text = 'Start', width = 25, command = self.new_project, bg='dark grey')
         self.button2 = ttk.Button(self.cv, text = 'Load', width=25, command = self.load_project)
         self.button3 = ttk.Button(self.cv, text = 'Quit', width=25, command = root.destroy)
         self.button3.pack(side=BOTTOM, padx=10, pady=25)
@@ -33,6 +33,7 @@ class HomePage:
         self.cv.destroy()
         my_gui = TkBase(root, [datetime.datetime.now() - datetime.timedelta(hours=x) for x in range(10)],
                 [1, 2, 3, 5, 3, 1, 8, 6, 4, 7])
+        root.resizable(True, True)
 
 
     def load_project(self):
@@ -43,7 +44,9 @@ class HomePage:
         my_gui = TkBase(root, [datetime.datetime.now() - datetime.timedelta(hours=x) for x in range(10)],
             [1, 2, 3, 5, 3, 1, 8, 6, 4, 7])
         my_gui.open()
+        root.resizable(True, True)
 
 root = tk.Tk()
+root.resizable(False, False)
 app = HomePage(root)
 root.mainloop()

@@ -33,9 +33,6 @@ class TkBase:
         self.main_graph_ax.plot(self.timestamps, self.data, color='#5436ff', linewidth=1)
         # draw all saved annotations
 
-        for annotation in self.annotations:
-            self.draw_annotation(annotation)
-
         self.main_graph_ax.xaxis_date()
         plt.gcf().autofmt_xdate()
         # adding grid
@@ -51,6 +48,9 @@ class TkBase:
         self.main_canvas.draw()
         self.main_canvas.get_tk_widget().pack(side=tkinter.BOTTOM, fill=tkinter.BOTH, expand=1)
         self.main_canvas.mpl_connect('button_release_event', self.butrelease)
+
+        for annotation in self.annotations:
+            self.draw_annotation(annotation)
 
         self.toolbar = NavigationToolbar(self.main_canvas, self.master, tkbase_=self)
         self.toolbar.update()
@@ -279,7 +279,7 @@ class TkBase:
         if (annotation.start == annotation.end):
             plt.figure(1)
             plt.axvline(x=date2num(annotation.start))
-        self.main_graph.main_canvas.draw()
+        self.main_canvas.draw()
 
     def close(self):
         self.master.quit()

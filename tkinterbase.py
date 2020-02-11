@@ -2,6 +2,7 @@ from tkinter import Tk, Label, Button, Toplevel, Entry, filedialog, PhotoImage
 import tkinter
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg, NavigationToolbar2Tk
+from matplotlib.backends.backend_pdf import PdfPages
 from matplotlib.widgets import SpanSelector
 from matplotlib.textpath import TextPath
 from matplotlib.patches import PathPatch
@@ -149,9 +150,10 @@ class TkBase:
 
         def save():
             filename = export_popup_entry.get() + '.pdf'
-
-            plt.savefig(filename)
-
+            with PdfPages(filename) as export_pdf:
+                for i in plt.get_fignums()[::-1]:
+                    plt.figure(i)
+                    export_pdf.savefig()
             cancel()
 
         popup = Toplevel(self.master)

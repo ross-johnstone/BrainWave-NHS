@@ -1,6 +1,5 @@
 import tkinter as tk
-from tkinter import *
-from tkinter import ttk, filedialog, messagebox
+from tkinter import ttk, filedialog, messagebox, BOTTOM
 from tkinterbase import TkBase
 import re
 import os

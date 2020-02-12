@@ -260,7 +260,7 @@ class TkBase:
                                                            annotation.start), vmax - vmin + 20, fc='r'))
         # if point annotation draw a vertical line
         if (annotation.start == annotation.end):
-            plt.figure(self.window_id)
+            plt.figure(self.window_id*2-1)
             plt.axvline(x=date2num(annotation.start))
         self.main_canvas.draw()
 

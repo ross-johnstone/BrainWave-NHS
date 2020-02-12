@@ -1,7 +1,9 @@
 import tkinter as tk
 from tkinter import *
-from tkinter import ttk, filedialog
+from tkinter import ttk, filedialog, messagebox
 from tkinterbase import TkBase
+import re
+import os
 
 
 class HomePage:
@@ -23,21 +25,46 @@ class HomePage:
         self.cv.pack(side='top', fill='both', expand='yes')
         self.cv.create_image(0, 0, image=self.bg_image, anchor='nw')
         self.open_button = ttk.Button(self.cv, text='Open', width=25, command=self.load_project)
-        self.quit_button = ttk.Button(self.cv, text='Quit', width=25, command=root.destroy)
+        self.quit_button = ttk.Button(self.cv, text='Quit', width=25, command=self.close)
         self.quit_button.pack(side=BOTTOM, padx=10, pady=25)
         self.open_button.pack(side=BOTTOM, padx=10, pady=25)
         self.frame.pack()
 
     def load_project(self):
         path = filedialog.askdirectory()
-        path = path + "/"
-        self.open_button.destroy()
-        self.quit_button.destroy()
-        self.cv.destroy()
-        my_gui = TkBase(root,path)
-        root.resizable(True, True)
+        if not path:
+            messagebox.showerror("Error", "File could not be opened.")
+        else:
+            path = path + "/"
+            if not self.isValid(path):
+                messagebox.showerror("Error", "Inappropriate file type.")
+            elif self.isValid(path):
+                self.open_button.destroy()
+                self.quit_button.destroy()
+                self.cv.destroy()
+                my_gui = TkBase(root,path)
+                root.resizable(True, True)
 
+    def isValid(self, path):
+        contents = os.listdir(path)
+        calfile=""
+        datafiles=[]
+        jsonfile=""
+        for filepath in contents:
+            if re.match(r'\d{2}-\d{2}-\d{4}_\d{2}_\d{2}_\d{2}_\d{1,4}_\d*.cal', filepath):
+                calfile=path+filepath
+            elif re.match(r'\d{2}-\d{2}-\d{4}_\d{2}_\d{2}_\d{2}_\d{1,4}_\d*.wav', filepath):
+                datafiles.append(path + filepath)
+            elif re.match('.*\.json', filepath):
+                jsonfile = path + filepath
+        if (calfile != "") and (datafiles != None):
+            return True
+        else:
+            return False
 
+    def close(self):
+         if messagebox.askokcancel("", "Are you sure you want to quit?"):
+             self.master.destroy()
 
 root = tk.Tk()
 root.resizable(False, False)

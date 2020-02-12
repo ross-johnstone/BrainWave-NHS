@@ -48,9 +48,10 @@ def open_project(path):
     if calfile != "":
         try:
             initial_time = get_initial_timestamp(calfile)
-        except Exception: 
+        except Exception:
             raise Exception("One of the data files could not be read.")
-        timestamps = np.arange(data.shape[0])*datetime.timedelta(microseconds=1000*20)
+        timestamps = np.arange(
+            data.shape[0]) * datetime.timedelta(microseconds=1000 * 20)
         timestamps += initial_time
     # load annotations
     annotations = []
@@ -60,8 +61,8 @@ def open_project(path):
         except Exception:
             annotations = []
 
-
     return data, timestamps, annotations
+
 
 def read_wav(filename):
     """
@@ -86,8 +87,10 @@ def get_initial_timestamp(filename):
     timestamp = ""
     with open(filename, 'r') as infile:
         firstline = infile.readline()
-        match = re.match((r'(?P<timestamp>\d{2}-\d{2}-\d{4} \d{2}:\d{2}:\d{2})'), firstline)
-        timestamp = datetime.datetime.strptime(match.group(1), '%d-%m-%Y %H:%M:%S')
+        match = re.match(
+            (r'(?P<timestamp>\d{2}-\d{2}-\d{4} \d{2}:\d{2}:\d{2})'), firstline)
+        timestamp = datetime.datetime.strptime(
+            match.group(1), '%d-%m-%Y %H:%M:%S')
         return timestamp
 
 

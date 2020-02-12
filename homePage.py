@@ -59,14 +59,11 @@ class HomePage:
     def isValid(self, path):
         # Checks the path contents to see if it has .cal and .wav files
         contents = os.listdir(path)
-<<<<<<< HEAD
         calfile=""
         datafiles=[]
-=======
         calfile = ""
         datafiles = []
         jsonfile = ""
->>>>>>> f4a358bd5d4f43f1ec03659194c9547114bad899
         for filepath in contents:
             if re.match(r'\d{2}-\d{2}-\d{4}_\d{2}_\d{2}_\d{2}_\d{1,4}_\d*.cal', filepath):
                 calfile = path + filepath

@@ -120,7 +120,7 @@ class TkBase:
                 filename = export_popup_entry.get() + '.pdf'
                 with PdfPages(filename) as export_pdf:
                     plt.figure(self.widnow_id + 1)
-                    export_pdf.savefig()l
+                    export_pdf.savefig()
                     plt.figure(self.widnow_id)
                     export_pdf.savefig()
                 cancel()

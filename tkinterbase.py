@@ -1,4 +1,4 @@
-from tkinter import Tk, Label, Button, Toplevel, Entry, filedialog, PhotoImage
+from tkinter import Label, Button, Toplevel, Entry, filedialog, PhotoImage
 import tkinter
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg, NavigationToolbar2Tk
@@ -21,7 +21,7 @@ class TkBase:
     def __init__(self, master, path):
 
         FIGSIZE = (8, 3)
-        self.widnow_id = next(self.id_generator)
+        self.window_id = next(self.id_generator)
         self.master = master
 
         master.title("BrainWave Visualization")
@@ -119,9 +119,9 @@ class TkBase:
             else:
                 filename = export_popup_entry.get() + '.pdf'
                 with PdfPages(filename) as export_pdf:
-                    plt.figure(self.widnow_id + 1)
+                    plt.figure(self.window_id + 1)
                     export_pdf.savefig()
-                    plt.figure(self.widnow_id)
+                    plt.figure(self.window_id)
                     export_pdf.savefig()
                 cancel()
 
@@ -351,6 +351,6 @@ class NavigationToolbar(NavigationToolbar2Tk):
         TkBase.close(self.tkbase_)
 
 
-root = Tk()
-my_gui = TkBase(root, "./pat1/")
-root.mainloop()
+# root = Tk()
+# my_gui = TkBase(root, "./pat1/")
+# root.mainloop()

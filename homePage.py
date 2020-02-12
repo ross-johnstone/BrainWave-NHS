@@ -79,6 +79,7 @@ class HomePage:
         if messagebox.askokcancel("", "Are you sure you want to quit?"):
             self.master.destroy()
 
+
 root = tk.Tk()
 root.resizable(False, False)
 app = HomePage(root)

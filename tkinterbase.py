@@ -106,7 +106,6 @@ class TkBase:
         pass
 
     def export(self):
-        plt.figure(1)
 
         def cancel():
             self.span_min = False
@@ -248,18 +247,16 @@ class TkBase:
         # if date range annotation draw rectangle
         if (annotation.start != annotation.end):
             vmax, vmin = self.get_vertical_range(annotation)
-            tp = TextPath((date2num(annotation.start) + 6000, 300),
-                          annotation.title, size=100000)
+            tp = TextPath((date2num(annotation.start) + 6000, 300), annotation.title, size=100000)
             self.main_graph_ax.add_patch(PathPatch(tp, color="black"))
             self.main_graph_ax.add_patch(plt.Rectangle((date2num(annotation.start), vmin - 10),
                                                        date2num(annotation.end) - date2num(
-                annotation.start), vmax - vmin + 20, fc='r'))
+                                                           annotation.start), vmax - vmin + 20, fc='r'))
         # if point annotation draw a vertical line
         if (annotation.start == annotation.end):
             plt.figure(1)
-            plt.axvline(x=matplotlib.dates.date2num(annotation.start))
             plt.axvline(x=date2num(annotation.start))
-        self.main_graph.main_canvas.draw()
+        self.main_canvas.draw()
 
     def draw_graph(self, data, timestamps, annotations):
         self.main_graph_ax.clear()

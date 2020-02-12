@@ -1,6 +1,5 @@
 import tkinter as tk
-from tkinter import *
-from tkinter import ttk, filedialog
+from tkinter import ttk, filedialog, BOTTOM
 from tkinterbase import TkBase
 
 
@@ -34,9 +33,8 @@ class HomePage:
         self.open_button.destroy()
         self.quit_button.destroy()
         self.cv.destroy()
-        my_gui = TkBase(root,path)
+        TkBase(root, path)
         root.resizable(True, True)
-
 
 
 root = tk.Tk()

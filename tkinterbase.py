@@ -1,4 +1,4 @@
-from tkinter import Tk, Label, Button, Toplevel, Entry, filedialog, PhotoImage
+from tkinter import Label, Button, Toplevel, Entry, filedialog, PhotoImage
 import tkinter
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg, NavigationToolbar2Tk
@@ -91,7 +91,7 @@ class TkBase:
         path = filedialog.askdirectory()
         path = path + "/"
         new_root = Toplevel(self.master)
-        my_gui = TkBase(new_root, path)
+        TkBase(new_root, path)
 
     # callback method for the annotate button activates the span selector
     def butrelease(self, event):

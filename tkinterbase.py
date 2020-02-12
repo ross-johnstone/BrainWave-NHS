@@ -1,4 +1,4 @@
-from tkinter import Label, Button, Toplevel, Entry, filedialog, PhotoImage
+from tkinter import Tk, Label, Button, Toplevel, Entry, filedialog, PhotoImage
 import tkinter
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg, NavigationToolbar2Tk
@@ -7,6 +7,7 @@ from matplotlib.widgets import SpanSelector
 from matplotlib.textpath import TextPath
 from matplotlib.patches import PathPatch
 from matplotlib.dates import date2num
+import itertools
 import datetime
 import numpy as np
 from annotations import Annotation, save_json
@@ -15,11 +16,12 @@ from tkinter import messagebox
 
 
 class TkBase:
+    id_generator = itertools.count(1)
 
     def __init__(self, master, path):
 
         FIGSIZE = (8, 3)
-
+        self.widnow_id = next(self.id_generator)
         self.master = master
 
         master.title("BrainWave Visualization")
@@ -117,9 +119,10 @@ class TkBase:
             else:
                 filename = export_popup_entry.get() + '.pdf'
                 with PdfPages(filename) as export_pdf:
-                    for i in plt.get_fignums()[::-1]:
-                        plt.figure(i)
-                        export_pdf.savefig()
+                    plt.figure(self.widnow_id + 1)
+                    export_pdf.savefig()l
+                    plt.figure(self.widnow_id)
+                    export_pdf.savefig()
                 cancel()
 
         popup = Toplevel(self.master)
@@ -256,7 +259,7 @@ class TkBase:
                                                            annotation.start), vmax - vmin + 20, fc='r'))
         # if point annotation draw a vertical line
         if (annotation.start == annotation.end):
-            plt.figure(1)
+            plt.figure(self.window_id)
             plt.axvline(x=date2num(annotation.start))
         self.main_canvas.draw()
 
@@ -348,7 +351,6 @@ class NavigationToolbar(NavigationToolbar2Tk):
         TkBase.close(self.tkbase_)
 
 
-# root = Tk()
-# my_gui = TkBase(root, [datetime.datetime.now() - datetime.timedelta(hours=x) for x in range(10)],
-#                 [1, 2, 3, 5, 3, 1, 8, 6, 4, 7])
-# root.mainloop()
+root = Tk()
+my_gui = TkBase(root, "./pat1/")
+root.mainloop()

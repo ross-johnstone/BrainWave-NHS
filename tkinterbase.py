@@ -25,6 +25,7 @@ class TkBase:
         self.master = master
 
         master.title("BrainWave Visualization")
+        master.state('zoomed')
 
         # create matplotlib figures with single axes on which the data will be
         # displayed

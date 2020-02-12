@@ -138,11 +138,7 @@ class TkBase:
         if (self.toolbar._active == 'ZOOM'):
             self.toolbar.zoom()
 
-    def compare(self):
-        pass
-
     def export(self):
-        plt.figure(1)
 
         def cancel():
             self.span_min = False
@@ -150,12 +146,16 @@ class TkBase:
             popup.update()
 
         def save():
-            filename = export_popup_entry.get() + '.pdf'
-            with PdfPages(filename) as export_pdf:
-                for i in plt.get_fignums()[::-1]:
-                    plt.figure(i)
-                    export_pdf.savefig()
-            cancel()
+            if not export_popup_entry.get().strip():
+                error_label = Label(popup, text="Please add a filename!", fg="red")
+                error_label.grid(row=1, column=0)
+            else:
+                filename = export_popup_entry.get() + '.pdf'
+                with PdfPages(filename) as export_pdf:
+                    for i in plt.get_fignums()[::-1]:
+                        plt.figure(i)
+                        export_pdf.savefig()
+                cancel()
 
         popup = Toplevel(self.master)
         popup.title('')

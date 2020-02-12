@@ -44,6 +44,42 @@ class TkBase:
         line = self.ax.lines[0]
         print(line.get_xdata())
 
+        self.listbox_frame = tkinter.Frame(master)
+        self.listbox_frame.pack(side=tkinter.RIGHT)
+
+        #dicitonary to convert from indices in listbox to annotation ids
+        self.index_to_ids = dict()
+
+        for i,id in enumerate(self.annotations):
+            id = id.id
+            self.index_to_ids[i] = id
+
+
+        self.listb = tkinter.Listbox(self.listbox_frame)
+        for a in self.annotations:
+            self.listb.insert(tkinter.END,a.title)
+        self.listb.bind('<<ListboxSelect>>', self.listbox_selection)
+        self.listb.grid(column=0,row=1)
+
+
+        self.labelTitle = tkinter.Label(self.listbox_frame,
+                            text = "Title:")
+        self.labelTitle.grid(column=0, row=2)
+
+        self.labelDescription = tkinter.Label(self.listbox_frame,
+                            text = "description:",
+                            wraplength=200)
+        self.labelDescription.grid(column=0, row=3)
+
+        self.go_to_annotation = tkinter.Button(self.listbox_frame,text='Go To annotation',command = self.goto_callback)
+        self.go_to_annotation.grid(column=0, row=4)
+
+        self.edit_annotation = tkinter.Button(self.listbox_frame,text='edit',command = self.edit_callback)
+        self.edit_annotation.grid(column=0, row=5)
+
+        self.delete_annotation = tkinter.Button(self.listbox_frame,text='delete',command = self.delete_callback)
+        self.delete_annotation.grid(column=0, row=6)
+
         # put the plot with navbar on the tkinter window
         self.canvas = FigureCanvasTkAgg(self.fig, master=root)
         self.canvas.draw()
@@ -53,6 +89,7 @@ class TkBase:
         self.toolbar = NavigationToolbar2Tk(self.canvas, root)
         self.toolbar.update()
         self.canvas.get_tk_widget().pack(side=tkinter.BOTTOM, fill=tkinter.BOTH, expand=1)
+        self.fig.canvas.toolbar.push_current()
 
         #add span selector to the axes but set it defaultly to not visible,
         #only activate it when the button annotate is pressed
@@ -96,12 +133,105 @@ class TkBase:
         if (self.toolbar._active == 'ZOOM'):
             self.toolbar.zoom()
 
-    def compare(self):
-        pass
-
     def export(self):
         plt.figure(1)
         plt.savefig('fig.pdf')
+
+    #callback function for the listbox widget
+    def listbox_selection(self,event):
+
+        if(self.listb.curselection()):
+            id = self.index_to_ids[self.listb.curselection()[0]]
+
+            annotation = None
+
+            for a in self.annotations:
+                if a.id == id:
+
+                    self.labelTitle['text'] = "Title: "+a.title
+                    self.labelDescription['text'] = "Description: "+a.content
+
+    #callback for go to annotation button
+    def goto_callback(self):
+        if(self.listb.curselection()):
+            id = self.index_to_ids[self.listb.curselection()[0]]
+
+            annotation = None
+
+            for a in self.annotations:
+                if a.id == id:
+                    print("start: "+ a.start.strftime("%m/%d/%Y, %H:%M:%S"))
+                    print("end: "+ a.end.strftime("%m/%d/%Y, %H:%M:%S"))
+
+                    range = self.get_vertical_range(a)
+                    self.ax.axis([a.start,a.end,range[1]-20,range[0]+20])
+                    self.fig.canvas.toolbar.push_current()
+                    self.fig.canvas.draw()
+
+
+    def edit_callback(self):
+        if(self.listb.curselection()):
+            # method called when cancel button on popup is pressed
+            def cancel():
+                top.destroy()
+                top.update()
+
+            # method called when save button on popup is pressed
+            def save():
+
+                annotation.title = title_entry.get()
+                save_json(self.annotations,'data/recording1/pat1/annotations.json')
+                self.listb.delete(index)
+                self.listb.insert(index,title_entry.get())
+                print(id)
+                cancel()
+
+            index = self.listb.curselection()[0]
+            id = self.index_to_ids[self.listb.curselection()[0]]
+
+            annotation = None
+
+            for a in self.annotations:
+                if a.id == id:
+                    annotation = a
+                    #popup in which you edit the annotation
+                    top = Toplevel(root)
+                    top.title('edit annotation')
+                    top.grab_set()
+
+                    #labels in top level window showing annotation start time and end time
+                    annotation_start_label = Label(top,text='Annotation start time: '+str(a.start))
+                    annotation_end_label = Label(top,text='Annotation end time: '+str(a.end))
+                    annotation_start_label.pack()
+                    annotation_end_label.pack()
+
+                    title_entry = Entry(top)
+                    title_entry.insert(tkinter.END,a.title)
+                    title_entry.pack()
+
+                    description_entry = Entry(top)
+                    description_entry.insert(tkinter.END,a.content)
+                    description_entry.pack()
+
+                    cancel_button = Button(master=top, text = "Cancel",command = cancel, bg='white')
+                    cancel_button.pack()
+
+                    save_button = Button(master=top, text = "Save", command= save, bg='white')
+                    save_button.pack()
+
+    def delete_callback(self):
+        if(self.listb.curselection()):
+            index = self.listb.curselection()[0]
+            id = self.index_to_ids[self.listb.curselection()[0]]
+
+            annotation = None
+
+            for a in self.annotations:
+                if a.id == id:
+                    self.annotations.remove(a)
+                    save_json(self.annotations,'data/recording1/pat1/annotations.json')
+                    self.listb.delete(index)
+
 
     def annotate(self):
 

@@ -120,9 +120,9 @@ class TkBase:
             else:
                 filename = export_popup_entry.get() + '.pdf'
                 with PdfPages(filename) as export_pdf:
-                    plt.figure(self.window_id + 1)
+                    plt.figure(self.window_id * 2 - 1)
                     export_pdf.savefig()
-                    plt.figure(self.window_id)
+                    plt.figure(self.window_id * 2 - 2)
                     export_pdf.savefig()
                 cancel()
 

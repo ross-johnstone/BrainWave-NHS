@@ -34,7 +34,7 @@ class TkBase:
         self.reference_graph, self.reference_graph_ax = plt.subplots(
             figsize=FIGSIZE)
         self.reference_graph.set_facecolor('xkcd:grey')
-        self.main_graph_ax.set_facecolor('xkcd:dark grey')
+        self.reference_graph_ax.set_facecolor('xkcd:dark grey')
         self.main_canvas = FigureCanvasTkAgg(self.main_graph, master=master)
         self.main_canvas.get_tk_widget().pack(
             side=tkinter.BOTTOM, fill=tkinter.BOTH, expand=1)

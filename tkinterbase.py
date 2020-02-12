@@ -31,11 +31,17 @@ class TkBase:
         # second, reference graph
         self.reference_graph, self.reference_graph_ax = plt.subplots(figsize=FIGSIZE)
         self.reference_graph.set_facecolor('xkcd:grey')
-
+        self.main_graph_ax.set_facecolor('xkcd:dark grey')
         self.main_canvas = FigureCanvasTkAgg(self.main_graph, master=master)
-        self.reference_canvas = FigureCanvasTkAgg(self.reference_graph, master=master)
-        self.project_path = path
+        self.main_canvas.get_tk_widget().pack(side=tkinter.BOTTOM, fill=tkinter.BOTH, expand=1)
+        self.toolbar = NavigationToolbar(self.main_canvas, self.master, tkbase_=self)
 
+        self.reference_canvas = FigureCanvasTkAgg(self.reference_graph, master=master)
+        self.reference_canvas.get_tk_widget().pack(side=tkinter.BOTTOM, fill=tkinter.BOTH, expand=1)
+        self.reference_canvas.get_tk_widget().pack(side=tkinter.BOTTOM, fill=tkinter.BOTH, expand=1)
+        
+
+        self.project_path = path
         try:
             self.data, self.timestamps, self.annotations = data.open_project(self.project_path)
             self.draw_graph(self.data, self.timestamps, self.annotations)
@@ -44,11 +50,7 @@ class TkBase:
 
 
         # put the plot with navbar on the tkinter window
-        self.main_canvas = FigureCanvasTkAgg(self.main_graph, master=master)
         self.main_canvas.mpl_connect('button_release_event', self.butrelease)
-
-        self.toolbar = NavigationToolbar(self.main_canvas, self.master, tkbase_=self)
-        self.toolbar.update()
 
         # add span selector to the axes but set it defaultly to not visible,
         # only activate it when the button annotate is pressed
@@ -254,13 +256,11 @@ class TkBase:
         #removing top and right borders
         self.main_graph_ax.spines['top'].set_visible(False)
         self.main_graph_ax.spines['right'].set_visible(False)
-
-        line = self.main_graph_ax.lines[0]
         # put the plot with navbar on the tkinter window
         self.main_canvas.draw()
-        self.main_canvas.get_tk_widget().pack(side=tkinter.BOTTOM, fill=tkinter.BOTH, expand=1)
 
-        print(line.get_xdata())     
+
+        self.toolbar.update()
 
         # second, reference graph displayed
         self.reference_graph_ax.clear()
@@ -268,7 +268,6 @@ class TkBase:
         self.reference_graph_ax.xaxis_date()
         # put the second plot on the tkinter window
         self.reference_canvas.draw()
-        self.reference_canvas.get_tk_widget().pack(side=tkinter.BOTTOM, fill=tkinter.BOTH, expand=1)
 
     def close(self):
         self.master.quit()

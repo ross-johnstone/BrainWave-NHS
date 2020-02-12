@@ -56,15 +56,12 @@ class HomePage:
         contents = os.listdir(path)
         calfile=""
         datafiles=[]
-        jsonfile=""
         for filepath in contents:
             if re.match(r'\d{2}-\d{2}-\d{4}_\d{2}_\d{2}_\d{2}_\d{1,4}_\d*.cal', filepath):
                 calfile=path+filepath
             elif re.match(r'\d{2}-\d{2}-\d{4}_\d{2}_\d{2}_\d{2}_\d{1,4}_\d*.wav', filepath):
                 datafiles.append(path + filepath)
-            elif re.match('.*\.json', filepath):
-                jsonfile = path + filepath
-        if (calfile != "") and (datafiles != None):
+        if (calfile != "") and (datafiles != []):
             return True
         else:
             return False

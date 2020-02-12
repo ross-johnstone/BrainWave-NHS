@@ -94,7 +94,7 @@ class TkBase:
         path = path + "/"
         new_root = Toplevel(self.master)
         new_root.protocol("WM_DELETE_WINDOW", new_root.destroy)
-        my_gui = TkBase(new_root, path)
+        TkBase(new_root, path)
 
     # callback method for the annotate button activates the span selector
     def butrelease(self, event):

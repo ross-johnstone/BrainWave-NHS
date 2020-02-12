@@ -1,11 +1,20 @@
 image: python:3.7
+
 stages: 
+    - Static Analysis
     - Test
+    
 before_script:
     - python3 -m pip install --upgrade pip --user
     - python3 -m pip install -r requirements.txt --user
+    - python3 -m pip install flake8 --quiet --user
+
+flake8:
+    stage: Static Analysis
+    script:
+    - python3 -m flake8 --extend-ignore=W191,E501 --verbose --filename = *.py 
+
 unittest:
-  only: [develop]
-  script: 
-    - python3 -m unittest discover --verbose -s "./" -p "test_*.py"
-  stage: Test
+    script: 
+        - python3 -m unittest discover --verbose -s "./" -p "test_*.py"
+    stage: Test

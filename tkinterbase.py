@@ -1,4 +1,4 @@
-from tkinter import Tk, Label, Button, Toplevel, Entry, filedialog, PhotoImage
+from tkinter import Label, Button, Toplevel, Entry, filedialog, PhotoImage
 import tkinter
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg, NavigationToolbar2Tk
@@ -11,68 +11,59 @@ import datetime
 import numpy as np
 from annotations import Annotation, save_json
 import data
+from tkinter import messagebox
 
 
 class TkBase:
+
     def __init__(self, master, path):
 
         FIGSIZE = (8, 3)
 
         self.master = master
+
         master.title("BrainWave Visualization")
 
-        # list of all annotations
-        self.project_path = path
-        self.data, self.timestamps, self.annotations = data.open_project(path)
-
-        # create a matplotlib figure with a single axes on which the data will be displayed
+        # create matplotlib figures with single axes on which the data will be
+        # displayed
         self.main_graph, self.main_graph_ax = plt.subplots(figsize=FIGSIZE)
         self.main_graph.set_facecolor('xkcd:grey')
         self.main_graph_ax.set_facecolor('xkcd:dark grey')
 
-        # plot values on the axe and set plot hue to NHS blue
-        self.main_graph_ax.plot(self.timestamps, self.data, color='#5436ff', linewidth=1)
-        # draw all saved annotations
+        # second, reference graph
+        self.reference_graph, self.reference_graph_ax = plt.subplots(
+            figsize=FIGSIZE)
+        self.reference_graph.set_facecolor('xkcd:grey')
+        self.reference_graph_ax.set_facecolor('xkcd:dark grey')
+        self.main_canvas = FigureCanvasTkAgg(self.main_graph, master=master)
+        self.main_canvas.get_tk_widget().pack(
+            side=tkinter.BOTTOM, fill=tkinter.BOTH, expand=1)
+        self.toolbar = NavigationToolbar(
+            self.main_canvas, self.master, tkbase_=self)
 
-        self.main_graph_ax.xaxis_date()
-        plt.gcf().autofmt_xdate()
-        # adding grid
-        self.main_graph_ax.grid(color='grey', linestyle='-', linewidth=0.25, alpha=0.5)
-        # removing top and right borders
-        self.main_graph_ax.spines['top'].set_visible(False)
-        self.main_graph_ax.spines['right'].set_visible(False)
+        self.reference_canvas = FigureCanvasTkAgg(
+            self.reference_graph, master=master)
+        self.reference_canvas.get_tk_widget().pack(
+            side=tkinter.BOTTOM, fill=tkinter.BOTH, expand=1)
+        self.reference_canvas.get_tk_widget().pack(
+            side=tkinter.BOTTOM, fill=tkinter.BOTH, expand=1)
 
-        line = self.main_graph_ax.lines[0]
+        self.project_path = path
+        try:
+            self.data, self.timestamps, self.annotations = data.open_project(
+                self.project_path)
+            self.draw_graph(self.data, self.timestamps, self.annotations)
+        except Exception as e:
+            messagebox.showerror("Error:", e)
 
         # put the plot with navbar on the tkinter window
-        self.main_canvas = FigureCanvasTkAgg(self.main_graph, master=master)
-        self.main_canvas.draw()
-        self.main_canvas.get_tk_widget().pack(side=tkinter.BOTTOM, fill=tkinter.BOTH, expand=1)
         self.main_canvas.mpl_connect('button_release_event', self.butrelease)
-
-        for annotation in self.annotations:
-            self.draw_annotation(annotation)
-
-        self.toolbar = NavigationToolbar(self.main_canvas, self.master, tkbase_=self)
-        self.toolbar.update()
-        self.main_canvas.get_tk_widget().pack(side=tkinter.BOTTOM, fill=tkinter.BOTH, expand=1)
 
         # add span selector to the axes but set it defaultly to not visible,
         # only activate it when the button annotate is pressed
         self.span = SpanSelector(self.main_graph_ax, self.onselect, 'horizontal', useblit=True,
                                  rectprops=dict(alpha=0.5, facecolor='red'), span_stays=True)
         self.span.set_visible(False)
-
-        # second, reference graph displayed
-        self.reference_graph, self.reference_graph_ax = plt.subplots(figsize=FIGSIZE)
-        self.reference_graph.set_facecolor('xkcd:grey')
-        self.reference_graph_ax.plot(self.timestamps, self.data, color="cyan", linewidth=1)
-        self.reference_graph_ax.set_facecolor('xkcd:dark grey')
-        self.reference_graph_ax.xaxis_date()
-
-        self.reference_canvas = FigureCanvasTkAgg(self.reference_graph, master=master)
-        self.reference_canvas.draw()
-        self.reference_canvas.get_tk_widget().pack(side=tkinter.BOTTOM, fill=tkinter.BOTH, expand=1)
 
         # create buttons for interaction
         self.annotate_button = Button(master, command=self.annotate)
@@ -85,42 +76,16 @@ class TkBase:
         self.span_min = None
         self.span_max = None
 
-        # self.open_button = Button(master, text="Open", command=self.open, bg='white')
-        # self.open_button.pack(side=tkinter.LEFT, fill=tkinter.BOTH, expand=1)
-
-        master.iconbitmap(r'res/general_images/favicon.ico')
-        master.state('zoomed')
-
     # callback method for the open button, opens an existing project
     def open(self):
-        FIGSIZE = (8, 3)
         path = filedialog.askdirectory()
         path = path + "/"
-        self.data, self.timestamps, self.annotations = data.open_project(path)
-
-        self.main_graph_ax.clear()
-        self.main_graph_ax.plot(self.timestamps, self.data, color='#5436ff', linewidth=1)
-        # draw all saved annotations
-        for annotation in self.annotations:
-            self.draw_annotation(annotation)
-
-        self.main_graph_ax.xaxis_date()
-        plt.gcf().autofmt_xdate()
-        # adding grid
-        self.main_graph_ax.grid(color='grey', linestyle='-', linewidth=0.25, alpha=0.5)
-        # removing top and right borders
-        self.main_graph_ax.spines['top'].set_visible(False)
-        self.main_graph_ax.spines['right'].set_visible(False)
-
-        line = self.main_graph_ax.lines[0]
-        self.main_canvas.draw()
-
-        self.reference_graph_ax.clear()
-        self.reference_graph_ax.plot(self.timestamps, self.data, color="cyan", linewidth=1)
-        self.reference_graph_ax.xaxis_date()
-
-        self.reference_canvas.draw()
-        self.reference_canvas.get_tk_widget().pack(side=tkinter.BOTTOM, fill=tkinter.BOTH, expand=1)
+        try:
+            self.data, self.timestamps, self.annotations = data.open_project(
+                path)
+            self.draw_graph(self.data, self.timestamps, self.annotations)
+        except Exception as e:
+            messagebox.showerror("Error:", e)
 
     def open_concurrent(self):
         path = filedialog.askdirectory()
@@ -198,7 +163,8 @@ class TkBase:
             # method called when save button on popup is pressed
             def save():
                 if not title_entry.get().strip():
-                    error_label = Label(top, text="Please add a title!", fg="red")
+                    error_label = Label(
+                        top, text="Please add a title!", fg="red")
                     error_label.grid(row=3)
                 else:
                     new_annotation = Annotation(title_entry.get(), description_entry.get(1.0, tkinter.END),
@@ -209,7 +175,8 @@ class TkBase:
                     save_json(self.annotations, json_path)
                     self.draw_annotation(new_annotation)
 
-                    # set spans back to none after the annotation is saved to prevent buggy behavior
+                    # set spans back to none after the annotation is saved to
+                    # prevent buggy behavior
                     self.span_min = None
                     self.span_max = None
 
@@ -221,9 +188,12 @@ class TkBase:
             top.title('Confirm Annotation')
             top.grab_set()
 
-            # labels in top level window showing annotation start time and end time
-            annotation_start_label = Label(top, text='Annotation start time: ' + str(self.span_min))
-            annotation_end_label = Label(top, text='Annotation end time: ' + str(self.span_max))
+            # labels in top level window showing annotation start time and end
+            # time
+            annotation_start_label = Label(
+                top, text='Annotation start time: ' + str(self.span_min))
+            annotation_end_label = Label(
+                top, text='Annotation end time: ' + str(self.span_max))
             annotation_start_label.grid(row=0)
             annotation_end_label.grid(row=1)
 
@@ -237,13 +207,16 @@ class TkBase:
             description_entry = tkinter.Text(top, height=6, width=30)
             description_entry.grid(row=6)
 
-            save_button = Button(master=top, text="Save", command=save, bg='white')
+            save_button = Button(master=top, text="Save",
+                                 command=save, bg='white')
             save_button.grid(row=7)
 
-            cancel_button = Button(master=top, text="Cancel", command=cancel, bg='white')
+            cancel_button = Button(
+                master=top, text="Cancel", command=cancel, bg='white')
             cancel_button.grid(row=8)
 
-            # change button back to annotate button and hide span selector again
+            # change button back to annotate button and hide span selector
+            # again
             self.annotate_button.config(text='Annotate', command=self.annotate)
             self.span.set_visible(False)
 
@@ -258,13 +231,16 @@ class TkBase:
     # callback method of the span selector, after every selection it writes
     # the selected range to class variables
     def onselect(self, min, max):
-        self.span_min = datetime.datetime.fromordinal(int(min)) + datetime.timedelta(seconds=divmod(min, 1)[1] * 86400)
-        self.span_max = datetime.datetime.fromordinal(int(max)) + datetime.timedelta(seconds=divmod(max, 1)[1] * 86400)
+        self.span_min = datetime.datetime.fromordinal(
+            int(min)) + datetime.timedelta(seconds=divmod(min, 1)[1] * 86400)
+        self.span_max = datetime.datetime.fromordinal(
+            int(max)) + datetime.timedelta(seconds=divmod(max, 1)[1] * 86400)
 
     # get vertical range for a given annotation
     def get_vertical_range(self, annotation):
 
-        range_indices = np.where(np.logical_and(self.timestamps > annotation.start, self.timestamps < annotation.end))
+        range_indices = np.where(np.logical_and(
+            self.timestamps > annotation.start, self.timestamps < annotation.end))
 
         range_data = self.data[range_indices]
         return range_data[np.argmax(range_data)], range_data[np.argmin(range_data)]
@@ -276,13 +252,42 @@ class TkBase:
             tp = TextPath((date2num(annotation.start) + 6000, 300), annotation.title, size=100000)
             self.main_graph_ax.add_patch(PathPatch(tp, color="black"))
             self.main_graph_ax.add_patch(plt.Rectangle((date2num(annotation.start), vmin - 10),
-                                            date2num(annotation.end) - date2num(
-                                                annotation.start), vmax - vmin + 20, fc='r'))
+                                                       date2num(annotation.end) - date2num(
+                                                           annotation.start), vmax - vmin + 20, fc='r'))
         # if point annotation draw a vertical line
         if (annotation.start == annotation.end):
             plt.figure(1)
             plt.axvline(x=date2num(annotation.start))
         self.main_canvas.draw()
+
+    def draw_graph(self, data, timestamps, annotations):
+        self.main_graph_ax.clear()
+        # plot values on the axe and set plot hue to NHS blue
+        self.main_graph_ax.plot(timestamps, data, color='#5436ff')
+        # draw all saved annotations
+        for annotation in annotations:
+            self.draw_annotation(annotation)
+
+        self.main_graph_ax.xaxis_date()
+        plt.gcf().autofmt_xdate()
+        # adding grid
+        self.main_graph_ax.grid(
+            color='grey', linestyle='-', linewidth=0.25, alpha=0.5)
+        # removing top and right borders
+        self.main_graph_ax.spines['top'].set_visible(False)
+        self.main_graph_ax.spines['right'].set_visible(False)
+        # put the plot with navbar on the tkinter window
+        self.main_canvas.draw()
+
+        self.toolbar.update()
+
+        # second, reference graph displayed
+        self.reference_graph_ax.clear()
+        self.reference_graph_ax.plot(
+            self.timestamps, self.data, color="cyan", linewidth=1)
+        self.reference_graph_ax.xaxis_date()
+        # put the second plot on the tkinter window
+        self.reference_canvas.draw()
 
     def close(self):
         self.master.quit()
@@ -308,7 +313,8 @@ class NavigationToolbar(NavigationToolbar2Tk):
             ('Open', 'Opens a new project', 'open', 'call_open'),
             ('Export', 'Export to PDF', 'export', 'call_export'),
             ('Save', 'Save the figure', 'filesave', 'save_figure'),
-            ('Open Concurrent', 'Open a concurrent graph view', 'compare', 'call_open_concurrent'),
+            ('Open Concurrent', 'Open a concurrent graph view',
+             'compare', 'call_open_concurrent'),
             (None, None, None, None),
             ('Quit', 'Quit application', 'quit', 'call_quit'),
         )

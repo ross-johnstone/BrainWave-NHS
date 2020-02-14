@@ -21,6 +21,7 @@ Main Application Layout
 *  **Reference graph** - the full waveform for the patient displayed above the interactive graph for reference - coloured cyan
 *  **Toolbar** - a set of buttons allowing for navigating the graph and adding annotations
 *  **Interactive graph** - the graph affected by the toolbar - coloured blue
+*  **Annotation sidebar** - a sidebar on the right allowing the user to focus in on specific annotations and edit and delete ones made prior
 
 Toolbar (Buttons from left to right)
 --------------

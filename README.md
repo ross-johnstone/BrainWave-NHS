@@ -38,7 +38,6 @@ Toolbar (Buttons from left to right)
 *  **Save** - if clicked allows the user to export the graph they are working on as a PNG
 *  **Open Concurrent** - if clicked allows user to open a new project in a new window if needed for comparison
 *  **Quit** - if clicked closes the current project and any existing concurrent projects
-*  
 
 Annotation Sidebar
 --------------

@@ -333,23 +333,24 @@ class NavigationToolbar(NavigationToolbar2Tk):
         b.pack(side=tkinter.LEFT)
         return b
 
+
     def call_annotate(self):
-        TkBase.annotate(self.tkbase_)
+        self.tkbase_.annotate()
 
     def call_confirm(self):
-        TkBase.confirm(self.tkbase_)
+        self.tkbase_.confirm()
 
     def call_open(self):
-        TkBase.open(self.tkbase_)
+        self.tkbase_.open()
 
     def call_open_concurrent(self):
-        TkBase.open_concurrent(self.tkbase_)
+        self.tkbase_.open_concurrent()
 
     def call_export(self):
-        TkBase.export(self.tkbase_)
+        self.tkbase_.export()
 
     def call_quit(self):
-        TkBase.close(self.tkbase_)
+        self.tkbase_.close()
 
 
 # root = Tk()

@@ -48,11 +48,11 @@ class TkBase:
         self.listbox_frame.pack(side=tkinter.RIGHT)
 
         #dicitonary to convert from indices in listbox to annotation ids
-        self.index_to_ids = dict()
+        self.index_to_ids = list()
 
-        for i,id in enumerate(self.annotations):
+        for id in self.annotations:
             id = id.id
-            self.index_to_ids[i] = id
+            self.index_to_ids.append(id)
 
 
         self.listb = tkinter.Listbox(self.listbox_frame)
@@ -228,6 +228,7 @@ class TkBase:
 
             for a in self.annotations:
                 if a.id == id:
+                    self.index_to_ids.remove(id)
                     self.annotations.remove(a)
                     save_json(self.annotations,'data/recording1/pat1/annotations.json')
                     self.listb.delete(index)

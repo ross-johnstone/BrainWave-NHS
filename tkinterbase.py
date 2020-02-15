@@ -29,6 +29,10 @@ class TkBase:
 
         #plot values on the axe and set plot hue to NHS blue
         self.ax.plot(self.timestamps,self.data, color='#5436ff')
+
+        #map from annotation id to the drawn shape in the graph
+        self.id_to_shape = dict()
+
         #draw all saved annotations
         for annotation in self.annotations:
             self.draw_annotation(annotation)
@@ -47,7 +51,7 @@ class TkBase:
         self.listbox_frame = tkinter.Frame(master)
         self.listbox_frame.pack(side=tkinter.RIGHT)
 
-        #dicitonary to convert from indices in listbox to annotation ids
+        #list to convert from indices in listbox to annotation ids
         self.index_to_ids = list()
 
         for id in self.annotations:
@@ -230,6 +234,8 @@ class TkBase:
                 if a.id == id:
                     self.index_to_ids.remove(id)
                     self.annotations.remove(a)
+                    self.id_to_shape[id].remove()
+                    self.fig.canvas.draw()
                     save_json(self.annotations,'data/recording1/pat1/annotations.json')
                     self.listb.delete(index)
 
@@ -334,14 +340,12 @@ class TkBase:
         #if date range annotation draw rectangle
         if(annotation.start != annotation.end):
             vmax,vmin = self.get_vertical_range(annotation)
-            tp = TextPath((matplotlib.dates.date2num(annotation.start)+6000,300), annotation.title, size=100000)
-            self.ax.add_patch(PathPatch(tp, color="black"))
-            self.ax.add_patch(plt.Rectangle((matplotlib.dates.date2num(annotation.start),vmin-10),
+            self.id_to_shape[annotation.id] = self.ax.add_patch(plt.Rectangle((matplotlib.dates.date2num(annotation.start),vmin-10),
                                              matplotlib.dates.date2num(annotation.end)-matplotlib.dates.date2num(annotation.start),vmax-vmin+20,fc='r'))
         #if point annotation draw a vertical line
         if(annotation.start==annotation.end):
             plt.figure(1)
-            plt.axvline(x=matplotlib.dates.date2num(annotation.start))
+            self.id_to_shape[annotation.id] = plt.axvline(x=matplotlib.dates.date2num(annotation.start))
         self.fig.canvas.draw()
 
 root = Tk()

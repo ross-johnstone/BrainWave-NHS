@@ -333,7 +333,6 @@ class NavigationToolbar(NavigationToolbar2Tk):
         b.pack(side=tkinter.LEFT)
         return b
 
-
     def call_annotate(self):
         self.tkbase_.annotate()
 

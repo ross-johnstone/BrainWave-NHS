@@ -235,6 +235,7 @@ class TkBase:
                     self.index_to_ids.remove(id)
                     self.annotations.remove(a)
                     self.id_to_shape[id].remove()
+                    del self.id_to_shape[id]
                     self.fig.canvas.draw()
                     save_json(self.annotations,'data/recording1/pat1/annotations.json')
                     self.listb.delete(index)

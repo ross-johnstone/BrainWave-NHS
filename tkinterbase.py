@@ -164,11 +164,16 @@ class TkBase:
 
             for a in self.annotations:
                 if a.id == id:
-                    print("start: "+ a.start.strftime("%m/%d/%Y, %H:%M:%S"))
-                    print("end: "+ a.end.strftime("%m/%d/%Y, %H:%M:%S"))
 
-                    range = self.get_vertical_range(a)
-                    self.ax.axis([a.start,a.end,range[1]-20,range[0]+20])
+                    if(a.end != a.start):
+                        range = self.get_vertical_range(a)
+                        diff = (range[0]-range[1])/2
+                        delta = (a.end - a.start)/15
+                        self.ax.axis([a.start - delta, a.end + delta, range[1]-diff, range[0]+diff])
+
+                    else:
+                        delta = datetime.timedelta(seconds=10)
+                        self.ax.axis([a.start - delta, a.end + delta, self.ax.get_ylim()[0], self.ax.get_ylim()[1]])
                     self.fig.canvas.toolbar.push_current()
                     self.fig.canvas.draw()
 

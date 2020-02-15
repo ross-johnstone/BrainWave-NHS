@@ -183,7 +183,8 @@ class TkBase:
             # method called when save button on popup is pressed
             def save():
 
-                annotation.title = title_entry.get()
+                a.title = title_entry.get()
+                a.content = description_entry.get()
                 save_json(self.annotations,'data/recording1/pat1/annotations.json')
                 self.listb.delete(index)
                 self.listb.insert(index,title_entry.get())
@@ -280,6 +281,8 @@ class TkBase:
                 self.annotations.append(new_annotation)
                 save_json(self.annotations,'data/recording1/pat1/annotations.json')
                 self.draw_annotation(new_annotation)
+                self.index_to_ids.append(new_annotation.id)
+                self.listb.insert(tkinter.END,new_annotation.title)
 
                 #set spans back to none after the annotation is saved to prevent buggy behavior
                 self.span_min=None

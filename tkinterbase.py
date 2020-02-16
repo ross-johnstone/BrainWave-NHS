@@ -13,7 +13,10 @@ import numpy as np
 from annotations import Annotation, save_json
 import data
 from tkinter import messagebox
+<<<<<<< HEAD
 
+=======
+>>>>>>> develop
 
 
 class TkBase:
@@ -21,13 +24,18 @@ class TkBase:
 
     def __init__(self, master, path):
 
+<<<<<<< HEAD
         FIGSIZE = (8,3)
+=======
+        FIGSIZE = (8, 3)
+>>>>>>> develop
         self.window_id = next(self.id_generator)
         self.master = master
 
         master.title("BrainWave Visualization")
         master.state('zoomed')
 
+<<<<<<< HEAD
 
         #map from annotation id to the drawn shape in the graph
         self.id_to_shape = dict()
@@ -103,6 +111,43 @@ class TkBase:
         # put the plot with navbar on the tkinter window
         self.main_canvas.mpl_connect('button_release_event', self.butrelease)
 
+=======
+        # create matplotlib figures with single axes on which the data will be
+        # displayed
+        self.main_graph, self.main_graph_ax = plt.subplots(figsize=FIGSIZE)
+        self.main_graph.set_facecolor('xkcd:grey')
+        self.main_graph_ax.set_facecolor('xkcd:dark grey')
+
+        # second, reference graph
+        self.reference_graph, self.reference_graph_ax = plt.subplots(
+            figsize=FIGSIZE)
+        self.reference_graph.set_facecolor('xkcd:grey')
+        self.reference_graph_ax.set_facecolor('xkcd:dark grey')
+        self.main_canvas = FigureCanvasTkAgg(self.main_graph, master=master)
+        self.main_canvas.get_tk_widget().pack(
+            side=tkinter.BOTTOM, fill=tkinter.BOTH, expand=1)
+        self.toolbar = NavigationToolbar(
+            self.main_canvas, self.master, tkbase_=self)
+
+        self.reference_canvas = FigureCanvasTkAgg(
+            self.reference_graph, master=master)
+        self.reference_canvas.get_tk_widget().pack(
+            side=tkinter.BOTTOM, fill=tkinter.BOTH, expand=1)
+        self.reference_canvas.get_tk_widget().pack(
+            side=tkinter.BOTTOM, fill=tkinter.BOTH, expand=1)
+
+        self.project_path = path
+        try:
+            self.data, self.timestamps, self.annotations = data.open_project(
+                self.project_path)
+            self.draw_graph(self.data, self.timestamps, self.annotations)
+        except Exception as e:
+            messagebox.showerror("Error:", e)
+
+        # put the plot with navbar on the tkinter window
+        self.main_canvas.mpl_connect('button_release_event', self.butrelease)
+
+>>>>>>> develop
         # add span selector to the axes but set it defaultly to not visible,
         # only activate it when the button annotate is pressed
         self.span = SpanSelector(self.main_graph_ax, self.onselect, 'horizontal', useblit=True,
@@ -120,6 +165,7 @@ class TkBase:
         self.span_min = None
         self.span_max = None
 
+    # callback method for the open button, opens an existing project
     def open(self):
         path = filedialog.askdirectory()
         path = path + "/"
@@ -137,10 +183,10 @@ class TkBase:
         new_root.protocol("WM_DELETE_WINDOW", new_root.destroy)
         TkBase(new_root, path)
 
-    #callback method for the annotate button activates the span selector
-    def butrelease(self,event):
-        #deactivate toolbar functionalities if any are active
-        if(self.toolbar._active=='PAN'):
+    # callback method for the annotate button activates the span selector
+    def butrelease(self, event):
+        # deactivate toolbar functionalities if any are active
+        if (self.toolbar._active == 'PAN'):
             self.toolbar.pan()
 
         if (self.toolbar._active == 'ZOOM'):
@@ -294,7 +340,6 @@ class TkBase:
 
 
     def annotate(self):
-
         # activate the span selector
         self.span.set_visible(True)
 
@@ -305,10 +350,10 @@ class TkBase:
         if (self.toolbar._active == 'ZOOM'):
             self.toolbar.zoom()
 
-        self.annotate_button.config(text='Confirm',command = self.confirm)
+        self.annotate_button.config(text='Confirm', command=self.confirm)
 
-    #callback method for the annotate button after span is sellected this button
-    #is pressed to add descriptions to the annotation and confirm selection
+    # callback method for the annotate button after span is sellected this button
+    # is pressed to add descriptions to the annotation and confirm selection
     def confirm(self):
         # if something is selected
         if (self.span_min):
@@ -388,20 +433,17 @@ class TkBase:
 
     # callback method of the span selector, after every selection it writes
     # the selected range to class variables
-
-
-    # callback method of the span selector, after every selection it writes
-    # the selected range to class variables
     def onselect(self, min, max):
         self.span_min = datetime.datetime.fromordinal(
             int(min)) + datetime.timedelta(seconds=divmod(min, 1)[1] * 86400)
         self.span_max = datetime.datetime.fromordinal(
             int(max)) + datetime.timedelta(seconds=divmod(max, 1)[1] * 86400)
 
-    #get vertical range for a given annotation
-    def get_vertical_range(self,annotation):
+    # get vertical range for a given annotation
+    def get_vertical_range(self, annotation):
 
-        range_indices = np.where(np.logical_and(self.timestamps>annotation.start,self.timestamps<annotation.end))
+        range_indices = np.where(np.logical_and(
+            self.timestamps > annotation.start, self.timestamps < annotation.end))
 
         range_data = self.data[range_indices]
         return range_data[np.argmax(range_data)], range_data[np.argmin(range_data)]
@@ -448,9 +490,9 @@ class TkBase:
         # put the second plot on the tkinter window
         self.reference_canvas.draw()
 
-
     def close(self):
         self.master.quit()
+
 
 class NavigationToolbar(NavigationToolbar2Tk):
 
@@ -489,22 +531,23 @@ class NavigationToolbar(NavigationToolbar2Tk):
         return b
 
     def call_annotate(self):
-        self.tkbase_.annotate()
+        TkBase.annotate(self.tkbase_)
 
     def call_confirm(self):
-        self.tkbase_.confirm()
+        TkBase.confirm(self.tkbase_)
 
     def call_open(self):
-        self.tkbase_.open()
+        TkBase.open(self.tkbase_)
 
     def call_open_concurrent(self):
-        self.tkbase_.open_concurrent()
+        TkBase.open_concurrent(self.tkbase_)
 
     def call_export(self):
-        self.tkbase_.export()
+        TkBase.export(self.tkbase_)
 
     def call_quit(self):
-        self.tkbase_.close()
+        TkBase.close(self.tkbase_)
+
 
 # root = Tk()
 # my_gui = TkBase(root, "./pat1/")

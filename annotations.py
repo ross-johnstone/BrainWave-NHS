@@ -3,7 +3,11 @@ import datetime as dt
 import itertools
 
 class Annotation:
+<<<<<<< HEAD
     id_generator = itertools.count(1)
+=======
+
+>>>>>>> develop
     def __init__(self, title, content, start_time, end_time):
         self.title = title
         self.content = content
@@ -28,30 +32,34 @@ class Annotation:
 
 
 def encode_annotation(annotation):
-	"""
-	Function to help encode an annotation object to save in a json file
-	"""
-	if isinstance(annotation, Annotation):
-		return {"__annotation__":True, "title":annotation.title, "content":annotation.content,
-				"start_time":dt.datetime.isoformat(annotation.start), "end_time":dt.datetime.isoformat(annotation.end)}
-	else:
-		type_name = annotation.__class__.__name__
-		raise TypeError("Object of type '{}' is not JSON serializable".format(type_name))
+    """
+    Function to help encode an annotation object to save in a json file
+    """
+    if isinstance(annotation, Annotation):
+        return {"__annotation__": True, "title": annotation.title, "content": annotation.content,
+                "start_time": dt.datetime.isoformat(annotation.start), "end_time": dt.datetime.isoformat(annotation.end)}
+    else:
+        type_name = annotation.__class__.__name__
+        raise TypeError(
+            "Object of type '{}' is not JSON serializable".format(type_name))
+
 
 def decode_annotation(dict):
-	"""
-	Hook function to help decode an annotation object from a json file
-	"""
-	if "__annotation__" in dict:
-		return Annotation(dict["title"], dict["content"], dt.datetime.strptime(dict["start_time"],"%Y-%m-%dT%H:%M:%S.%f"), dt.datetime.strptime(dict["end_time"],"%Y-%m-%dT%H:%M:%S.%f"))
-	return dict
+    """
+    Hook function to help decode an annotation object from a json file
+    """
+    if "__annotation__" in dict:
+        return Annotation(dict["title"], dict["content"], dt.datetime.strptime(dict["start_time"], "%Y-%m-%dT%H:%M:%S.%f"), dt.datetime.strptime(dict["end_time"], "%Y-%m-%dT%H:%M:%S.%f"))
+    return dict
+
 
 def save_json(annotations, filename):
     """
     Saves an annotation object as json
     """
     with open(filename, "w+") as outfile:
-        json.dump(annotations, outfile, sort_keys=True, default=encode_annotation)
+        json.dump(annotations, outfile, sort_keys=True,
+                  default=encode_annotation)
 
 
 def open_json(filename):

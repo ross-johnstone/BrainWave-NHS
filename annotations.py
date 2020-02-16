@@ -3,11 +3,8 @@ import datetime as dt
 import itertools
 
 class Annotation:
-<<<<<<< HEAD
     id_generator = itertools.count(1)
-=======
-
->>>>>>> develop
+    
     def __init__(self, title, content, start_time, end_time):
         self.title = title
         self.content = content

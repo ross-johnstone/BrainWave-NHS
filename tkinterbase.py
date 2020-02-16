@@ -13,41 +13,30 @@ import numpy as np
 from annotations import Annotation, save_json
 import data
 from tkinter import messagebox
-<<<<<<< HEAD
-
-=======
->>>>>>> develop
-
 
 class TkBase:
     id_generator = itertools.count(1)
 
     def __init__(self, master, path):
 
-<<<<<<< HEAD
         FIGSIZE = (8,3)
-=======
-        FIGSIZE = (8, 3)
->>>>>>> develop
         self.window_id = next(self.id_generator)
         self.master = master
 
         master.title("BrainWave Visualization")
         master.state('zoomed')
 
-<<<<<<< HEAD
-
         #map from annotation id to the drawn shape in the graph
         self.id_to_shape = dict()
 
-        self.listbox_frame = tkinter.Frame(master)
+        self.listbox_frame = tkinter.Frame(self.master)
         self.listbox_frame.pack(side=tkinter.RIGHT)
 
         #list to convert from indices in listbox to annotation ids
         self.index_to_ids = list()
 
 
-        self.listb = tkinter.Listbox(self.listbox_frame)
+        self.listb = tkinter.Listbox(self.listbox_frame, width = 30)
 
         self.listb.bind('<<ListboxSelect>>', self.listbox_selection)
         self.listb.grid(column=0,row=1)
@@ -59,7 +48,7 @@ class TkBase:
 
         self.labelDescription = tkinter.Label(self.listbox_frame,
                             text = "description:",
-                            wraplength=200)
+                            wraplength=150)
         self.labelDescription.grid(column=0, row=3)
 
         self.go_to_annotation = tkinter.Button(self.listbox_frame,text='Go To annotation',command = self.goto_callback)
@@ -111,43 +100,6 @@ class TkBase:
         # put the plot with navbar on the tkinter window
         self.main_canvas.mpl_connect('button_release_event', self.butrelease)
 
-=======
-        # create matplotlib figures with single axes on which the data will be
-        # displayed
-        self.main_graph, self.main_graph_ax = plt.subplots(figsize=FIGSIZE)
-        self.main_graph.set_facecolor('xkcd:grey')
-        self.main_graph_ax.set_facecolor('xkcd:dark grey')
-
-        # second, reference graph
-        self.reference_graph, self.reference_graph_ax = plt.subplots(
-            figsize=FIGSIZE)
-        self.reference_graph.set_facecolor('xkcd:grey')
-        self.reference_graph_ax.set_facecolor('xkcd:dark grey')
-        self.main_canvas = FigureCanvasTkAgg(self.main_graph, master=master)
-        self.main_canvas.get_tk_widget().pack(
-            side=tkinter.BOTTOM, fill=tkinter.BOTH, expand=1)
-        self.toolbar = NavigationToolbar(
-            self.main_canvas, self.master, tkbase_=self)
-
-        self.reference_canvas = FigureCanvasTkAgg(
-            self.reference_graph, master=master)
-        self.reference_canvas.get_tk_widget().pack(
-            side=tkinter.BOTTOM, fill=tkinter.BOTH, expand=1)
-        self.reference_canvas.get_tk_widget().pack(
-            side=tkinter.BOTTOM, fill=tkinter.BOTH, expand=1)
-
-        self.project_path = path
-        try:
-            self.data, self.timestamps, self.annotations = data.open_project(
-                self.project_path)
-            self.draw_graph(self.data, self.timestamps, self.annotations)
-        except Exception as e:
-            messagebox.showerror("Error:", e)
-
-        # put the plot with navbar on the tkinter window
-        self.main_canvas.mpl_connect('button_release_event', self.butrelease)
-
->>>>>>> develop
         # add span selector to the axes but set it defaultly to not visible,
         # only activate it when the button annotate is pressed
         self.span = SpanSelector(self.main_graph_ax, self.onselect, 'horizontal', useblit=True,
@@ -240,7 +192,7 @@ class TkBase:
                 if a.id == id:
 
                     self.labelTitle['text'] = "Title: "+a.title
-                    self.labelDescription['text'] = "Description: "+a.content
+                    self.labelDescription['text'] = "Description: \n"+a.content
 
     #callback for go to annotation button
     def goto_callback(self):
@@ -256,13 +208,13 @@ class TkBase:
                         range = self.get_vertical_range(a)
                         diff = (range[0]-range[1])/2
                         delta = (a.end - a.start)/15
-                        self.ax.axis([a.start - delta, a.end + delta, range[1]-diff, range[0]+diff])
+                        self.main_graph_ax.axis([a.start - delta, a.end + delta, range[1]-diff, range[0]+diff])
 
                     else:
                         delta = datetime.timedelta(seconds=10)
-                        self.ax.axis([a.start - delta, a.end + delta, self.ax.get_ylim()[0], self.ax.get_ylim()[1]])
-                    self.fig.canvas.toolbar.push_current()
-                    self.fig.canvas.draw()
+                        self.main_graph_ax.axis([a.start - delta, a.end + delta, self.main_graph_ax.get_ylim()[0], self.main_graph_ax.get_ylim()[1]])
+                    self.main_graph.canvas.toolbar.push_current()
+                    self.main_graph.canvas.draw()
 
 
     def edit_callback(self):
@@ -297,7 +249,7 @@ class TkBase:
                 if a.id == id:
                     annotation = a
                     #popup in which you edit the annotation
-                    top = Toplevel(root)
+                    top = Toplevel(self.master)
                     top.title('edit annotation')
                     top.grab_set()
 
@@ -334,7 +286,7 @@ class TkBase:
                     self.annotations.remove(a)
                     self.id_to_shape[id].remove()
                     del self.id_to_shape[id]
-                    self.fig.canvas.draw()
+                    self.main_graph.canvas.draw()
                     save_json(self.annotations,'data/recording1/pat1/annotations.json')
                     self.listb.delete(index)
 
@@ -377,6 +329,8 @@ class TkBase:
                     json_path = self.project_path + 'annotations.json'
                     save_json(self.annotations, json_path)
                     self.draw_annotation(new_annotation)
+                    self.index_to_ids.append(new_annotation.id)
+                    self.listb.insert(tkinter.END,new_annotation.title)
 
                     # set spans back to none after the annotation is saved to
                     # prevent buggy behavior
@@ -452,13 +406,13 @@ class TkBase:
         #if date range annotation draw rectangle
         if(annotation.start != annotation.end):
             vmax,vmin = self.get_vertical_range(annotation)
-            self.id_to_shape[annotation.id] = self.ax.add_patch(plt.Rectangle((matplotlib.dates.date2num(annotation.start),vmin-10),
-                                             matplotlib.dates.date2num(annotation.end)-matplotlib.dates.date2num(annotation.start),vmax-vmin+20,fc='r'))
+            self.id_to_shape[annotation.id] = self.main_graph_ax.add_patch(plt.Rectangle((date2num(annotation.start),vmin-10),
+                                             date2num(annotation.end)-date2num(annotation.start),vmax-vmin+20,fc='r'))
         #if point annotation draw a vertical line
         if(annotation.start==annotation.end):
             plt.figure(self.window_id*2-1)
-            self.id_to_shape[annotation.id] = plt.axvline(x=matplotlib.dates.date2num(annotation.start))
-        self.fig.canvas.draw()
+            self.id_to_shape[annotation.id] = plt.axvline(x=date2num(annotation.start))
+        self.main_graph.canvas.draw()
 
 
     def draw_graph(self, data, timestamps, annotations):
@@ -479,8 +433,8 @@ class TkBase:
         self.main_graph_ax.spines['right'].set_visible(False)
         # put the plot with navbar on the tkinter window
         self.main_canvas.draw()
-
         self.toolbar.update()
+        self.main_graph.canvas.toolbar.push_current()
 
         # second, reference graph displayed
         self.reference_graph_ax.clear()

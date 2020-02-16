@@ -160,7 +160,7 @@ class TkBase:
                 with PdfPages(filename) as export_pdf:
                     plt.figure(self.window_id * 2 - 1)
                     export_pdf.savefig()
-                    plt.figure(self.window_id * 2 - 2)
+                    plt.figure(self.window_id * 2)
                     export_pdf.savefig()
                 cancel()
 
@@ -233,7 +233,7 @@ class TkBase:
                     error_label.grid(row=3)
                 else:
                     a.title = title_entry.get()
-                    a.content = description_entry.get()
+                    a.content = description_entry.get(1.0, tkinter.END)
                     save_json(self.annotations,'data/recording1/pat1/annotations.json')
                     self.listb.delete(index)
                     self.listb.insert(index,title_entry.get())
@@ -254,24 +254,34 @@ class TkBase:
                     top.grab_set()
 
                     #labels in top level window showing annotation start time and end time
-                    annotation_start_label = Label(top,text='Annotation start time: '+str(a.start))
-                    annotation_end_label = Label(top,text='Annotation end time: '+str(a.end))
-                    annotation_start_label.pack()
-                    annotation_end_label.pack()
+                    annotation_start_label = Label(
+                        top,text='Annotation start time: '+str(a.start))
+                    annotation_end_label = Label(
+                        top,text='Annotation end time: '+str(a.end))
+                    annotation_start_label.grid(row=0)
+                    annotation_end_label.grid(row=1)
 
-                    title_entry = Entry(top)
+                    annotation_title_label = Label(top, text='Title')
+                    annotation_title_label.grid(row=2)
+                    title_entry = Entry(top, font=("Courier", 12))
                     title_entry.insert(tkinter.END,a.title)
-                    title_entry.pack()
+                    title_entry.grid(row=4)
 
-                    description_entry = Entry(top)
+                    description_label = Label(top, text='Description')
+                    description_label.grid(row=5)
+                    description_entry = tkinter.Text(top, height=6, width=30)
                     description_entry.insert(tkinter.END,a.content)
-                    description_entry.pack()
+                    description_entry.grid(row=6)
 
                     cancel_button = Button(master=top, text = "Cancel",command = cancel, bg='white')
-                    cancel_button.pack()
+                    cancel_button.grid(row=8)
 
                     save_button = Button(master=top, text = "Save", command= save, bg='white')
-                    save_button.pack()
+                    save_button.grid(row=7)
+
+                    top.resizable(False, False)
+                    top.iconbitmap(r"./res/general_images/favicon.ico")
+                    top.protocol("WM_DELETE_WINDOW", cancel)
 
     def delete_callback(self):
         if(self.listb.curselection()):

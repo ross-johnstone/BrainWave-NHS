@@ -211,8 +211,16 @@ class TkBase:
                         self.main_graph_ax.axis([a.start - delta, a.end + delta, range[1]-diff, range[0]+diff])
 
                     else:
-                        delta = datetime.timedelta(seconds=10)
-                        self.main_graph_ax.axis([a.start - delta, a.end + delta, self.main_graph_ax.get_ylim()[0], self.main_graph_ax.get_ylim()[1]])
+
+                        delta = datetime.timedelta(seconds=5)
+
+                        range_indices = np.where(np.logical_and(
+                            self.timestamps > a.start-datetime.timedelta(milliseconds = 19), self.timestamps < a.end+datetime.timedelta(milliseconds=19)))
+                        range_data = self.data[range_indices]
+                        ypoint = range_data[np.argmax(range_data)]
+
+                        self.main_graph_ax.axis([a.start - delta, a.end + delta, ypoint-30, ypoint+30])
+
                     self.main_graph.canvas.toolbar.push_current()
                     self.main_graph.canvas.draw()
 

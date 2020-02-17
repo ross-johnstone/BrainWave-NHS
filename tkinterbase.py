@@ -14,50 +14,52 @@ from annotations import Annotation, save_json
 import data
 from tkinter import messagebox
 
+
 class TkBase:
     id_generator = itertools.count(1)
 
     def __init__(self, master, path):
 
-        FIGSIZE = (8,3)
+        FIGSIZE = (8, 3)
         self.window_id = next(self.id_generator)
         self.master = master
 
         master.title("BrainWave Visualization")
         master.state('zoomed')
 
-        #map from annotation id to the drawn shape in the graph
+        # map from annotation id to the drawn shape in the graph
         self.id_to_shape = dict()
 
         self.listbox_frame = tkinter.Frame(self.master)
         self.listbox_frame.pack(side=tkinter.RIGHT)
 
-        #list to convert from indices in listbox to annotation ids
+        # list to convert from indices in listbox to annotation ids
         self.index_to_ids = list()
 
-
-        self.listb = tkinter.Listbox(self.listbox_frame, width = 30)
+        self.listb = tkinter.Listbox(self.listbox_frame, width=30)
 
         self.listb.bind('<<ListboxSelect>>', self.listbox_selection)
-        self.listb.grid(column=0,row=1)
-
+        self.listb.grid(column=0, row=1)
 
         self.labelTitle = tkinter.Label(self.listbox_frame,
-                            text = "Title:")
+                                        text="Title:")
         self.labelTitle.grid(column=0, row=2)
 
         self.labelDescription = tkinter.Label(self.listbox_frame,
-                            text = "description:",
-                            wraplength=150)
+                                              text="description:",
+                                              wraplength=150)
         self.labelDescription.grid(column=0, row=3)
 
-        self.go_to_annotation = tkinter.Button(self.listbox_frame,text='Go To annotation',command = self.goto_callback)
+        self.go_to_annotation = tkinter.Button(
+            self.listbox_frame, text='Go To annotation', command=self.goto_callback)
         self.go_to_annotation.grid(column=0, row=4)
 
-        self.edit_annotation = tkinter.Button(self.listbox_frame,text='edit',command = self.edit_callback)
+        self.edit_annotation = tkinter.Button(
+            self.listbox_frame, text='edit', command=self.edit_callback)
         self.edit_annotation.grid(column=0, row=5)
 
-        self.delete_annotation = tkinter.Button(self.listbox_frame,text='delete',command = self.delete_callback)
+        self.delete_annotation = tkinter.Button(
+            self.listbox_frame, text='delete', command=self.delete_callback)
         self.delete_annotation.grid(column=0, row=6)
 
         # create matplotlib figures with single axes on which the data will be
@@ -66,7 +68,7 @@ class TkBase:
         self.main_graph.set_facecolor('xkcd:grey')
         self.main_graph_ax.set_facecolor('xkcd:dark grey')
 
-         # second, reference graph
+        # second, reference graph
         self.reference_graph, self.reference_graph_ax = plt.subplots(
             figsize=FIGSIZE)
         self.reference_graph.set_facecolor('xkcd:grey')
@@ -93,7 +95,7 @@ class TkBase:
                 id = id.id
                 self.index_to_ids.append(id)
             for a in self.annotations:
-                self.listb.insert(tkinter.END,a.title)
+                self.listb.insert(tkinter.END, a.title)
         except Exception as e:
             messagebox.showerror("Error:", e)
 
@@ -153,7 +155,8 @@ class TkBase:
 
         def save():
             if not export_popup_entry.get().strip():
-                error_label = Label(popup, text="Please add a filename!", fg="red")
+                error_label = Label(
+                    popup, text="Please add a filename!", fg="red")
                 error_label.grid(row=1, column=0)
             else:
                 filename = export_popup_entry.get() + '.pdf'
@@ -178,10 +181,8 @@ class TkBase:
         close_export_popup_button = Button(popup, text="Confirm", command=save)
         close_export_popup_button.grid(row=1, column=1)
 
-
-
-    #callback function for the listbox widget
-    def listbox_selection(self,event):
+    # callback function for the listbox widget
+    def listbox_selection(self, event):
 
         if(self.listb.curselection()):
             id = self.index_to_ids[self.listb.curselection()[0]]
@@ -194,7 +195,7 @@ class TkBase:
                     self.labelTitle['text'] = "Title: "+a.title
                     self.labelDescription['text'] = "Description: \n"+a.content
 
-    #callback for go to annotation button
+    # callback for go to annotation button
     def goto_callback(self):
         if(self.listb.curselection()):
             id = self.index_to_ids[self.listb.curselection()[0]]
@@ -208,22 +209,23 @@ class TkBase:
                         range = self.get_vertical_range(a)
                         diff = (range[0]-range[1])/2
                         delta = (a.end - a.start)/15
-                        self.main_graph_ax.axis([a.start - delta, a.end + delta, range[1]-diff, range[0]+diff])
+                        self.main_graph_ax.axis(
+                            [a.start - delta, a.end + delta, range[1]-diff, range[0]+diff])
 
                     else:
 
                         delta = datetime.timedelta(seconds=5)
 
                         range_indices = np.where(np.logical_and(
-                            self.timestamps > a.start-datetime.timedelta(milliseconds = 19), self.timestamps < a.end+datetime.timedelta(milliseconds=19)))
+                            self.timestamps > a.start-datetime.timedelta(milliseconds=19), self.timestamps < a.end+datetime.timedelta(milliseconds=19)))
                         range_data = self.data[range_indices]
                         ypoint = range_data[np.argmax(range_data)]
 
-                        self.main_graph_ax.axis([a.start - delta, a.end + delta, ypoint-30, ypoint+30])
+                        self.main_graph_ax.axis(
+                            [a.start - delta, a.end + delta, ypoint-30, ypoint+30])
 
                     self.main_graph.canvas.toolbar.push_current()
                     self.main_graph.canvas.draw()
-
 
     def edit_callback(self):
         if(self.listb.curselection()):
@@ -242,9 +244,10 @@ class TkBase:
                 else:
                     a.title = title_entry.get()
                     a.content = description_entry.get(1.0, tkinter.END)
-                    save_json(self.annotations,'data/recording1/pat1/annotations.json')
+                    save_json(self.annotations,
+                              'data/recording1/pat1/annotations.json')
                     self.listb.delete(index)
-                    self.listb.insert(index,title_entry.get())
+                    self.listb.insert(index, title_entry.get())
                     print(id)
                     cancel()
 
@@ -256,35 +259,37 @@ class TkBase:
             for a in self.annotations:
                 if a.id == id:
                     annotation = a
-                    #popup in which you edit the annotation
+                    # popup in which you edit the annotation
                     top = Toplevel(self.master)
                     top.title('edit annotation')
                     top.grab_set()
 
-                    #labels in top level window showing annotation start time and end time
+                    # labels in top level window showing annotation start time and end time
                     annotation_start_label = Label(
-                        top,text='Annotation start time: '+str(a.start))
+                        top, text='Annotation start time: '+str(a.start))
                     annotation_end_label = Label(
-                        top,text='Annotation end time: '+str(a.end))
+                        top, text='Annotation end time: '+str(a.end))
                     annotation_start_label.grid(row=0)
                     annotation_end_label.grid(row=1)
 
                     annotation_title_label = Label(top, text='Title')
                     annotation_title_label.grid(row=2)
                     title_entry = Entry(top, font=("Courier", 12))
-                    title_entry.insert(tkinter.END,a.title)
+                    title_entry.insert(tkinter.END, a.title)
                     title_entry.grid(row=4)
 
                     description_label = Label(top, text='Description')
                     description_label.grid(row=5)
                     description_entry = tkinter.Text(top, height=6, width=30)
-                    description_entry.insert(tkinter.END,a.content)
+                    description_entry.insert(tkinter.END, a.content)
                     description_entry.grid(row=6)
 
-                    cancel_button = Button(master=top, text = "Cancel",command = cancel, bg='white')
+                    cancel_button = Button(
+                        master=top, text="Cancel", command=cancel, bg='white')
                     cancel_button.grid(row=8)
 
-                    save_button = Button(master=top, text = "Save", command= save, bg='white')
+                    save_button = Button(
+                        master=top, text="Save", command=save, bg='white')
                     save_button.grid(row=7)
 
                     top.resizable(False, False)
@@ -305,9 +310,9 @@ class TkBase:
                     self.id_to_shape[id].remove()
                     del self.id_to_shape[id]
                     self.main_graph.canvas.draw()
-                    save_json(self.annotations,'data/recording1/pat1/annotations.json')
+                    save_json(self.annotations,
+                              'data/recording1/pat1/annotations.json')
                     self.listb.delete(index)
-
 
     def annotate(self):
         # activate the span selector
@@ -348,7 +353,7 @@ class TkBase:
                     save_json(self.annotations, json_path)
                     self.draw_annotation(new_annotation)
                     self.index_to_ids.append(new_annotation.id)
-                    self.listb.insert(tkinter.END,new_annotation.title)
+                    self.listb.insert(tkinter.END, new_annotation.title)
 
                     # set spans back to none after the annotation is saved to
                     # prevent buggy behavior
@@ -420,18 +425,18 @@ class TkBase:
         range_data = self.data[range_indices]
         return range_data[np.argmax(range_data)], range_data[np.argmin(range_data)]
 
-    def draw_annotation(self,annotation):
-        #if date range annotation draw rectangle
+    def draw_annotation(self, annotation):
+        # if date range annotation draw rectangle
         if(annotation.start != annotation.end):
-            vmax,vmin = self.get_vertical_range(annotation)
-            self.id_to_shape[annotation.id] = self.main_graph_ax.add_patch(plt.Rectangle((date2num(annotation.start),vmin-10),
-                                             date2num(annotation.end)-date2num(annotation.start),vmax-vmin+20,fc='r'))
-        #if point annotation draw a vertical line
-        if(annotation.start==annotation.end):
+            vmax, vmin = self.get_vertical_range(annotation)
+            self.id_to_shape[annotation.id] = self.main_graph_ax.add_patch(plt.Rectangle((date2num(annotation.start), vmin-10),
+                                                                                         date2num(annotation.end)-date2num(annotation.start), vmax-vmin+20, fc='r'))
+        # if point annotation draw a vertical line
+        if(annotation.start == annotation.end):
             plt.figure(self.window_id*2-1)
-            self.id_to_shape[annotation.id] = plt.axvline(x=date2num(annotation.start))
+            self.id_to_shape[annotation.id] = plt.axvline(
+                x=date2num(annotation.start))
         self.main_graph.canvas.draw()
-
 
     def draw_graph(self, data, timestamps, annotations):
         self.main_graph_ax.clear()

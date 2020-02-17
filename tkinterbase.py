@@ -236,21 +236,23 @@ class TkBase:
                         top, text="Please add a title!", fg="red")
                     error_label.grid(row=3)
                 else:
-                    a.title = title_entry.get()
-                    a.content = description_entry.get(1.0, tkinter.END)
+                    annotation.title = title_entry.get()
+                    annotation.content = description_entry.get(1.0, tkinter.END)
                     save_json(self.annotations,
                               'data/recording1/pat1/annotations.json')
                     self.listb.delete(index)
                     self.listb.insert(index, title_entry.get())
-                    print(id)
                     cancel()
 
             index = self.listb.curselection()[0]
             id = self.index_to_ids[self.listb.curselection()[0]]
 
+            annotation = None
+
             for a in self.annotations:
                 if a.id == id:
                     # popup in which you edit the annotation
+                    annotation = a
                     top = Toplevel(self.master)
                     top.title('edit annotation')
                     top.grab_set()

@@ -316,7 +316,7 @@ class NavigationToolbar(NavigationToolbar2Tk):
             (None, None, None, None),
             ('Open', 'Opens a new project', 'open', 'call_open'),
             ('Export', 'Export to PDF', 'export', 'call_export'),
-            ('Save', 'Save the figure', 'filesave', 'save_figure'),
+            ('Save', 'Save the graph as PNG', 'filesave', 'save_figure'),
             ('Open Concurrent', 'Open a concurrent graph view',
              'compare', 'call_open_concurrent'),
             (None, None, None, None),

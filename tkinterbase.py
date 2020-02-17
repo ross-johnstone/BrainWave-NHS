@@ -13,7 +13,8 @@ import numpy as np
 from annotations import Annotation, save_json
 import data
 from tkinter import messagebox
-
+import os
+import re
 
 class TkBase:
     id_generator = itertools.count(1)
@@ -93,9 +94,36 @@ class TkBase:
     def open_concurrent(self):
         path = filedialog.askdirectory()
         path = path + "/"
-        new_root = Toplevel(self.master)
-        new_root.protocol("WM_DELETE_WINDOW", new_root.destroy)
-        TkBase(new_root, path)
+        try:
+            if self.check_valid_path(path):
+                new_root = Toplevel(self.master)
+                new_root.protocol("WM_DELETE_WINDOW", new_root.destroy)
+                TkBase(new_root, path)
+        except Exception as e:
+            raise Exception(e)
+
+    def check_valid_path(self, path):
+        # Checks the path contents to see if it has .cal and .wav files and raises exceptions if it doesn't
+        # returns false if user clicked on cancel, or an unexpected scenario occurs for quiet handling
+        contents = os.listdir(path)
+        calfile = ""
+        datafiles = []
+        for filepath in contents:
+            if re.match(r'\d{2}-\d{2}-\d{4}_\d{2}_\d{2}_\d{2}_\d{1,4}_\d*.cal', filepath):
+                calfile = path + filepath
+            elif re.match(r'\d{2}-\d{2}-\d{4}_\d{2}_\d{2}_\d{2}_\d{1,4}_\d*.wav', filepath):
+                datafiles.append(path + filepath)
+        if (calfile != "") and (datafiles != []):
+            return True
+        elif calfile == "" and datafiles == [] and path == "/":
+            return False
+        elif calfile == "" and datafiles == []:
+            raise Exception("Missing .cal file and .wav files")
+        elif calfile == "":
+            raise Exception("Missing .cal file")
+        elif datafiles == []:
+            raise Exception("Missing .wav files")
+        return False
 
     # callback method for the annotate button activates the span selector
     def butrelease(self, event):
@@ -343,7 +371,10 @@ class NavigationToolbar(NavigationToolbar2Tk):
         self.tkbase_.open()
 
     def call_open_concurrent(self):
-        self.tkbase_.open_concurrent()
+        try:
+            self.tkbase_.open_concurrent()
+        except Exception as e:
+            messagebox.showerror("Error:", e)
 
     def call_export(self):
         self.tkbase_.export()

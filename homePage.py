@@ -40,21 +40,23 @@ class HomePage:
     def load_project(self):
         path = filedialog.askdirectory()
         if not path:
-            # If user exits file directory  - shows error msg
-            messagebox.showerror("Error", "File could not be opened.")
+            # If user exits file directory  - do nothing
+            pass
         else:
             path = path + "/"
-            if not self.isValid(path):
+            try:
+                if self.isValid(path):
+                # Destroys homepage and runs main app
+                    self.open_button.destroy()
+                    self.quit_button.destroy()
+                    self.cv.destroy()
+                    TkBase(root, path)
+                    root.resizable(True, True)
+            except Exception as e:
+
                 # If user picks a folder with no .cal or .wav files - shows
                 # error msg
-                messagebox.showerror("Error", "Inappropriate file type.")
-            elif self.isValid(path):
-                # Destroys homepage and runs main app
-                self.open_button.destroy()
-                self.quit_button.destroy()
-                self.cv.destroy()
-                TkBase(root, path)
-                root.resizable(True, True)
+                messagebox.showerror("Error: ", e)
 
     def isValid(self, path):
         # Checks the path contents to see if it has .cal and .wav files
@@ -68,8 +70,15 @@ class HomePage:
                 datafiles.append(path + filepath)
         if (calfile != "") and (datafiles != []):
             return True
-        else:
+        elif calfile == "" and datafiles == [] and path == "/":
             return False
+        elif calfile == "" and datafiles == []:
+            raise Exception("Missing .cal file and .wav files")
+        elif calfile == "":
+            raise Exception("Missing .cal file")
+        elif datafiles == []:
+            raise Exception("Missing .wav files")
+        return False
 
     def close(self):
         # Pop up to user asking them if they want to quit

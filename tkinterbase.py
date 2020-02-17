@@ -55,9 +55,14 @@ class TkBase:
         self.project_path = path
         try:
             self.data, self.timestamps, self.annotations = data.open_project(
-                self.project_path)
+                path)
+            if self.annotations != []:
+                if self.annotations[0] == -1:
+                    messagebox.showerror("Error: ", self.annotations[1])
+                    self.annotations = []
             self.draw_graph(self.data, self.timestamps, self.annotations)
         except Exception as e:
+            print(e)
             messagebox.showerror("Error:", e)
 
         # put the plot with navbar on the tkinter window
@@ -87,8 +92,13 @@ class TkBase:
         try:
             self.data, self.timestamps, self.annotations = data.open_project(
                 path)
+            if self.annotations != []:
+                if self.annotations[0] == -1:
+                    messagebox.showerror("Error: ", self.annotations[1])
+                    self.annotations = []
             self.draw_graph(self.data, self.timestamps, self.annotations)
         except Exception as e:
+            print(e)
             messagebox.showerror("Error:", e)
 
     def open_concurrent(self):

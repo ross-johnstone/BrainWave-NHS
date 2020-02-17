@@ -1,6 +1,12 @@
 import json
 import datetime as dt
 
+class AnnotationException(Exception):
+    """
+    Exception for when the .json file contains annotations in an incorrect format, this annotation is ignored and execution continues,
+    just without annotations.
+    """
+    pass
 
 class Annotation:
 
@@ -62,4 +68,7 @@ def open_json(filename):
     Unpacks a json object into an annotation
     """
     with open(filename) as infile:
-        return json.load(infile, object_hook=decode_annotation)
+        try:
+            return json.load(infile, object_hook=decode_annotation)
+        except Exception as e: 
+            raise AnnotationException("Wrong format of annotation in .json file, annotations could not be loaded.")

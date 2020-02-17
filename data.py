@@ -35,21 +35,17 @@ def open_project(path):
         try:
             tmp_data = read_wav(file)
         except Exception:
-            raise Exception("One of the data files could not be read.")
+            raise Exception("One of the data files could not be read")
         raw_data.append(tmp_data)
     data = np.hstack(raw_data)
 
-    # load annotations
-    annotations = []
-    if jsonfile != "":
-        annotations = open_json(jsonfile)
     # create timestamps
     timestamps = None
     if calfile != "":
         try:
             initial_time = get_initial_timestamp(calfile)
         except Exception:
-            raise Exception("One of the data files could not be read.")
+            raise Exception("The .cal file could not be read")
         timestamps = np.arange(
             data.shape[0]) * datetime.timedelta(microseconds=1000 * 20)
         timestamps += initial_time
@@ -58,8 +54,8 @@ def open_project(path):
     if jsonfile != "":
         try:
             annotations = open_json(jsonfile)
-        except Exception:
-            annotations = []
+        except Exception as e:
+            annotations = [-1, "The annotation file is in an incorrect format."]
 
     return data, timestamps, annotations
 

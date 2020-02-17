@@ -4,8 +4,6 @@ import matplotlib.pyplot as plt
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg, NavigationToolbar2Tk
 from matplotlib.backends.backend_pdf import PdfPages
 from matplotlib.widgets import SpanSelector
-from matplotlib.textpath import TextPath
-from matplotlib.patches import PathPatch
 from matplotlib.dates import date2num
 import itertools
 import datetime
@@ -187,8 +185,6 @@ class TkBase:
         if(self.listb.curselection()):
             id = self.index_to_ids[self.listb.curselection()[0]]
 
-            annotation = None
-
             for a in self.annotations:
                 if a.id == id:
 
@@ -199,8 +195,6 @@ class TkBase:
     def goto_callback(self):
         if(self.listb.curselection()):
             id = self.index_to_ids[self.listb.curselection()[0]]
-
-            annotation = None
 
             for a in self.annotations:
                 if a.id == id:
@@ -254,11 +248,8 @@ class TkBase:
             index = self.listb.curselection()[0]
             id = self.index_to_ids[self.listb.curselection()[0]]
 
-            annotation = None
-
             for a in self.annotations:
                 if a.id == id:
-                    annotation = a
                     # popup in which you edit the annotation
                     top = Toplevel(self.master)
                     top.title('edit annotation')
@@ -300,8 +291,6 @@ class TkBase:
         if(self.listb.curselection()):
             index = self.listb.curselection()[0]
             id = self.index_to_ids[self.listb.curselection()[0]]
-
-            annotation = None
 
             for a in self.annotations:
                 if a.id == id:

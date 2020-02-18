@@ -24,28 +24,7 @@ class TkBase:
         master.title("BrainWave Visualization")
         master.state('zoomed')
 
-        # map from annotation id to the drawn shape in the graph
-        self.id_to_shape = dict()
-
-        self.listbox_frame = tkinter.Frame(self.master)
-        self.listbox_frame.pack(side=tkinter.RIGHT)
-
-        # list to convert from indices in listbox to annotation ids
-        self.index_to_ids = list()
-
-        self.listb = tkinter.Listbox(self.listbox_frame, width=30)
-
-        self.listb.bind('<<ListboxSelect>>', self.listbox_selection)
-        self.listb.grid(column=0, row=1)
-
-        self.labelTitle = tkinter.Label(self.listbox_frame,
-                                        text="Title:")
-        self.labelTitle.grid(column=0, row=2)
-
-        self.labelDescription = tkinter.Label(self.listbox_frame,
-                                              text="description:",
-                                              wraplength=150)
-        self.labelDescription.grid(column=0, row=3)
+        self.initialize_annotation_display()
 
         self.go_to_annotation = tkinter.Button(
             self.listbox_frame, text='Go To annotation', command=self.goto_callback)
@@ -121,6 +100,40 @@ class TkBase:
         # variables for storing min and max of the current span selection
         self.span_min = None
         self.span_max = None
+
+    def initialize_annotation_display(self):
+        self.id_to_shape = dict()
+
+        self.listbox_frame = tkinter.Frame(self.master)
+        self.listbox_frame.pack(side=tkinter.RIGHT)
+
+        # list to convert from indices in listbox to annotation ids
+        self.index_to_ids = list()
+
+        self.listb = tkinter.Listbox(self.listbox_frame, width=30)
+
+        self.listb.bind('<<ListboxSelect>>', self.listbox_selection)
+        self.listb.grid(column=0, row=1)
+
+        self.labelTitle = tkinter.Label(self.listbox_frame,
+                                        text="Title:")
+        self.labelTitle.grid(column=0, row=2)
+
+        self.labelDescription = tkinter.Label(self.listbox_frame,
+                                              text="description:",
+                                              wraplength=150)
+        self.labelDescription.grid(column=0, row=3)
+        self.go_to_annotation = tkinter.Button(
+            self.listbox_frame, text='Go To annotation', command=self.goto_callback)
+        self.go_to_annotation.grid(column=0, row=4)
+
+        self.edit_annotation = tkinter.Button(
+            self.listbox_frame, text='edit', command=self.edit_callback)
+        self.edit_annotation.grid(column=0, row=5)
+
+        self.delete_annotation = tkinter.Button(
+            self.listbox_frame, text='delete', command=self.delete_callback)
+        self.delete_annotation.grid(column=0, row=6)
 
     # callback method for the open button, opens an existing project
     def open(self):

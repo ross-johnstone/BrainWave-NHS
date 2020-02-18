@@ -20,36 +20,14 @@ class TkBase:
         FIGSIZE = (8, 3)
         self.window_id = next(self.id_generator)
         self.master = master
+        self.toolitems = toolitems
 
         master.title("BrainWave Visualization")
         master.state('zoomed')
 
         self.initialize_annotation_display()
-        
-        # create matplotlib figures with single axes on which the data will be
-        # displayed
-        self.main_graph, self.main_graph_ax = plt.subplots(figsize=FIGSIZE)
-        self.main_graph.set_facecolor('xkcd:grey')
-        self.main_graph_ax.set_facecolor('xkcd:dark grey')
 
-        # second, reference graph
-        self.reference_graph, self.reference_graph_ax = plt.subplots(
-            figsize=FIGSIZE)
-        self.reference_graph.set_facecolor('xkcd:grey')
-        self.reference_graph_ax.set_facecolor('xkcd:dark grey')
-        self.main_canvas = FigureCanvasTkAgg(self.main_graph, master=master)
-        self.main_canvas.get_tk_widget().pack(
-            side=tkinter.BOTTOM, fill=tkinter.BOTH, expand=1)
-        self.toolitems = toolitems
-        self.toolbar = NavigationToolbar(
-            self.main_canvas, self.master, tkbase_=self, toolitems=self.toolitems)
-
-        self.reference_canvas = FigureCanvasTkAgg(
-            self.reference_graph, master=master)
-        self.reference_canvas.get_tk_widget().pack(
-            side=tkinter.BOTTOM, fill=tkinter.BOTH, expand=1)
-        self.reference_canvas.get_tk_widget().pack(
-            side=tkinter.BOTTOM, fill=tkinter.BOTH, expand=1)
+        self.initialize_graph_display(FIGSIZE)
 
         self.project_path = path
         try:
@@ -122,6 +100,29 @@ class TkBase:
         self.delete_annotation = tkinter.Button(
             self.listbox_frame, text='delete', command=self.delete_callback)
         self.delete_annotation.grid(column=0, row=6)
+
+    def initialize_graph_display(self, FIGSIZE):
+        # create matplotlib figures with single axes on which the data will be
+        # displayed
+        self.main_graph, self.main_graph_ax = plt.subplots(figsize=FIGSIZE)
+        self.main_graph.set_facecolor('xkcd:grey')
+        self.main_graph_ax.set_facecolor('xkcd:dark grey')
+
+        # second, reference graph
+        self.reference_graph, self.reference_graph_ax = plt.subplots(
+            figsize=FIGSIZE)
+        self.reference_graph.set_facecolor('xkcd:grey')
+        self.reference_graph_ax.set_facecolor('xkcd:dark grey')
+        self.main_canvas = FigureCanvasTkAgg(self.main_graph, master=self.master)
+        self.main_canvas.get_tk_widget().pack(
+            side=tkinter.BOTTOM, fill=tkinter.BOTH, expand=1)
+        self.toolbar = NavigationToolbar(
+            self.main_canvas, self.master, tkbase_=self, toolitems=self.toolitems)
+
+        self.reference_canvas = FigureCanvasTkAgg(
+            self.reference_graph, master=self.master)
+        self.reference_canvas.get_tk_widget().pack(
+            side=tkinter.BOTTOM, fill=tkinter.BOTH, expand=1)
 
     # callback method for the open button, opens an existing project
     def open(self):

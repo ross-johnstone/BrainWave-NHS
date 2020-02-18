@@ -54,7 +54,7 @@ def open_project(path):
     if jsonfile != "":
         try:
             annotations = open_json(jsonfile)
-        except Exception as e:
+        except Exception:
             annotations = [-1,
                            "The annotation file is in an incorrect format."]
 

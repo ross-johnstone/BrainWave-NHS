@@ -75,6 +75,6 @@ def open_json(filename):
     with open(filename) as infile:
         try:
             return json.load(infile, object_hook=decode_annotation)
-        except Exception as e:
+        except Exception:
             raise AnnotationException(
                 "Wrong format of annotation in .json file, annotations could not be loaded.")

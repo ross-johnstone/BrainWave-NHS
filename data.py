@@ -55,32 +55,36 @@ def open_project(path):
         try:
             annotations = open_json(jsonfile)
         except Exception as e:
-            annotations = [-1, "The annotation file is in an incorrect format."]
+            annotations = [-1,
+                           "The annotation file is in an incorrect format."]
 
     return data, timestamps, annotations
 
+
 def check_valid_path(path):
         # Checks the path contents to see if it has .cal and .wav files and raises exceptions if it doesn't
-        # returns false if user clicked on cancel, or an unexpected scenario occurs for quiet handling
-        contents = os.listdir(path)
-        calfile = ""
-        datafiles = []
-        for filepath in contents:
-            if re.match(r'\d{2}-\d{2}-\d{4}_\d{2}_\d{2}_\d{2}_\d{1,4}_\d*.cal', filepath):
-                calfile = path + filepath
-            elif re.match(r'\d{2}-\d{2}-\d{4}_\d{2}_\d{2}_\d{2}_\d{1,4}_\d*.wav', filepath):
-                datafiles.append(path + filepath)
-        if (calfile != "") and (datafiles != []):
-            return True
-        elif calfile == "" and datafiles == [] and path == "/":
-            return False
-        elif calfile == "" and datafiles == []:
-            raise Exception("Missing .cal file and .wav files")
-        elif calfile == "":
-            raise Exception("Missing .cal file")
-        elif datafiles == []:
-            raise Exception("Missing .wav files")
+        # returns false if user clicked on cancel, or an unexpected scenario
+        # occurs for quiet handling
+    contents = os.listdir(path)
+    calfile = ""
+    datafiles = []
+    for filepath in contents:
+        if re.match(r'\d{2}-\d{2}-\d{4}_\d{2}_\d{2}_\d{2}_\d{1,4}_\d*.cal', filepath):
+            calfile = path + filepath
+        elif re.match(r'\d{2}-\d{2}-\d{4}_\d{2}_\d{2}_\d{2}_\d{1,4}_\d*.wav', filepath):
+            datafiles.append(path + filepath)
+    if (calfile != "") and (datafiles != []):
+        return True
+    elif calfile == "" and datafiles == [] and path == "/":
         return False
+    elif calfile == "" and datafiles == []:
+        raise Exception("Missing .cal file and .wav files")
+    elif calfile == "":
+        raise Exception("Missing .cal file")
+    elif datafiles == []:
+        raise Exception("Missing .wav files")
+    return False
+
 
 def read_wav(filename):
     """

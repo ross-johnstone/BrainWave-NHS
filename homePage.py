@@ -4,25 +4,25 @@ from tkinterbase import TkBase
 from data import check_valid_path
 
 default_toolitems = (
-            ('Home', 'Reset original view', 'home', 'home'),
-            ('Back', 'Back to previous view', 'back', 'back'),
-            ('Forward', 'Forward to next view', 'forward', 'forward'),
-            (None, None, None, None),
-            ('Pan', 'Pan axes with left mouse, zoom with right', 'move', 'pan'),
-            ('Zoom', 'Zoom to rectangle', 'zoom_to_rect', 'zoom'),
-            ('Subplots', 'Configure subplots', 'subplots', 'configure_subplots'),
-            (None, None, None, None),
-            ('Annotate', 'Create an annotation', 'annotate', 'call_annotate'),
-            ('Confirm', 'Confirm annotation', 'confirm', 'call_confirm'),
-            (None, None, None, None),
-            ('Open', 'Opens a new project', 'open', 'call_open'),
-            ('Export', 'Export to PDF', 'export', 'call_export'),
-            ('Save', 'Save the graph as PNG', 'filesave', 'save_figure'),
-            ('Open Concurrent', 'Open a concurrent graph view',
-                'compare', 'call_open_concurrent'),
-            (None, None, None, None),
-            ('Quit', 'Quit application', 'quit', 'call_quit'),
-        )
+    ('Home', 'Reset original view', 'home', 'home'),
+    ('Back', 'Back to previous view', 'back', 'back'),
+    ('Forward', 'Forward to next view', 'forward', 'forward'),
+    (None, None, None, None),
+    ('Pan', 'Pan axes with left mouse, zoom with right', 'move', 'pan'),
+    ('Zoom', 'Zoom to rectangle', 'zoom_to_rect', 'zoom'),
+    ('Subplots', 'Configure subplots', 'subplots', 'configure_subplots'),
+    (None, None, None, None),
+    ('Annotate', 'Create an annotation', 'annotate', 'call_annotate'),
+    ('Confirm', 'Confirm annotation', 'confirm', 'call_confirm'),
+    (None, None, None, None),
+    ('Open', 'Opens a new project', 'open', 'call_open'),
+    ('Export', 'Export to PDF', 'export', 'call_export'),
+    ('Save', 'Save the graph as PNG', 'filesave', 'save_figure'),
+    ('Open Concurrent', 'Open a concurrent graph view',
+     'compare', 'call_open_concurrent'),
+    (None, None, None, None),
+    ('Quit', 'Quit application', 'quit', 'call_quit'),
+)
 
 
 class HomePage:
@@ -66,7 +66,7 @@ class HomePage:
             path = path + "/"
             try:
                 if check_valid_path(path):
-                # Destroys homepage and runs main app
+                    # Destroys homepage and runs main app
                     self.open_button.destroy()
                     self.quit_button.destroy()
                     self.cv.destroy()

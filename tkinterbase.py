@@ -12,6 +12,7 @@ from annotations import Annotation, save_json
 import data
 from tkinter import messagebox
 
+
 class TkBase:
     id_generator = itertools.count(1)
 
@@ -67,6 +68,8 @@ class TkBase:
         self.span_min = None
         self.span_max = None
 
+        # function that initializes the display of annotations to the right of
+        # the screen
     def initialize_annotation_display(self):
         self.id_to_shape = dict()
 
@@ -101,6 +104,7 @@ class TkBase:
             self.listbox_frame, text='delete', command=self.delete_callback)
         self.delete_annotation.grid(column=0, row=6)
 
+    # function that initializes the graphs and everything to do with them
     def initialize_graph_display(self, FIGSIZE):
         # create matplotlib figures with single axes on which the data will be
         # displayed
@@ -113,7 +117,8 @@ class TkBase:
             figsize=FIGSIZE)
         self.reference_graph.set_facecolor('xkcd:grey')
         self.reference_graph_ax.set_facecolor('xkcd:dark grey')
-        self.main_canvas = FigureCanvasTkAgg(self.main_graph, master=self.master)
+        self.main_canvas = FigureCanvasTkAgg(
+            self.main_graph, master=self.master)
         self.main_canvas.get_tk_widget().pack(
             side=tkinter.BOTTOM, fill=tkinter.BOTH, expand=1)
         self.toolbar = NavigationToolbar(
@@ -223,8 +228,9 @@ class TkBase:
             for a in self.annotations:
                 if a.id == id:
 
-                    self.labelTitle['text'] = "Title: "+a.title
-                    self.labelDescription['text'] = "Description: \n"+a.content
+                    self.labelTitle['text'] = "Title: " + a.title
+                    self.labelDescription[
+                        'text'] = "Description: \n" + a.content
 
     # callback for go to annotation button
     def goto_callback(self):
@@ -236,22 +242,22 @@ class TkBase:
 
                     if(a.end != a.start):
                         range = self.get_vertical_range(a)
-                        diff = (range[0]-range[1])/2
-                        delta = (a.end - a.start)/15
+                        diff = (range[0] - range[1]) / 2
+                        delta = (a.end - a.start) / 15
                         self.main_graph_ax.axis(
-                            [a.start - delta, a.end + delta, range[1]-diff, range[0]+diff])
+                            [a.start - delta, a.end + delta, range[1] - diff, range[0] + diff])
 
                     else:
 
                         delta = datetime.timedelta(seconds=5)
 
                         range_indices = np.where(np.logical_and(
-                            self.timestamps > a.start-datetime.timedelta(milliseconds=19), self.timestamps < a.end+datetime.timedelta(milliseconds=19)))
+                            self.timestamps > a.start - datetime.timedelta(milliseconds=19), self.timestamps < a.end + datetime.timedelta(milliseconds=19)))
                         range_data = self.data[range_indices]
                         ypoint = range_data[np.argmax(range_data)]
 
                         self.main_graph_ax.axis(
-                            [a.start - delta, a.end + delta, ypoint-30, ypoint+30])
+                            [a.start - delta, a.end + delta, ypoint - 30, ypoint + 30])
 
                     self.main_graph.canvas.toolbar.push_current()
                     self.main_graph.canvas.draw()
@@ -272,7 +278,8 @@ class TkBase:
                     error_label.grid(row=3)
                 else:
                     annotation.title = title_entry.get()
-                    annotation.content = description_entry.get(1.0, tkinter.END)
+                    annotation.content = description_entry.get(
+                        1.0, tkinter.END)
                     save_json(self.annotations,
                               'data/recording1/pat1/annotations.json')
                     self.listb.delete(index)
@@ -292,11 +299,12 @@ class TkBase:
                     top.title('edit annotation')
                     top.grab_set()
 
-                    # labels in top level window showing annotation start time and end time
+                    # labels in top level window showing annotation start time
+                    # and end time
                     annotation_start_label = Label(
-                        top, text='Annotation start time: '+str(a.start))
+                        top, text='Annotation start time: ' + str(a.start))
                     annotation_end_label = Label(
-                        top, text='Annotation end time: '+str(a.end))
+                        top, text='Annotation end time: ' + str(a.end))
                     annotation_start_label.grid(row=0)
                     annotation_end_label.grid(row=1)
 
@@ -455,11 +463,11 @@ class TkBase:
         # if date range annotation draw rectangle
         if(annotation.start != annotation.end):
             vmax, vmin = self.get_vertical_range(annotation)
-            self.id_to_shape[annotation.id] = self.main_graph_ax.add_patch(plt.Rectangle((date2num(annotation.start), vmin-10),
-                                                                                         date2num(annotation.end)-date2num(annotation.start), vmax-vmin+20, fc='r'))
+            self.id_to_shape[annotation.id] = self.main_graph_ax.add_patch(plt.Rectangle((date2num(annotation.start), vmin - 10),
+                                                                                         date2num(annotation.end) - date2num(annotation.start), vmax - vmin + 20, fc='r'))
         # if point annotation draw a vertical line
         if(annotation.start == annotation.end):
-            plt.figure(self.window_id*2-1)
+            plt.figure(self.window_id * 2 - 1)
             self.id_to_shape[annotation.id] = plt.axvline(
                 x=date2num(annotation.start))
         self.main_graph.canvas.draw()
@@ -534,8 +542,3 @@ class NavigationToolbar(NavigationToolbar2Tk):
 
     def call_quit(self):
         self.tkbase_.close()
-
-
-# root = Tk()
-# my_gui = TkBase(root, "./pat1/")
-# root.mainloop()

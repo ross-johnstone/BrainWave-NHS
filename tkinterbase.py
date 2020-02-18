@@ -1,4 +1,4 @@
-from tkinter import Label, Button, Toplevel, Entry, filedialog, PhotoImage
+from tkinter import Label, Button, Toplevel, Entry, filedialog, PhotoImage, ttk
 import tkinter
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg, NavigationToolbar2Tk
@@ -73,35 +73,40 @@ class TkBase:
     def initialize_annotation_display(self):
         self.id_to_shape = dict()
 
-        self.listbox_frame = tkinter.Frame(self.master)
-        self.listbox_frame.pack(side=tkinter.RIGHT)
+        self.listbox_frame = tkinter.Frame(self.master, bg="#949494")
+        self.listbox_frame.pack(side=tkinter.RIGHT, padx=(10, 10))
 
         # list to convert from indices in listbox to annotation ids
         self.index_to_ids = list()
 
-        self.listb = tkinter.Listbox(self.listbox_frame, width=30)
+        self.listb = tkinter.Listbox(self.listbox_frame, width=30, height=50)
 
         self.listb.bind('<<ListboxSelect>>', self.listbox_selection)
         self.listb.grid(column=0, row=1)
 
         self.labelTitle = tkinter.Label(self.listbox_frame,
-                                        text="Title:")
+                                        text="Title:", bg="#949494", anchor='w')
         self.labelTitle.grid(column=0, row=2)
 
         self.labelDescription = tkinter.Label(self.listbox_frame,
                                               text="description:",
-                                              wraplength=150)
+                                              wraplength=150, bg="#949494", anchor='w')
         self.labelDescription.grid(column=0, row=3)
-        self.go_to_annotation = tkinter.Button(
-            self.listbox_frame, text='Go To annotation', command=self.goto_callback)
+
+        # self.go_to_annotation = tkinter.Button(
+            # self.listbox_frame, text='Go To annotation', command=self.goto_callback)
+
+        self.go_to_annotation = ttk.Button(
+            self.listbox_frame, text='Go-To', width=30, command=self.goto_callback)
+
         self.go_to_annotation.grid(column=0, row=4)
 
-        self.edit_annotation = tkinter.Button(
-            self.listbox_frame, text='edit', command=self.edit_callback)
+        self.edit_annotation = ttk.Button(
+            self.listbox_frame, text='Edit', width=30, command=self.edit_callback)
         self.edit_annotation.grid(column=0, row=5)
 
-        self.delete_annotation = tkinter.Button(
-            self.listbox_frame, text='delete', command=self.delete_callback)
+        self.delete_annotation = ttk.Button(
+            self.listbox_frame, text='Delete', width=30, command=self.delete_callback)
         self.delete_annotation.grid(column=0, row=6)
 
     # function that initializes the graphs and everything to do with them
@@ -197,7 +202,7 @@ class TkBase:
                     popup, text="Please add a filename!", fg="red")
                 error_label.grid(row=1, column=0)
             else:
-                filename = export_popup_entry.get() + '.pdf'
+                filename = self.project_path + export_popup_entry.get() + '.pdf'
                 with PdfPages(filename) as export_pdf:
                     plt.figure(self.window_id * 2 - 1)
                     export_pdf.savefig()

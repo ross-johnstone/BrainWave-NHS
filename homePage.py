@@ -72,6 +72,7 @@ class HomePage:
                     self.cv.destroy()
                     TkBase(root, path, default_toolitems)
                     root.resizable(True, True)
+                    root.configure(bg="#949494")
             except Exception as e:
                 # If user picks a folder with no .cal or .wav files - shows
                 # error msg

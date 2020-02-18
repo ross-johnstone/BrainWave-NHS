@@ -29,7 +29,7 @@ class TkBase:
         self.id_to_shape = dict()
 
         self.listbox_frame = tkinter.Frame(self.master, bg="#949494")
-        self.listbox_frame.pack(side=tkinter.RIGHT, padx=(10,10))
+        self.listbox_frame.pack(side=tkinter.RIGHT, padx=(10, 10))
 
         # list to convert from indices in listbox to annotation ids
         self.index_to_ids = list()

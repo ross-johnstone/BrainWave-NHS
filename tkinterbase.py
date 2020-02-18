@@ -176,7 +176,7 @@ class TkBase:
                     popup, text="Please add a filename!", fg="red")
                 error_label.grid(row=1, column=0)
             else:
-                filename = export_popup_entry.get() + '.pdf'
+                filename = self.project_path + export_popup_entry.get() + '.pdf'
                 with PdfPages(filename) as export_pdf:
                     plt.figure(self.window_id * 2 - 1)
                     export_pdf.savefig()

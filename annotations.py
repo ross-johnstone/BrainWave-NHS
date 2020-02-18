@@ -1,5 +1,6 @@
 import json
 import datetime as dt
+import itertools
 
 class AnnotationException(Exception):
     """
@@ -9,12 +10,14 @@ class AnnotationException(Exception):
     pass
 
 class Annotation:
+    id_generator = itertools.count(1)
 
     def __init__(self, title, content, start_time, end_time):
         self.title = title
         self.content = content
         self.start = start_time
         self.end = end_time
+        self.id = next(self.id_generator)
 
     def __str__(self):
         return str(vars(self))

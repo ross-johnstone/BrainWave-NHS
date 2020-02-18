@@ -4,8 +4,6 @@ import matplotlib.pyplot as plt
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg, NavigationToolbar2Tk
 from matplotlib.backends.backend_pdf import PdfPages
 from matplotlib.widgets import SpanSelector
-from matplotlib.textpath import TextPath
-from matplotlib.patches import PathPatch
 from matplotlib.dates import date2num
 import itertools
 import datetime
@@ -19,7 +17,7 @@ import re
 class TkBase:
     id_generator = itertools.count(1)
 
-    def __init__(self, master, path):
+    def __init__(self, master, path, toolitems):
 
         FIGSIZE = (8, 3)
         self.window_id = next(self.id_generator)
@@ -27,6 +25,41 @@ class TkBase:
 
         master.title("BrainWave Visualization")
         master.state('zoomed')
+
+        # map from annotation id to the drawn shape in the graph
+        self.id_to_shape = dict()
+
+        self.listbox_frame = tkinter.Frame(self.master)
+        self.listbox_frame.pack(side=tkinter.RIGHT)
+
+        # list to convert from indices in listbox to annotation ids
+        self.index_to_ids = list()
+
+        self.listb = tkinter.Listbox(self.listbox_frame, width=30)
+
+        self.listb.bind('<<ListboxSelect>>', self.listbox_selection)
+        self.listb.grid(column=0, row=1)
+
+        self.labelTitle = tkinter.Label(self.listbox_frame,
+                                        text="Title:")
+        self.labelTitle.grid(column=0, row=2)
+
+        self.labelDescription = tkinter.Label(self.listbox_frame,
+                                              text="description:",
+                                              wraplength=150)
+        self.labelDescription.grid(column=0, row=3)
+
+        self.go_to_annotation = tkinter.Button(
+            self.listbox_frame, text='Go To annotation', command=self.goto_callback)
+        self.go_to_annotation.grid(column=0, row=4)
+
+        self.edit_annotation = tkinter.Button(
+            self.listbox_frame, text='edit', command=self.edit_callback)
+        self.edit_annotation.grid(column=0, row=5)
+
+        self.delete_annotation = tkinter.Button(
+            self.listbox_frame, text='delete', command=self.delete_callback)
+        self.delete_annotation.grid(column=0, row=6)
 
         # create matplotlib figures with single axes on which the data will be
         # displayed
@@ -42,8 +75,9 @@ class TkBase:
         self.main_canvas = FigureCanvasTkAgg(self.main_graph, master=master)
         self.main_canvas.get_tk_widget().pack(
             side=tkinter.BOTTOM, fill=tkinter.BOTH, expand=1)
+        self.toolitems = toolitems
         self.toolbar = NavigationToolbar(
-            self.main_canvas, self.master, tkbase_=self)
+            self.main_canvas, self.master, tkbase_=self, toolitems=self.toolitems)
 
         self.reference_canvas = FigureCanvasTkAgg(
             self.reference_graph, master=master)
@@ -61,6 +95,11 @@ class TkBase:
                     messagebox.showerror("Error: ", self.annotations[1])
                     self.annotations = []
             self.draw_graph(self.data, self.timestamps, self.annotations)
+            for id in self.annotations:
+                id = id.id
+                self.index_to_ids.append(id)
+            for a in self.annotations:
+                self.listb.insert(tkinter.END, a.title)
         except Exception as e:
             print(e)
             messagebox.showerror("Error:", e)
@@ -102,13 +141,31 @@ class TkBase:
             messagebox.showerror("Error:", e)
 
     def open_concurrent(self):
+        second_toolitems = (
+            ('Home', 'Reset original view', 'home', 'home'),
+            ('Back', 'Back to previous view', 'back', 'back'),
+            ('Forward', 'Forward to next view', 'forward', 'forward'),
+            (None, None, None, None),
+            ('Pan', 'Pan axes with left mouse, zoom with right', 'move', 'pan'),
+            ('Zoom', 'Zoom to rectangle', 'zoom_to_rect', 'zoom'),
+            ('Subplots', 'Configure subplots', 'subplots', 'configure_subplots'),
+            (None, None, None, None),
+            ('Annotate', 'Create an annotation', 'annotate', 'call_annotate'),
+            ('Confirm', 'Confirm annotation', 'confirm', 'call_confirm'),
+            (None, None, None, None),
+            ('Open', 'Opens a new project', 'open', 'call_open'),
+            ('Export', 'Export to PDF', 'export', 'call_export'),
+            ('Save', 'Save the graph as PNG', 'filesave', 'save_figure'),
+            (None, None, None, None),
+            ('Quit', 'Quit application', 'quit', 'call_quit'),
+        )
         path = filedialog.askdirectory()
         path = path + "/"
         try:
             if self.check_valid_path(path):
                 new_root = Toplevel(self.master)
                 new_root.protocol("WM_DELETE_WINDOW", new_root.destroy)
-                TkBase(new_root, path)
+                TkBase(new_root, path, second_toolitems)
         except Exception as e:
             raise Exception(e)
 
@@ -153,14 +210,15 @@ class TkBase:
 
         def save():
             if not export_popup_entry.get().strip():
-                error_label = Label(popup, text="Please add a filename!", fg="red")
+                error_label = Label(
+                    popup, text="Please add a filename!", fg="red")
                 error_label.grid(row=1, column=0)
             else:
                 filename = export_popup_entry.get() + '.pdf'
                 with PdfPages(filename) as export_pdf:
                     plt.figure(self.window_id * 2 - 1)
                     export_pdf.savefig()
-                    plt.figure(self.window_id * 2 - 2)
+                    plt.figure(self.window_id * 2)
                     export_pdf.savefig()
                 cancel()
 
@@ -177,6 +235,132 @@ class TkBase:
 
         close_export_popup_button = Button(popup, text="Confirm", command=save)
         close_export_popup_button.grid(row=1, column=1)
+
+    # callback function for the listbox widget
+    def listbox_selection(self, event):
+
+        if(self.listb.curselection()):
+            id = self.index_to_ids[self.listb.curselection()[0]]
+
+            for a in self.annotations:
+                if a.id == id:
+
+                    self.labelTitle['text'] = "Title: "+a.title
+                    self.labelDescription['text'] = "Description: \n"+a.content
+
+    # callback for go to annotation button
+    def goto_callback(self):
+        if(self.listb.curselection()):
+            id = self.index_to_ids[self.listb.curselection()[0]]
+
+            for a in self.annotations:
+                if a.id == id:
+
+                    if(a.end != a.start):
+                        range = self.get_vertical_range(a)
+                        diff = (range[0]-range[1])/2
+                        delta = (a.end - a.start)/15
+                        self.main_graph_ax.axis(
+                            [a.start - delta, a.end + delta, range[1]-diff, range[0]+diff])
+
+                    else:
+
+                        delta = datetime.timedelta(seconds=5)
+
+                        range_indices = np.where(np.logical_and(
+                            self.timestamps > a.start-datetime.timedelta(milliseconds=19), self.timestamps < a.end+datetime.timedelta(milliseconds=19)))
+                        range_data = self.data[range_indices]
+                        ypoint = range_data[np.argmax(range_data)]
+
+                        self.main_graph_ax.axis(
+                            [a.start - delta, a.end + delta, ypoint-30, ypoint+30])
+
+                    self.main_graph.canvas.toolbar.push_current()
+                    self.main_graph.canvas.draw()
+
+    def edit_callback(self):
+        if(self.listb.curselection()):
+            # method called when cancel button on popup is pressed
+            def cancel():
+                top.destroy()
+                top.update()
+
+            # method called when save button on popup is pressed
+            def save():
+
+                if not title_entry.get().strip():
+                    error_label = Label(
+                        top, text="Please add a title!", fg="red")
+                    error_label.grid(row=3)
+                else:
+                    annotation.title = title_entry.get()
+                    annotation.content = description_entry.get(1.0, tkinter.END)
+                    save_json(self.annotations,
+                              'data/recording1/pat1/annotations.json')
+                    self.listb.delete(index)
+                    self.listb.insert(index, title_entry.get())
+                    cancel()
+
+            index = self.listb.curselection()[0]
+            id = self.index_to_ids[self.listb.curselection()[0]]
+
+            annotation = None
+
+            for a in self.annotations:
+                if a.id == id:
+                    # popup in which you edit the annotation
+                    annotation = a
+                    top = Toplevel(self.master)
+                    top.title('edit annotation')
+                    top.grab_set()
+
+                    # labels in top level window showing annotation start time and end time
+                    annotation_start_label = Label(
+                        top, text='Annotation start time: '+str(a.start))
+                    annotation_end_label = Label(
+                        top, text='Annotation end time: '+str(a.end))
+                    annotation_start_label.grid(row=0)
+                    annotation_end_label.grid(row=1)
+
+                    annotation_title_label = Label(top, text='Title')
+                    annotation_title_label.grid(row=2)
+                    title_entry = Entry(top, font=("Courier", 12))
+                    title_entry.insert(tkinter.END, a.title)
+                    title_entry.grid(row=4)
+
+                    description_label = Label(top, text='Description')
+                    description_label.grid(row=5)
+                    description_entry = tkinter.Text(top, height=6, width=30)
+                    description_entry.insert(tkinter.END, a.content)
+                    description_entry.grid(row=6)
+
+                    cancel_button = Button(
+                        master=top, text="Cancel", command=cancel, bg='white')
+                    cancel_button.grid(row=8)
+
+                    save_button = Button(
+                        master=top, text="Save", command=save, bg='white')
+                    save_button.grid(row=7)
+
+                    top.resizable(False, False)
+                    top.iconbitmap(r"./res/general_images/favicon.ico")
+                    top.protocol("WM_DELETE_WINDOW", cancel)
+
+    def delete_callback(self):
+        if(self.listb.curselection()):
+            index = self.listb.curselection()[0]
+            id = self.index_to_ids[self.listb.curselection()[0]]
+
+            for a in self.annotations:
+                if a.id == id:
+                    self.index_to_ids.remove(id)
+                    self.annotations.remove(a)
+                    self.id_to_shape[id].remove()
+                    del self.id_to_shape[id]
+                    self.main_graph.canvas.draw()
+                    save_json(self.annotations,
+                              'data/recording1/pat1/annotations.json')
+                    self.listb.delete(index)
 
     def annotate(self):
         # activate the span selector
@@ -216,6 +400,8 @@ class TkBase:
                     json_path = self.project_path + 'annotations.json'
                     save_json(self.annotations, json_path)
                     self.draw_annotation(new_annotation)
+                    self.index_to_ids.append(new_annotation.id)
+                    self.listb.insert(tkinter.END, new_annotation.title)
 
                     # set spans back to none after the annotation is saved to
                     # prevent buggy behavior
@@ -289,18 +475,16 @@ class TkBase:
 
     def draw_annotation(self, annotation):
         # if date range annotation draw rectangle
-        if (annotation.start != annotation.end):
+        if(annotation.start != annotation.end):
             vmax, vmin = self.get_vertical_range(annotation)
-            tp = TextPath((date2num(annotation.start) + 6000, 300), annotation.title, size=100000)
-            self.main_graph_ax.add_patch(PathPatch(tp, color="black"))
-            self.main_graph_ax.add_patch(plt.Rectangle((date2num(annotation.start), vmin - 10),
-                                                       date2num(annotation.end) - date2num(
-                                                           annotation.start), vmax - vmin + 20, fc='r'))
+            self.id_to_shape[annotation.id] = self.main_graph_ax.add_patch(plt.Rectangle((date2num(annotation.start), vmin-10),
+                                                                                         date2num(annotation.end)-date2num(annotation.start), vmax-vmin+20, fc='r'))
         # if point annotation draw a vertical line
-        if (annotation.start == annotation.end):
+        if(annotation.start == annotation.end):
             plt.figure(self.window_id*2-1)
-            plt.axvline(x=date2num(annotation.start))
-        self.main_canvas.draw()
+            self.id_to_shape[annotation.id] = plt.axvline(
+                x=date2num(annotation.start))
+        self.main_graph.canvas.draw()
 
     def draw_graph(self, data, timestamps, annotations):
         self.main_graph_ax.clear()
@@ -320,8 +504,8 @@ class TkBase:
         self.main_graph_ax.spines['right'].set_visible(False)
         # put the plot with navbar on the tkinter window
         self.main_canvas.draw()
-
         self.toolbar.update()
+        self.main_graph.canvas.toolbar.push_current()
 
         # second, reference graph displayed
         self.reference_graph_ax.clear()
@@ -337,29 +521,10 @@ class TkBase:
 
 class NavigationToolbar(NavigationToolbar2Tk):
 
-    def __init__(self, canvas_, parent_, tkbase_):
+    def __init__(self, canvas_, parent_, tkbase_, toolitems):
         self.tkbase_ = tkbase_
         self.parent_ = parent_
-        self.toolitems = (
-            ('Home', 'Reset original view', 'home', 'home'),
-            ('Back', 'Back to previous view', 'back', 'back'),
-            ('Forward', 'Forward to next view', 'forward', 'forward'),
-            (None, None, None, None),
-            ('Pan', 'Pan axes with left mouse, zoom with right', 'move', 'pan'),
-            ('Zoom', 'Zoom to rectangle', 'zoom_to_rect', 'zoom'),
-            ('Subplots', 'Configure subplots', 'subplots', 'configure_subplots'),
-            (None, None, None, None),
-            ('Annotate', 'Create an annotation', 'annotate', 'call_annotate'),
-            ('Confirm', 'Confirm annotation', 'confirm', 'call_confirm'),
-            (None, None, None, None),
-            ('Open', 'Opens a new project', 'open', 'call_open'),
-            ('Export', 'Export to PDF', 'export', 'call_export'),
-            ('Save', 'Save the figure', 'filesave', 'save_figure'),
-            ('Open Concurrent', 'Open a concurrent graph view',
-             'compare', 'call_open_concurrent'),
-            (None, None, None, None),
-            ('Quit', 'Quit application', 'quit', 'call_quit'),
-        )
+        self.toolitems = toolitems
         NavigationToolbar2Tk.__init__(self, canvas_, parent_)
 
     def _Button(self, text, file, command, extension='.gif'):

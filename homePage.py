@@ -76,6 +76,7 @@ class HomePage:
                 self.cv.destroy()
                 TkBase(root, path, default_toolitems)
                 root.resizable(True, True)
+                root.configure(bg="#949494")
 
     def isValid(self, path):
         # Checks the path contents to see if it has .cal and .wav files

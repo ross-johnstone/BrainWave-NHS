@@ -1,8 +1,7 @@
 import tkinter as tk
 from tkinter import ttk, filedialog, messagebox, BOTTOM
 from tkinterbase import TkBase
-import re
-import os
+from data import check_valid_path
 
 default_toolitems = (
             ('Home', 'Reset original view', 'home', 'home'),
@@ -66,7 +65,7 @@ class HomePage:
         else:
             path = path + "/"
             try:
-                if self.isValid(path):
+                if check_valid_path(path):
                 # Destroys homepage and runs main app
                     self.open_button.destroy()
                     self.quit_button.destroy()
@@ -77,28 +76,6 @@ class HomePage:
                 # If user picks a folder with no .cal or .wav files - shows
                 # error msg
                 messagebox.showerror("Error: ", e)
-
-    def isValid(self, path):
-        # Checks the path contents to see if it has .cal and .wav files
-        contents = os.listdir(path)
-        calfile = ""
-        datafiles = []
-        for filepath in contents:
-            if re.match(r'\d{2}-\d{2}-\d{4}_\d{2}_\d{2}_\d{2}_\d{1,4}_\d*.cal', filepath):
-                calfile = path + filepath
-            elif re.match(r'\d{2}-\d{2}-\d{4}_\d{2}_\d{2}_\d{2}_\d{1,4}_\d*.wav', filepath):
-                datafiles.append(path + filepath)
-        if (calfile != "") and (datafiles != []):
-            return True
-        elif calfile == "" and datafiles == [] and path == "/":
-            return False
-        elif calfile == "" and datafiles == []:
-            raise Exception("Missing .cal file and .wav files")
-        elif calfile == "":
-            raise Exception("Missing .cal file")
-        elif datafiles == []:
-            raise Exception("Missing .wav files")
-        return False
 
     def close(self):
         # Pop up to user asking them if they want to quit

@@ -11,8 +11,6 @@ import numpy as np
 from annotations import Annotation, save_json
 import data
 from tkinter import messagebox
-import os
-import re
 
 class TkBase:
     id_generator = itertools.count(1)
@@ -129,13 +127,14 @@ class TkBase:
         path = filedialog.askdirectory()
         path = path + "/"
         try:
-            self.data, self.timestamps, self.annotations = data.open_project(
-                path)
-            if self.annotations != []:
-                if self.annotations[0] == -1:
-                    messagebox.showerror("Error: ", self.annotations[1])
-                    self.annotations = []
-            self.draw_graph(self.data, self.timestamps, self.annotations)
+            if data.check_valid_path(path):
+                self.data, self.timestamps, self.annotations = data.open_project(
+                    path)
+                if self.annotations != []:
+                    if self.annotations[0] == -1:
+                        messagebox.showerror("Error: ", self.annotations[1])
+                        self.annotations = []
+                self.draw_graph(self.data, self.timestamps, self.annotations)
         except Exception as e:
             print(e)
             messagebox.showerror("Error:", e)
@@ -162,35 +161,12 @@ class TkBase:
         path = filedialog.askdirectory()
         path = path + "/"
         try:
-            if self.check_valid_path(path):
+            if data.check_valid_path(path):
                 new_root = Toplevel(self.master)
                 new_root.protocol("WM_DELETE_WINDOW", new_root.destroy)
                 TkBase(new_root, path, second_toolitems)
         except Exception as e:
             raise Exception(e)
-
-    def check_valid_path(self, path):
-        # Checks the path contents to see if it has .cal and .wav files and raises exceptions if it doesn't
-        # returns false if user clicked on cancel, or an unexpected scenario occurs for quiet handling
-        contents = os.listdir(path)
-        calfile = ""
-        datafiles = []
-        for filepath in contents:
-            if re.match(r'\d{2}-\d{2}-\d{4}_\d{2}_\d{2}_\d{2}_\d{1,4}_\d*.cal', filepath):
-                calfile = path + filepath
-            elif re.match(r'\d{2}-\d{2}-\d{4}_\d{2}_\d{2}_\d{2}_\d{1,4}_\d*.wav', filepath):
-                datafiles.append(path + filepath)
-        if (calfile != "") and (datafiles != []):
-            return True
-        elif calfile == "" and datafiles == [] and path == "/":
-            return False
-        elif calfile == "" and datafiles == []:
-            raise Exception("Missing .cal file and .wav files")
-        elif calfile == "":
-            raise Exception("Missing .cal file")
-        elif datafiles == []:
-            raise Exception("Missing .wav files")
-        return False
 
     # callback method for the annotate button activates the span selector
     def butrelease(self, event):

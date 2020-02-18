@@ -45,7 +45,7 @@ class TkBase:
 
         self.labelDescription = tkinter.Label(self.listbox_frame,
                                               text="description:",
-                                              wraplength=150,bg="#949494")
+                                              wraplength=150, bg="#949494")
         self.labelDescription.grid(column=0, row=3)
 
         self.go_to_annotation = ttk.Button(

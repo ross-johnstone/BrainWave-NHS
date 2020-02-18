@@ -17,7 +17,7 @@ class TkBase:
     id_generator = itertools.count(1)
 
     def __init__(self, master, path):
-
+        
         FIGSIZE = (8, 3)
         self.window_id = next(self.id_generator)
         self.master = master

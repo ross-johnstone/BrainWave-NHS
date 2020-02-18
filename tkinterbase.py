@@ -25,19 +25,7 @@ class TkBase:
         master.state('zoomed')
 
         self.initialize_annotation_display()
-
-        self.go_to_annotation = tkinter.Button(
-            self.listbox_frame, text='Go To annotation', command=self.goto_callback)
-        self.go_to_annotation.grid(column=0, row=4)
-
-        self.edit_annotation = tkinter.Button(
-            self.listbox_frame, text='edit', command=self.edit_callback)
-        self.edit_annotation.grid(column=0, row=5)
-
-        self.delete_annotation = tkinter.Button(
-            self.listbox_frame, text='delete', command=self.delete_callback)
-        self.delete_annotation.grid(column=0, row=6)
-
+        
         # create matplotlib figures with single axes on which the data will be
         # displayed
         self.main_graph, self.main_graph_ax = plt.subplots(figsize=FIGSIZE)

@@ -16,7 +16,7 @@ from tkinter import messagebox
 class TkBase:
     id_generator = itertools.count(1)
 
-    def __init__(self, master, path):
+    def __init__(self, master, path, toolitems):
 
         FIGSIZE = (8, 3)
         self.window_id = next(self.id_generator)
@@ -74,8 +74,9 @@ class TkBase:
         self.main_canvas = FigureCanvasTkAgg(self.main_graph, master=master)
         self.main_canvas.get_tk_widget().pack(
             side=tkinter.BOTTOM, fill=tkinter.BOTH, expand=1)
+        self.toolitems = toolitems
         self.toolbar = NavigationToolbar(
-            self.main_canvas, self.master, tkbase_=self)
+            self.main_canvas, self.master, tkbase_=self, toolitems=self.toolitems)
 
         self.reference_canvas = FigureCanvasTkAgg(
             self.reference_graph, master=master)
@@ -129,11 +130,29 @@ class TkBase:
             messagebox.showerror("Error:", e)
 
     def open_concurrent(self):
+        second_toolitems = (
+            ('Home', 'Reset original view', 'home', 'home'),
+            ('Back', 'Back to previous view', 'back', 'back'),
+            ('Forward', 'Forward to next view', 'forward', 'forward'),
+            (None, None, None, None),
+            ('Pan', 'Pan axes with left mouse, zoom with right', 'move', 'pan'),
+            ('Zoom', 'Zoom to rectangle', 'zoom_to_rect', 'zoom'),
+            ('Subplots', 'Configure subplots', 'subplots', 'configure_subplots'),
+            (None, None, None, None),
+            ('Annotate', 'Create an annotation', 'annotate', 'call_annotate'),
+            ('Confirm', 'Confirm annotation', 'confirm', 'call_confirm'),
+            (None, None, None, None),
+            ('Open', 'Opens a new project', 'open', 'call_open'),
+            ('Export', 'Export to PDF', 'export', 'call_export'),
+            ('Save', 'Save the graph as PNG', 'filesave', 'save_figure'),
+            (None, None, None, None),
+            ('Quit', 'Quit application', 'quit', 'call_quit'),
+        )
         path = filedialog.askdirectory()
         path = path + "/"
         new_root = Toplevel(self.master)
         new_root.protocol("WM_DELETE_WINDOW", new_root.destroy)
-        TkBase(new_root, path)
+        TkBase(new_root, path, second_toolitems)
 
     # callback method for the annotate button activates the span selector
     def butrelease(self, event):
@@ -464,29 +483,10 @@ class TkBase:
 
 class NavigationToolbar(NavigationToolbar2Tk):
 
-    def __init__(self, canvas_, parent_, tkbase_):
+    def __init__(self, canvas_, parent_, tkbase_, toolitems):
         self.tkbase_ = tkbase_
         self.parent_ = parent_
-        self.toolitems = (
-            ('Home', 'Reset original view', 'home', 'home'),
-            ('Back', 'Back to previous view', 'back', 'back'),
-            ('Forward', 'Forward to next view', 'forward', 'forward'),
-            (None, None, None, None),
-            ('Pan', 'Pan axes with left mouse, zoom with right', 'move', 'pan'),
-            ('Zoom', 'Zoom to rectangle', 'zoom_to_rect', 'zoom'),
-            ('Subplots', 'Configure subplots', 'subplots', 'configure_subplots'),
-            (None, None, None, None),
-            ('Annotate', 'Create an annotation', 'annotate', 'call_annotate'),
-            ('Confirm', 'Confirm annotation', 'confirm', 'call_confirm'),
-            (None, None, None, None),
-            ('Open', 'Opens a new project', 'open', 'call_open'),
-            ('Export', 'Export to PDF', 'export', 'call_export'),
-            ('Save', 'Save the graph as PNG', 'filesave', 'save_figure'),
-            ('Open Concurrent', 'Open a concurrent graph view',
-             'compare', 'call_open_concurrent'),
-            (None, None, None, None),
-            ('Quit', 'Quit application', 'quit', 'call_quit'),
-        )
+        self.toolitems = toolitems
         NavigationToolbar2Tk.__init__(self, canvas_, parent_)
 
     def _Button(self, text, file, command, extension='.gif'):

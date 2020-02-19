@@ -76,7 +76,8 @@ class HomePage:
             except Exception as e:
                 # If user picks a folder with no .cal or .wav files - shows
                 # error msg
-                messagebox.showerror("Error", "Inappropriate file type.")
+                e.message = "Inappropriate file type."
+                messagebox.showerror("Error", e)
 
     def close(self):
         # Pop up to user asking them if they want to quit

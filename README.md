@@ -4,10 +4,10 @@ Program that allows the user to visualise brainwaves.
 
 **Installation**
 ----------------
-Install this .zip folder:   *"zip folder here"*
-1.  Open the "Executable.exe" file
-2.  Open your desired data
-3.  Start working!
+1.  Install the .zip folder
+2.  Extract all the items in the desired location
+3.  Run "BrainWave.exe"
+4.  Start working!
     
 **How to Use**
 --------------

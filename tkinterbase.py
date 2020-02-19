@@ -60,6 +60,15 @@ class TkBase:
             self.listbox_frame, text='Delete', width=30, command=self.delete_callback)
         self.delete_annotation.grid(column=0, row=6)
 
+        self.master.grid_columnconfigure(0, weight=1)
+        self.master.grid_rowconfigure(0, weight=1)
+        self.master.grid_rowconfigure(1, weight=1)
+        self.master.grid_rowconfigure(2, weight=1)
+        self.master.grid_rowconfigure(3, weight=1)
+        self.master.grid_rowconfigure(4, weight=1)
+        self.master.grid_rowconfigure(5, weight=1)
+        self.master.grid_rowconfigure(6, weight=1)
+
         # create matplotlib figures with single axes on which the data will be
         # displayed
         self.main_graph, self.main_graph_ax = plt.subplots(figsize=FIGSIZE)

@@ -72,33 +72,11 @@ class HomePage:
                     self.cv.destroy()
                     TkBase(root, path, default_toolitems)
                     root.resizable(True, True)
+                    root.configure(bg="#949494")
             except Exception as e:
                 # If user picks a folder with no .cal or .wav files - shows
                 # error msg
                 messagebox.showerror("Error", "Inappropriate file type.")
-            elif self.isValid(path):
-                # Destroys homepage and runs main app
-                self.open_button.destroy()
-                self.quit_button.destroy()
-                self.cv.destroy()
-                TkBase(root, path, default_toolitems)
-                root.resizable(True, True)
-                root.configure(bg="#949494")
-
-    def isValid(self, path):
-        # Checks the path contents to see if it has .cal and .wav files
-        contents = os.listdir(path)
-        calfile = ""
-        datafiles = []
-        for filepath in contents:
-            if re.match(r'\d{2}-\d{2}-\d{4}_\d{2}_\d{2}_\d{2}_\d{1,4}_\d*.cal', filepath):
-                calfile = path + filepath
-            elif re.match(r'\d{2}-\d{2}-\d{4}_\d{2}_\d{2}_\d{2}_\d{1,4}_\d*.wav', filepath):
-                datafiles.append(path + filepath)
-        if (calfile != "") and (datafiles != []):
-            return True
-        else:
-            return False
 
     def close(self):
         # Pop up to user asking them if they want to quit

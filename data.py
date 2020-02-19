@@ -35,21 +35,17 @@ def open_project(path):
         try:
             tmp_data = read_wav(file)
         except Exception:
-            raise Exception("One of the data files could not be read.")
+            raise Exception("One of the data files could not be read")
         raw_data.append(tmp_data)
     data = np.hstack(raw_data)
 
-    # load annotations
-    annotations = []
-    if jsonfile != "":
-        annotations = open_json(jsonfile)
     # create timestamps
     timestamps = None
     if calfile != "":
         try:
             initial_time = get_initial_timestamp(calfile)
         except Exception:
-            raise Exception("One of the data files could not be read.")
+            raise Exception("The .cal file could not be read")
         timestamps = np.arange(
             data.shape[0]) * datetime.timedelta(microseconds=1000 * 20)
         timestamps += initial_time
@@ -59,9 +55,35 @@ def open_project(path):
         try:
             annotations = open_json(jsonfile)
         except Exception:
-            annotations = []
+            annotations = [-1,
+                           "The annotation file is in an incorrect format."]
 
     return data, timestamps, annotations
+
+
+def check_valid_path(path):
+    # Checks the path contents to see if it has .cal and .wav files and raises exceptions if it doesn't
+    # returns false if user clicked on cancel, or an unexpected scenario
+    # occurs for quiet handling
+    contents = os.listdir(path)
+    calfile = ""
+    datafiles = []
+    for filepath in contents:
+        if re.match(r'\d{2}-\d{2}-\d{4}_\d{2}_\d{2}_\d{2}_\d{1,4}_\d*.cal', filepath):
+            calfile = path + filepath
+        elif re.match(r'\d{2}-\d{2}-\d{4}_\d{2}_\d{2}_\d{2}_\d{1,4}_\d*.wav', filepath):
+            datafiles.append(path + filepath)
+    if (calfile != "") and (datafiles != []):
+        return True
+    elif calfile == "" and datafiles == [] and path == "/":
+        return False
+    elif calfile == "" and datafiles == []:
+        raise Exception("Missing .cal file and .wav files")
+    elif calfile == "":
+        raise Exception("Missing .cal file")
+    elif datafiles == []:
+        raise Exception("Missing .wav files")
+    return False
 
 
 def read_wav(filename):

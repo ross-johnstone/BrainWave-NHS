@@ -1,57 +1,80 @@
 import json
+import datetime as dt
+import itertools
+
+
+class AnnotationException(Exception):
+    """
+    Exception for when the .json file contains annotations in an incorrect format, this annotation is ignored and execution continues,
+    just without annotations.
+    """
+    pass
+
 
 class Annotation:
-	def __init__(self, title, content, start_time, end_time):
-		self.title = title
-		self.content = content
-		self.start = start_time
-		self.end = end_time
-	def __str__(self):
-		dct = vars(self)
-		return str(dct)
-		# return "{\"title\": \"{}\", \"content\": \"{}\", \"start\": \"{}\", \"end\": \"{}\"}".format(self.title, self.content, self.start, self.end)  
-	def __repr__(self):
-		return str(self)
+    id_generator = itertools.count(1)
+
+    def __init__(self, title, content, start_time, end_time):
+        self.title = title
+        self.content = content
+        self.start = start_time
+        self.end = end_time
+        self.id = next(self.id_generator)
+
+    def __str__(self):
+        return str(vars(self))
+
+    def __repr__(self):
+        return str(self)
+
+    def __eq__(self, other):
+        # only compare against other annotations
+        if not isinstance(other, Annotation):
+            return NotImplemented
+        return self.title == other.title and self.content == other.content and self.start == other.start and self.end == other.end
+
+    def __hash__(self):
+        return hash((self.title, self.content, self.start, self.end))
+
+
 def encode_annotation(annotation):
-	if isinstance(annotation, Annotation):
-		return {"__annotation__":True, "title":annotation.title, "content":annotation.content, "start_time":annotation.start, "end_time":annotation.end}
-	else:
-		type_name = annotation.__class__.__name__
-		raise TypeError("Object of type '{}' is not JSON serializable".format(type_name))
+    """
+    Function to help encode an annotation object to save in a json file
+    """
+    if isinstance(annotation, Annotation):
+        return {"__annotation__": True, "title": annotation.title, "content": annotation.content,
+                "start_time": dt.datetime.isoformat(annotation.start), "end_time": dt.datetime.isoformat(annotation.end)}
+    else:
+        type_name = annotation.__class__.__name__
+        raise TypeError(
+            "Object of type '{}' is not JSON serializable".format(type_name))
+
 
 def decode_annotation(dict):
-	if "__annotation__" in dict:
-		return Annotation(dict["title"], dict["content"], dict["start_time"], dict["end_time"])
-	return dict
+    """
+    Hook function to help decode an annotation object from a json file
+    """
+    if "__annotation__" in dict:
+        return Annotation(dict["title"], dict["content"], dt.datetime.strptime(dict["start_time"], "%Y-%m-%dT%H:%M:%S.%f"), dt.datetime.strptime(dict["end_time"], "%Y-%m-%dT%H:%M:%S.%f"))
+    return dict
 
-def generate_annotations():
-	annotations = []
-	annotations.append(Annotation("Test annotation 1", "This is the first test annotation.", 100, 250))
-	annotations.append(Annotation("Test annotation 2", "This is the second test annotation, but it's a little bit longer just as an edge case.", 300, 350))
-	annotations.append(Annotation("Test annotation 3", "This is the third test annotation.", 455, 500))
-	annotations.append(Annotation("Test annotation 4", "This is in fact not the fourth test annotation, just kidding it actually is.", 600, 700))
-	return annotations
 
-def save_json(annotations):
-	"""
-	Saves an annotation object as json
-	"""
-	with open("test.txt","w+") as outfile:
-		json.dump(annotations, outfile, sort_keys=True, default=encode_annotation)
+def save_json(annotations, filename):
+    """
+    Saves an annotation object as json
+    """
+    with open(filename, "w+") as outfile:
+        json.dump(annotations, outfile, sort_keys=True,
+                  default=encode_annotation)
+
 
 def open_json(filename):
-	"""
-	Unpacks a json object into an annotation
-	"""
-	with open(filename) as infile:
-		return json.load(infile, object_hook=decode_annotation)
-
-def main ():
-	#TODO make these testcases in the automated tests check against [{u'content': u'This is the first test annotation.', u'start': 100, u'end': 250, u'title': u'Test annotation 1'}, {u'content': u"This is the second test annotation, but it's a little bit longer just as an edge case.", u'start': 300, u'end': 350, u'title': u'Test annotation 2'}, {u'content': u'This is the third test annotation.', u'start': 455, u'end': 500, u'title': u'Test annotation 3'}, {u'content': u'This is in fact not the fourth test annotation, just kidding it actually is.', u'start': 600, u'end': 700, u'title': u'Test annotation 4'}]
-	annotations = generate_annotations()
-	save_json(annotations)
-	loaded_annotations = open_json("test.txt")
-	print(loaded_annotations)
-
-if __name__ == "__main__":
-	main()
+    """
+    Unpacks a json object into an annotation
+    """
+    with open(filename) as infile:
+        try:
+            return json.load(infile, object_hook=decode_annotation)
+        except Exception:
+            raise AnnotationException(
+                "Wrong format of annotation in .json file, annotations could not be loaded.")

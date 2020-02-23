@@ -26,6 +26,7 @@ class TkBase:
         self.master.protocol("WM_DELETE_WINDOW", self.master.quit)
         master.title("BrainWave Visualization")
         master.state('zoomed')
+        master.protocol("WM_DELETE_WINDOW", self.root_close)
 
         self.initialize_annotation_display()
 
@@ -173,8 +174,9 @@ class TkBase:
         try:
             if data.check_valid_path(path):
                 new_root = Toplevel(self.master)
-                new_root.protocol("WM_DELETE_WINDOW", new_root.destroy)
-                TkBase(new_root, path, second_toolitems)
+                child_gui = TkBase(new_root, path, second_toolitems)
+                child_gui.master.protocol("WM_DELETE_WINDOW", child_gui.child_close)
+                child_gui.master.iconbitmap(r'res/general_images/favicon.ico')
         except Exception as e:
             raise Exception(e)
 
@@ -503,8 +505,12 @@ class TkBase:
         # put the second plot on the tkinter window
         self.reference_canvas.draw()
 
-    def close(self):
-        self.master.quit()
+    def root_close(self):
+        if messagebox.askokcancel("Close app", "Closing this window will close all windows, are you sure?"):
+            self.master.quit()
+
+    def child_close(self):
+        self.master.destroy()
 
 
 class NavigationToolbar(NavigationToolbar2Tk):
@@ -543,4 +549,4 @@ class NavigationToolbar(NavigationToolbar2Tk):
         self.tkbase_.export()
 
     def call_quit(self):
-        self.tkbase_.close()
+        self.tkbase_.root_close()

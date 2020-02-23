@@ -33,6 +33,7 @@ class TkBase:
         self.initialize_graph_display(FIGSIZE)
 
         self.project_path = path
+        self.json_path = self.project_path + "annotations.json"
         try:
             self.data, self.timestamps, self.annotations = data.open_project(
                 path)
@@ -140,12 +141,20 @@ class TkBase:
         try:
             if data.check_valid_path(path):
                 self.data, self.timestamps, self.annotations = data.open_project(
-                    path)
+                    self.project_path)
                 if self.annotations != []:
                     if self.annotations[0] == -1:
                         messagebox.showerror("Error: ", self.annotations[1])
                         self.annotations = []
                 self.draw_graph(self.data, self.timestamps, self.annotations)
+                self.index_to_ids = list()
+                self.id_to_shape = dict()
+                for id in self.annotations:
+                    id = id.id
+                    self.index_to_ids.append(id)
+                self.listb.delete(0,tkinter.END)
+                for a in self.annotations:
+                    self.listb.insert(tkinter.END, a.title)
         except Exception as e:
             print(e)
             messagebox.showerror("Error:", e)

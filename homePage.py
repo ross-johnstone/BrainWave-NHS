@@ -1,8 +1,28 @@
 import tkinter as tk
 from tkinter import ttk, filedialog, messagebox, BOTTOM
 from tkinterbase import TkBase
-import re
-import os
+from data import check_valid_path
+
+default_toolitems = (
+    ('Home', 'Reset original view', 'home', 'home'),
+    ('Back', 'Back to previous view', 'back', 'back'),
+    ('Forward', 'Forward to next view', 'forward', 'forward'),
+    (None, None, None, None),
+    ('Pan', 'Pan axes with left mouse, zoom with right', 'move', 'pan'),
+    ('Zoom', 'Zoom to rectangle', 'zoom_to_rect', 'zoom'),
+    ('Subplots', 'Configure subplots', 'subplots', 'configure_subplots'),
+    (None, None, None, None),
+    ('Annotate', 'Create an annotation', 'annotate', 'call_annotate'),
+    ('Confirm', 'Confirm annotation', 'confirm', 'call_confirm'),
+    (None, None, None, None),
+    ('Open', 'Opens a new project', 'open', 'call_open'),
+    ('Export', 'Export to PDF', 'export', 'call_export'),
+    ('Save', 'Save the graph as PNG', 'filesave', 'save_figure'),
+    ('Open Concurrent', 'Open a concurrent graph view',
+     'compare', 'call_open_concurrent'),
+    (None, None, None, None),
+    ('Quit', 'Quit application', 'quit', 'call_quit'),
+)
 
 
 class HomePage:
@@ -40,36 +60,24 @@ class HomePage:
     def load_project(self):
         path = filedialog.askdirectory()
         if not path:
-            # If user exits file directory  - shows error msg
-            messagebox.showerror("Error", "File could not be opened.")
+            # If user exits file directory  - do nothing
+            pass
         else:
             path = path + "/"
-            if not self.isValid(path):
+            try:
+                if check_valid_path(path):
+                    # Destroys homepage and runs main app
+                    self.open_button.destroy()
+                    self.quit_button.destroy()
+                    self.cv.destroy()
+                    TkBase(root, path, default_toolitems)
+                    root.resizable(True, True)
+                    root.configure(bg="#949494")
+            except Exception as e:
                 # If user picks a folder with no .cal or .wav files - shows
                 # error msg
-                messagebox.showerror("Error", "Inappropriate file type.")
-            elif self.isValid(path):
-                # Destroys homepage and runs main app
-                self.open_button.destroy()
-                self.quit_button.destroy()
-                self.cv.destroy()
-                TkBase(root, path)
-                root.resizable(True, True)
-
-    def isValid(self, path):
-        # Checks the path contents to see if it has .cal and .wav files
-        contents = os.listdir(path)
-        calfile = ""
-        datafiles = []
-        for filepath in contents:
-            if re.match(r'\d{2}-\d{2}-\d{4}_\d{2}_\d{2}_\d{2}_\d{1,4}_\d*.cal', filepath):
-                calfile = path + filepath
-            elif re.match(r'\d{2}-\d{2}-\d{4}_\d{2}_\d{2}_\d{2}_\d{1,4}_\d*.wav', filepath):
-                datafiles.append(path + filepath)
-        if (calfile != "") and (datafiles != []):
-            return True
-        else:
-            return False
+                e.message = "Inappropriate file type."
+                messagebox.showerror("Error", e)
 
     def close(self):
         # Pop up to user asking them if they want to quit

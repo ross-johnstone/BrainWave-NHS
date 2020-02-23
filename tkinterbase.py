@@ -22,6 +22,7 @@ class TkBase:
         self.window_id = next(self.id_generator)
         self.master = master
 
+        self.master.protocol("WM_DELETE_WINDOW", self.master.quit)
         master.title("BrainWave Visualization")
         master.state('zoomed')
 
@@ -85,6 +86,7 @@ class TkBase:
             side=tkinter.BOTTOM, fill=tkinter.BOTH, expand=1)
 
         self.project_path = path
+        self.json_path = self.project_path + "/annotations.json"
         try:
             self.data, self.timestamps, self.annotations = data.open_project(
                 self.project_path)
@@ -120,10 +122,11 @@ class TkBase:
     # callback method for the open button, opens an existing project
     def open(self):
         path = filedialog.askdirectory()
-        path = path + "/"
+        self.project_path = path + "/"
+        self.json_path = self.project_path + "annotations.json"
         try:
             self.data, self.timestamps, self.annotations = data.open_project(
-                path)
+                self.project_path)
             self.draw_graph(self.data, self.timestamps, self.annotations)
         except Exception as e:
             messagebox.showerror("Error:", e)
@@ -239,7 +242,7 @@ class TkBase:
                     annotation.title = title_entry.get()
                     annotation.content = description_entry.get(1.0, tkinter.END)
                     save_json(self.annotations,
-                              'data/recording1/pat1/annotations.json')
+                              self.json_path)
                     self.listb.delete(index)
                     self.listb.insert(index, title_entry.get())
                     cancel()
@@ -302,7 +305,7 @@ class TkBase:
                     del self.id_to_shape[id]
                     self.main_graph.canvas.draw()
                     save_json(self.annotations,
-                              'data/recording1/pat1/annotations.json')
+                              self.json_path)
                     self.listb.delete(index)
 
     def annotate(self):
@@ -340,8 +343,7 @@ class TkBase:
                                                 self.span_min, self.span_max)
 
                     self.annotations.append(new_annotation)
-                    json_path = self.project_path + 'annotations.json'
-                    save_json(self.annotations, json_path)
+                    save_json(self.annotations, self.json_path)
                     self.draw_annotation(new_annotation)
                     self.index_to_ids.append(new_annotation.id)
                     self.listb.insert(tkinter.END, new_annotation.title)

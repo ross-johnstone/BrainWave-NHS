@@ -12,6 +12,9 @@ class AnnotationException(Exception):
 
 
 class Annotation:
+    """
+    Basic annotation class to represent annotations within the application, implements eq, str and repr for debugging purposes.
+    """
     id_generator = itertools.count(1)
 
     def __init__(self, title, content, start_time, end_time):
@@ -39,7 +42,7 @@ class Annotation:
 
 def encode_annotation(annotation):
     """
-    Function to help encode an annotation object to save in a json file
+    Helper function to encode an annotation object to save in a json file
     """
     if isinstance(annotation, Annotation):
         return {"__annotation__": True, "title": annotation.title, "content": annotation.content,
@@ -61,7 +64,7 @@ def decode_annotation(dict):
 
 def save_json(annotations, filename):
     """
-    Saves an annotation object as json
+    Saves an a list of annotations as a json, takes the list and filename as arguments and saves it as filename in the project directory.
     """
     with open(filename, "w+") as outfile:
         json.dump(annotations, outfile, sort_keys=True,
@@ -70,7 +73,7 @@ def save_json(annotations, filename):
 
 def open_json(filename):
     """
-    Unpacks a json object into an annotation
+    Given a filename unpacks a json object into an annotation list
     """
     with open(filename) as infile:
         try:

@@ -71,6 +71,9 @@ class TkBase:
         # function that initializes the display of annotations to the right of
         # the screen
     def initialize_annotation_display(self):
+        """
+        initializes the functionalities of the annotation display like the list and the buttons to browse annotations 
+        """
         self.id_to_shape = dict()
 
         self.listbox_frame = tkinter.Frame(self.master, bg="#949494")
@@ -111,6 +114,10 @@ class TkBase:
 
     # function that initializes the graphs and everything to do with them
     def initialize_graph_display(self, FIGSIZE):
+        """
+        initializes the functionalities of the graph display including the main and reference graph
+        """
+
         # create matplotlib figures with single axes on which the data will be
         # displayed
         self.main_graph, self.main_graph_ax = plt.subplots(figsize=FIGSIZE)
@@ -134,8 +141,10 @@ class TkBase:
         self.reference_canvas.get_tk_widget().pack(
             side=tkinter.BOTTOM, fill=tkinter.BOTH, expand=1)
 
-    # callback method for the open button, opens an existing project
     def open(self):
+        """
+         callback method for the open button, opens an existing project
+        """
         path = filedialog.askdirectory()
         path = path + "/"
         try:
@@ -152,6 +161,9 @@ class TkBase:
             messagebox.showerror("Error:", e)
 
     def open_concurrent(self):
+        """
+        callback method for the open concurrent button, opens a new window with a new project identical in functionality to the original application
+        """
         second_toolitems = (
             ('Home', 'Reset original view', 'home', 'home'),
             ('Back', 'Back to previous view', 'back', 'back'),
@@ -180,8 +192,10 @@ class TkBase:
         except Exception as e:
             raise Exception(e)
 
-    # callback method for the annotate button activates the span selector
     def butrelease(self, event):
+        """
+        callback method for the annotate button activates the span selector
+        """
         # deactivate toolbar functionalities if any are active
         if (self.toolbar._active == 'PAN'):
             self.toolbar.pan()
@@ -190,7 +204,9 @@ class TkBase:
             self.toolbar.zoom()
 
     def export(self):
-
+        """
+        callback method for the export button opens a prompt asking for filename in order to save the figure
+        """
         def cancel():
             self.span_min = False
             popup.destroy()
@@ -224,9 +240,10 @@ class TkBase:
         close_export_popup_button = Button(popup, text="Confirm", command=save)
         close_export_popup_button.grid(row=1, column=1)
 
-    # callback function for the listbox widget
     def listbox_selection(self, event):
-
+        """
+        callback function for the listbox widget
+        """
         if(self.listb.curselection()):
             id = self.index_to_ids[self.listb.curselection()[0]]
 
@@ -237,8 +254,10 @@ class TkBase:
                     self.labelDescription[
                         'text'] = "Description: \n" + a.content
 
-    # callback for go to annotation button
     def goto_callback(self):
+        """
+        callback for go to annotation button
+        """
         if(self.listb.curselection()):
             id = self.index_to_ids[self.listb.curselection()[0]]
 
@@ -268,6 +287,9 @@ class TkBase:
                     self.main_graph.canvas.draw()
 
     def edit_callback(self):
+        """
+        callback for edit annotation button
+        """
         if(self.listb.curselection()):
             # method called when cancel button on popup is pressed
             def cancel():
@@ -338,6 +360,9 @@ class TkBase:
                     top.protocol("WM_DELETE_WINDOW", cancel)
 
     def delete_callback(self):
+        """
+        callback for the delete annotation button
+        """
         if(self.listb.curselection()):
             index = self.listb.curselection()[0]
             id = self.index_to_ids[self.listb.curselection()[0]]
@@ -354,6 +379,10 @@ class TkBase:
                     self.listb.delete(index)
 
     def annotate(self):
+        """
+        callback for the annotate button on the toolbar
+        """
+
         # activate the span selector
         self.span.set_visible(True)
 
@@ -366,9 +395,12 @@ class TkBase:
 
         self.annotate_button.config(text='Confirm', command=self.confirm)
 
-    # callback method for the annotate button after span is sellected this button
-    # is pressed to add descriptions to the annotation and confirm selection
+    
     def confirm(self):
+        """
+        callback method for the annotate button after span is sellected this button
+        is pressed to add descriptions to the annotation and confirm selection
+        """
         # if something is selected
         if (self.span_min):
             # method called when cancel button on popup is pressed
@@ -447,16 +479,20 @@ class TkBase:
             top.iconbitmap(r"./res/general_images/favicon.ico")
             top.protocol("WM_DELETE_WINDOW", cancel)
 
-    # callback method of the span selector, after every selection it writes
-    # the selected range to class variables
     def onselect(self, min, max):
+        """
+        callback method of the span selector, after every selection it writes
+        the selected range to class variables
+        """
         self.span_min = datetime.datetime.fromordinal(
             int(min)) + datetime.timedelta(seconds=divmod(min, 1)[1] * 86400)
         self.span_max = datetime.datetime.fromordinal(
             int(max)) + datetime.timedelta(seconds=divmod(max, 1)[1] * 86400)
 
-    # get vertical range for a given annotation
     def get_vertical_range(self, annotation):
+        """
+        get vertical range for a given annotation
+        """
 
         range_indices = np.where(np.logical_and(
             self.timestamps > annotation.start, self.timestamps < annotation.end))
@@ -465,6 +501,10 @@ class TkBase:
         return range_data[np.argmax(range_data)], range_data[np.argmin(range_data)]
 
     def draw_annotation(self, annotation):
+        """
+        draws annotation to the main graph as a box if it's a span or a line if it's a point annotation
+        """
+
         # if date range annotation draw rectangle
         if(annotation.start != annotation.end):
             vmax, vmin = self.get_vertical_range(annotation)
@@ -478,6 +518,9 @@ class TkBase:
         self.main_graph.canvas.draw()
 
     def draw_graph(self, data, timestamps, annotations):
+        """
+        draws the main graph and the referece graph given data, timestamps and annotations
+        """
         self.main_graph_ax.clear()
         # plot values on the axe and set plot hue to NHS blue
         self.main_graph_ax.plot(timestamps, data, color='#5436ff')
@@ -511,6 +554,9 @@ class TkBase:
 
 
 class NavigationToolbar(NavigationToolbar2Tk):
+    """
+    encapsulates all of the graph functionalities in an extension of tk navigation toolbar
+    """
 
     def __init__(self, canvas_, parent_, tkbase_, toolitems):
         self.tkbase_ = tkbase_

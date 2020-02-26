@@ -28,8 +28,11 @@ class TkBase:
         # map from annotation id to the drawn shape in the graph
         self.id_to_shape = dict()
 
-        self.listbox_frame = tkinter.Frame(self.master, bg="#949494")
-        self.listbox_frame.pack(side=tkinter.RIGHT, padx=(10, 10))
+        self.annotation_frame = tkinter.Frame(self.master, bg="#949494")
+        self.annotation_frame.pack(side=tkinter.RIGHT, padx=(10, 10))
+
+        self.listbox_frame = tkinter.Frame(self.annotation_frame, bg="#949494")
+        self.listbox_frame.pack()
 
         # list to convert from indices in listbox to annotation ids
         self.index_to_ids = list()
@@ -42,25 +45,25 @@ class TkBase:
         self.listb.pack(side="bottom",fill="y")
 
         
-        self.labelTitle = tkinter.Label(self.listbox_frame,
+        self.labelTitle = tkinter.Label(self.annotation_frame,
                                         text="Title:", bg="#949494", anchor='w')
         self.labelTitle.pack(side="top")
 
-        self.labelDescription = tkinter.Label(self.listbox_frame,
+        self.labelDescription = tkinter.Label(self.annotation_frame,
                                               text="description:",
                                               wraplength=150, bg="#949494", anchor='w')
         self.labelDescription.pack(side="top")
 
         self.go_to_annotation = ttk.Button(
-            self.listbox_frame, text='Go-To', width=30, command=self.goto_callback)
+            self.annotation_frame, text='Go-To', width=30, command=self.goto_callback)
         self.go_to_annotation.pack(side="top")
 
         self.edit_annotation = ttk.Button(
-            self.listbox_frame, text='Edit', width=30, command=self.edit_callback)
+            self.annotation_frame, text='Edit', width=30, command=self.edit_callback)
         self.edit_annotation.pack(side="top")
 
         self.delete_annotation = ttk.Button(
-            self.listbox_frame, text='Delete', width=30, command=self.delete_callback)
+            self.annotation_frame, text='Delete', width=30, command=self.delete_callback)
         self.delete_annotation.pack(side="top")
 
         # self.master.grid_columnconfigure(0, weight=1)
@@ -146,6 +149,8 @@ class TkBase:
         new_root = Toplevel(self.master)
         new_root.protocol("WM_DELETE_WINDOW", new_root.destroy)
         TkBase(new_root, path)
+        new_root.configure(bg="#949494")
+        new_root.iconbitmap(r'res/general_images/favicon.ico')
 
     # callback method for the annotate button activates the span selector
     def butrelease(self, event):

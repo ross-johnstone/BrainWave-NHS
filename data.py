@@ -114,13 +114,3 @@ def get_initial_timestamp(filename):
         timestamp = datetime.datetime.strptime(
             match.group(1), '%d-%m-%Y %H:%M:%S')
         return timestamp
-
-
-def main():
-    data, timestamps, annotations = open_project("./data/recording2/pat2/")
-
-
-# do whatever with the data in testing
-
-if __name__ == "__main__":
-    main()

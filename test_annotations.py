@@ -38,7 +38,7 @@ class TestAnnotations(unittest.TestCase):
         annotation = self.annotations[0]
         encoded_annotation = encode_annotation(annotation)
 
-        self.assertEqual(isinstance(encoded_annotation, dict), True, "This should be a dictionary")
+        self.assertTrue(isinstance(encoded_annotation, dict), "This should be a dictionary")
         self.assertEqual(encoded_annotation["title"], annotation.title, "The titles should be the same")
         self.assertEqual(encoded_annotation["content"], annotation.content, "The content should be the same")
         self.assertEqual(encoded_annotation["start_time"], datetime.isoformat(annotation.start),
@@ -47,8 +47,12 @@ class TestAnnotations(unittest.TestCase):
                          "The end should be the same")
 
         decoded_annotation = decode_annotation(encoded_annotation)
-        self.assertEqual(isinstance(decoded_annotation, Annotation), True, "This should be an annotation object")
+        self.assertTrue(isinstance(decoded_annotation, Annotation), "This should be an annotation object")
         self.assertEqual(annotation, decoded_annotation)
+
+    def test_encode_exception(self):
+        with self.assertRaises(TypeError):
+            encode_annotation("Not an annotation")
 
     def test_save_open_annotations(self):
         annotations = self.annotations
@@ -59,6 +63,10 @@ class TestAnnotations(unittest.TestCase):
             # check whether the annotation objects loaded have the correct information
             self.assertEqual(annotations[i], loaded_annotations[i], "Annotations should be equal")
         os.remove("test.json")
+
+    def test_open_json_excpetion(self):
+        with self.assertRaises(Exception):
+            open_json("./data/invalid_json/annotations.json")
 
 
 if __name__ == '__main__':

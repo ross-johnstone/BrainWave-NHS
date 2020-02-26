@@ -58,6 +58,9 @@ class HomePage:
         self.frame.pack()
 
     def load_project(self):
+        """
+        handler function for the open button, loads project if given a valid path otherwise does nothing
+        """
         path = filedialog.askdirectory()
         if not path:
             # If user exits file directory  - do nothing

@@ -62,9 +62,11 @@ def open_project(path):
 
 
 def check_valid_path(path):
-    # Checks the path contents to see if it has .cal and .wav files and raises exceptions if it doesn't
-    # returns false if user clicked on cancel, or an unexpected scenario
-    # occurs for quiet handling
+    """
+    Checks the path contents to see if it has .cal and .wav files and raises exceptions if it doesn't
+    returns false if user clicked on cancel, or an unexpected scenario
+    occurs for quiet handling
+    """
     contents = os.listdir(path)
     calfile = ""
     datafiles = []
@@ -114,13 +116,3 @@ def get_initial_timestamp(filename):
         timestamp = datetime.datetime.strptime(
             match.group(1), '%d-%m-%Y %H:%M:%S')
         return timestamp
-
-
-def main():
-    data, timestamps, annotations = open_project("./data/recording2/pat2/")
-
-
-# do whatever with the data in testing
-
-if __name__ == "__main__":
-    main()

@@ -14,12 +14,13 @@ class AnnotationException(Exception):
 class Annotation:
     id_generator = itertools.count(1)
 
-    def __init__(self, title, content, start_time, end_time):
+    def __init__(self, title, content, start_time, end_time, color):
         self.title = title
         self.content = content
         self.start = start_time
         self.end = end_time
         self.id = next(self.id_generator)
+        self.color = color
 
     def __str__(self):
         return str(vars(self))
@@ -43,7 +44,7 @@ def encode_annotation(annotation):
     """
     if isinstance(annotation, Annotation):
         return {"__annotation__": True, "title": annotation.title, "content": annotation.content,
-                "start_time": dt.datetime.isoformat(annotation.start), "end_time": dt.datetime.isoformat(annotation.end)}
+                "start_time": dt.datetime.isoformat(annotation.start), "end_time": dt.datetime.isoformat(annotation.end), "color": annotation.color}
     else:
         type_name = annotation.__class__.__name__
         raise TypeError(
@@ -55,7 +56,7 @@ def decode_annotation(dict):
     Hook function to help decode an annotation object from a json file
     """
     if "__annotation__" in dict:
-        return Annotation(dict["title"], dict["content"], dt.datetime.strptime(dict["start_time"], "%Y-%m-%dT%H:%M:%S.%f"), dt.datetime.strptime(dict["end_time"], "%Y-%m-%dT%H:%M:%S.%f"))
+        return Annotation(dict["title"], dict["content"], dt.datetime.strptime(dict["start_time"], "%Y-%m-%dT%H:%M:%S.%f"), dt.datetime.strptime(dict["end_time"], "%Y-%m-%dT%H:%M:%S.%f"), dict["color"])
     return dict
 
 

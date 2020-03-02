@@ -1,4 +1,4 @@
-from tkinter import Label, Button, Toplevel, Entry, filedialog, PhotoImage, ttk
+from tkinter import Label, Button, Toplevel, Entry, filedialog, PhotoImage, ttk, colorchooser
 import tkinter
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg, NavigationToolbar2Tk
@@ -152,7 +152,7 @@ class TkBase:
                 for id in self.annotations:
                     id = id.id
                     self.index_to_ids.append(id)
-                self.listb.delete(0,tkinter.END)
+                self.listb.delete(0, tkinter.END)
                 for a in self.annotations:
                     self.listb.insert(tkinter.END, a.title)
         except Exception as e:
@@ -184,7 +184,8 @@ class TkBase:
             if data.check_valid_path(path):
                 new_root = Toplevel(self.master)
                 child_gui = TkBase(new_root, path, second_toolitems)
-                child_gui.master.protocol("WM_DELETE_WINDOW", child_gui.child_close)
+                child_gui.master.protocol(
+                    "WM_DELETE_WINDOW", child_gui.child_close)
                 child_gui.master.iconbitmap(r'res/general_images/favicon.ico')
         except Exception as e:
             raise Exception(e)
@@ -362,6 +363,10 @@ class TkBase:
                               self.json_path)
                     self.listb.delete(index)
 
+    def pick_color(self):
+        color = colorchooser.askcolor()
+        return color[0]
+
     def annotate(self):
         # activate the span selector
         self.span.set_visible(True)
@@ -378,8 +383,13 @@ class TkBase:
     # callback method for the annotate button after span is sellected this button
     # is pressed to add descriptions to the annotation and confirm selection
     def confirm(self):
+        annotation_color = None
         # if something is selected
         if (self.span_min):
+            def pick_color():
+                nonlocal annotation_color
+                annotation_color = self.pick_color()
+
             # method called when cancel button on popup is pressed
             def cancel():
                 self.span_min = False
@@ -393,9 +403,11 @@ class TkBase:
                         top, text="Please add a title!", fg="red")
                     error_label.grid(row=3)
                 else:
+                    nonlocal annotation_color
+                    if annotation_color == None:
+                        annotation_color = (256, 0, 0)
                     new_annotation = Annotation(title_entry.get(), description_entry.get(1.0, tkinter.END),
-                                                self.span_min, self.span_max)
-
+                                                self.span_min, self.span_max, annotation_color)
                     self.annotations.append(new_annotation)
                     save_json(self.annotations, self.json_path)
                     self.draw_annotation(new_annotation)
@@ -442,6 +454,10 @@ class TkBase:
                 master=top, text="Cancel", command=cancel, bg='white')
             cancel_button.grid(row=8)
 
+            color_button = Button(master=top, text="choose color",
+                                  command=pick_color, bg='white')
+            color_button.grid(row=9)
+
             # change button back to annotate button and hide span selector
             # again
             self.annotate_button.config(text='Annotate', command=self.annotate)
@@ -474,15 +490,18 @@ class TkBase:
 
     def draw_annotation(self, annotation):
         # if date range annotation draw rectangle
+        annotation_color = annotation.color
+        annotation_color = tuple(map(lambda x: x/256, annotation_color))
+        annotation_color = annotation_color + (0.5,)
         if(annotation.start != annotation.end):
             vmax, vmin = self.get_vertical_range(annotation)
             self.id_to_shape[annotation.id] = self.main_graph_ax.add_patch(plt.Rectangle((date2num(annotation.start), vmin - 10),
-                                                                                         date2num(annotation.end) - date2num(annotation.start), vmax - vmin + 20, fc='r'))
+                                                                                         date2num(annotation.end) - date2num(annotation.start), vmax - vmin + 20, color=annotation_color))
         # if point annotation draw a vertical line
         if(annotation.start == annotation.end):
             plt.figure(self.window_id * 2 - 1)
             self.id_to_shape[annotation.id] = plt.axvline(
-                x=date2num(annotation.start))
+                x=date2num(annotation.start), color=annotation_color)
         self.main_graph.canvas.draw()
 
     def draw_graph(self, data, timestamps, annotations):

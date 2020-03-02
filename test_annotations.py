@@ -57,6 +57,10 @@ class TestAnnotations(unittest.TestCase):
                          True, "This should be an annotation object")
         self.assertEqual(annotation, decoded_annotation)
 
+    def test_encode_exception(self):
+        with self.assertRaises(TypeError):
+            encode_annotation("Not an annotation")
+
     def test_save_open_annotations(self):
         annotations = self.annotations
         save_json(annotations, "test.json")
@@ -68,6 +72,10 @@ class TestAnnotations(unittest.TestCase):
             self.assertEqual(
                 annotations[i], loaded_annotations[i], "Annotations should be equal")
         os.remove("test.json")
+
+    def test_open_json_excpetion(self):
+        with self.assertRaises(Exception):
+            open_json("./data/invalid_json/annotations.json")
 
 
 if __name__ == '__main__':

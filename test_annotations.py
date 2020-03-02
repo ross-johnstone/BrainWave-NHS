@@ -14,16 +14,16 @@ class TestAnnotations(unittest.TestCase):
         annotations = []
         annotations.append(
             Annotation("Test annotation 1", "This is the first test annotation.", datetime.fromtimestamp(100.5),
-                       datetime.fromtimestamp(250.5)))
+                       datetime.fromtimestamp(250.5), (256,0,0)))
         annotations.append(Annotation("Test annotation 2",
                                       "This is the second test annotation, but it's a little bit longer just as an edge case.",
-                                      datetime.fromtimestamp(300.5), datetime.fromtimestamp(350.5)))
+                                      datetime.fromtimestamp(300.5), datetime.fromtimestamp(350.5), (256,0,0)))
         annotations.append(
             Annotation("Test annotation 3", "This is the third test annotation.", datetime.fromtimestamp(455.5),
-                       datetime.fromtimestamp(500.5)))
+                       datetime.fromtimestamp(500.5), (256,0,0)))
         annotations.append(Annotation("Test annotation 4",
                                       "This is in fact not the fourth test annotation, just kidding it actually is.",
-                                      datetime.fromtimestamp(600.5), datetime.fromtimestamp(700.5)))
+                                      datetime.fromtimestamp(600.5), datetime.fromtimestamp(700.5), (256,0,0)))
         self.annotations = annotations
 
     def test_generate_annotations(self):

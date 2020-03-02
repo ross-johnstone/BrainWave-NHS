@@ -404,7 +404,7 @@ class TkBase:
                     error_label.grid(row=3)
                 else:
                     nonlocal annotation_color
-                    if annotation_color == None:
+                    if annotation_color is None:
                         annotation_color = (256, 0, 0)
                     new_annotation = Annotation(title_entry.get(), description_entry.get(1.0, tkinter.END),
                                                 self.span_min, self.span_max, annotation_color)

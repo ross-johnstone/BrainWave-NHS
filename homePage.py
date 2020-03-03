@@ -2,7 +2,7 @@ import tkinter as tk
 from tkinter import ttk, filedialog, messagebox, BOTTOM
 from tkinterbase import TkBase
 from data import check_valid_path
-
+import logging 
 default_toolitems = (
     ('Home', 'Reset original view', 'home', 'home'),
     ('Back', 'Back to previous view', 'back', 'back'),
@@ -27,6 +27,10 @@ default_toolitems = (
 
 class HomePage:
     def __init__(self, master):
+
+        logging.basicConfig(filename='event_log.log', level=logging.INFO, filemode='w')
+        logging.info('Starting application')
+
         # Initialises window with background image and widgets
         self.master = master
         master.title("BrainWave Visualization - HomePage")

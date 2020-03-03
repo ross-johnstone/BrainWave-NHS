@@ -1,7 +1,7 @@
 import json
 import datetime as dt
 import itertools
-
+import logging
 
 class AnnotationException(Exception):
     """
@@ -67,6 +67,7 @@ def save_json(annotations, filename):
     """
     Saves an a list of annotations as a json, takes the list and filename as arguments and saves it as filename in the project directory.
     """
+    logging.info('Encoding annotations as json into {}'.format(filename))
     with open(filename, "w+") as outfile:
         json.dump(annotations, outfile, sort_keys=True,
                   default=encode_annotation)
@@ -76,9 +77,12 @@ def open_json(filename):
     """
     Given a filename unpacks a json object into an annotation list
     """
+    logging.info('Opening json file {}'.format(filename))
     with open(filename) as infile:
         try:
+            logging.info('Decoding .json into annotations'.format(filename))
             return json.load(infile, object_hook=decode_annotation)
         except Exception:
+            logging.error('Wrong annotation format in .json file')
             raise AnnotationException(
                 "Wrong format of annotation in .json file, annotations could not be loaded.")

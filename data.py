@@ -4,7 +4,7 @@ import os
 import re
 import datetime
 from annotations import open_json
-
+import logging
 
 def open_project(path):
     """
@@ -14,6 +14,7 @@ def open_project(path):
         and a list of Annotation objects  as the third element in result if a json file is present,
         else it returns an empty list.
     """
+    logging.info('Opening project at path: {}'.format(path))
     contents = os.listdir(path)
     calfile = ""
     datafiles = []
@@ -21,30 +22,38 @@ def open_project(path):
     # acquire filepaths for the different project files
     for filepath in contents:
         if re.match(r'\d{2}-\d{2}-\d{4}_\d{2}_\d{2}_\d{2}_\d{1,4}_\d*.cal', filepath):
+            logging.info('Found calfile: {}'.format(filepath))
             calfile = path + filepath
         elif re.match(r'\d{2}-\d{2}-\d{4}_\d{2}_\d{2}_\d{2}_\d{1,4}_\d*.wav', filepath):
+            logging.info('Found datafile: {}'.format(filepath))
             datafiles.append(path + filepath)
         elif re.match('.*\.json', filepath):
+            logging.info('Found jsonfile: {}'.format(filepath))
             jsonfile = path + filepath
     # sort datafiles to obtain the correct order of data
     datafiles.sort()
     raw_data = []
 
+    logging.info('Creating numpy array from data')
     # create a numpy array from the datafiles
     for file in datafiles:
         try:
             tmp_data = read_wav(file)
         except Exception:
+            logging.error('.wav file at {} could not be read'.format(file))
             raise Exception("One of the data files could not be read")
         raw_data.append(tmp_data)
     data = np.hstack(raw_data)
 
     # create timestamps
+    logging.info('Creating timestamps')
     timestamps = None
     if calfile != "":
         try:
+            logging.info('Getting initial timestamp')
             initial_time = get_initial_timestamp(calfile)
         except Exception:
+            logging.info('.cal file at {} could not be read'.format(calfile))
             raise Exception("The .cal file could not be read")
         timestamps = np.arange(
             data.shape[0]) * datetime.timedelta(microseconds=1000 * 20)
@@ -52,12 +61,14 @@ def open_project(path):
     # load annotations
     annotations = []
     if jsonfile != "":
+        logging.info('Loading annotations')
         try:
             annotations = open_json(jsonfile)
         except Exception:
+            logging.warning('The annotations could not be loaded from file at {}'.format(jsonfile))
             annotations = [-1,
                            "The annotation file is in an incorrect format."]
-
+    logging.info('Finished opening project')
     return data, timestamps, annotations
 
 
@@ -67,6 +78,7 @@ def check_valid_path(path):
     returns false if user clicked on cancel, or an unexpected scenario
     occurs for quiet handling
     """
+    logging.info('Checking validity of path: {}'.format(path))
     contents = os.listdir(path)
     calfile = ""
     datafiles = []
@@ -76,14 +88,19 @@ def check_valid_path(path):
         elif re.match(r'\d{2}-\d{2}-\d{4}_\d{2}_\d{2}_\d{2}_\d{1,4}_\d*.wav', filepath):
             datafiles.append(path + filepath)
     if (calfile != "") and (datafiles != []):
+        logging.info('Path valid.')
         return True
     elif calfile == "" and datafiles == [] and path == "/":
+        logging.info('Cancel button was clicked')
         return False
     elif calfile == "" and datafiles == []:
+        logging.error('Missing .cal and .wav files')
         raise Exception("Missing .cal file and .wav files")
     elif calfile == "":
+        logging.error('Missing .cal file')
         raise Exception("Missing .cal file")
     elif datafiles == []:
+        logging.error('Missing .wav file')
         raise Exception("Missing .wav files")
     return False
 
@@ -92,6 +109,7 @@ def read_wav(filename):
     """
         Reads a single wav file in the format of two bytes is equal to one ICB reading and returns it as a numpy array
     """
+    logging.info('Reading .wav file at {}'.format(filename))
     frames = []
     with open(filename, 'rb') as infile:
         raw_data = infile.read(2)
@@ -108,6 +126,7 @@ def get_initial_timestamp(filename):
     """
         Reads a .cal file and returns the initial timestamp
     """
+    logging.info('Reading .cal file at {}'.format(filename))
     timestamp = ""
     with open(filename, 'r') as infile:
         firstline = infile.readline()

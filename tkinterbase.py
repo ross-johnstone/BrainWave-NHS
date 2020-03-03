@@ -11,13 +11,14 @@ import numpy as np
 from annotations import Annotation, save_json
 import data
 from tkinter import messagebox
+import logging
 
 
 class TkBase:
     id_generator = itertools.count(1)
 
     def __init__(self, master, path, toolitems):
-
+        logging.basicConfig(filename='event_log.log', level=logging.INFO)
         FIGSIZE = (8, 3)
         self.window_id = next(self.id_generator)
         self.master = master
@@ -48,7 +49,8 @@ class TkBase:
             for a in self.annotations:
                 self.listb.insert(tkinter.END, a.title)
         except Exception as e:
-            print(e)
+            logging.error('Error during opening initial project')
+            logging.error(e)
             messagebox.showerror("Error:", e)
 
         # put the plot with navbar on the tkinter window
@@ -77,6 +79,8 @@ class TkBase:
         """
         initializes the functionalities of the annotation display like the list and the buttons to browse annotations 
         """
+        logging.info('Initializing annotation display')
+
         self.id_to_shape = dict()
 
         self.listbox_frame = tkinter.Frame(self.master, bg="#949494")
@@ -117,6 +121,8 @@ class TkBase:
         initializes the functionalities of the graph display including the main and reference graph
         """
 
+        logging.info('Initializing graph display')
+
         # create matplotlib figures with single axes on which the data will be
         # displayed
         self.main_graph, self.main_graph_ax = plt.subplots(figsize=FIGSIZE)
@@ -144,10 +150,13 @@ class TkBase:
         """
          callback method for the open button, opens an existing project
         """
+        logging.info('Opening file...')
         path = filedialog.askdirectory()
+        logging.info('Path given: {}'.format(path))
         self.project_path = path + "/"
         self.json_path = self.project_path + "annotations.json"
         try:
+            logging.info('Checking validity of path')
             if data.check_valid_path(path):
                 self.data, self.timestamps, self.annotations = data.open_project(
                     self.project_path)
@@ -164,14 +173,19 @@ class TkBase:
                 self.listb.delete(0, tkinter.END)
                 for a in self.annotations:
                     self.listb.insert(tkinter.END, a.title)
+            else:
+                logging.warning('Invalid path given.')
+            logging.info('File open successfully')    
         except Exception as e:
-            print(e)
+            logging.error(e)
             messagebox.showerror("Error:", e)
 
     def open_concurrent(self):
         """
         callback method for the open concurrent button, opens a new window with a new project identical in functionality to the original application
         """
+
+        logging.info('Opening concurrent window')
         second_toolitems = (
             ('Home', 'Reset original view', 'home', 'home'),
             ('Back', 'Back to previous view', 'back', 'back'),
@@ -192,20 +206,26 @@ class TkBase:
         )
         path = filedialog.askdirectory()
         path = path + "/"
+        logging.info('Path given: {}'.format(path))
         try:
+            logging.info('Checking validity of path')
             if data.check_valid_path(path):
                 new_root = Toplevel(self.master)
                 child_gui = TkBase(new_root, path, second_toolitems)
                 child_gui.master.protocol(
                     "WM_DELETE_WINDOW", child_gui.child_close)
                 child_gui.master.iconbitmap(r'res/general_images/favicon.ico')
+            else:
+                logging.warning('Invalid path given.')
         except Exception as e:
+            logging.error(e)
             raise Exception(e)
 
     def butrelease(self, event):
         """
         callback method for the annotate button activates the span selector
         """
+
         # deactivate toolbar functionalities if any are active
         if (self.toolbar._active == 'PAN'):
             self.toolbar.pan()
@@ -218,24 +238,30 @@ class TkBase:
         callback method for the export button opens a prompt asking for filename in order to save the figure
         """
         def cancel():
+            logging.info('Canceling export')
             self.span_min = False
             popup.destroy()
             popup.update()
 
         def save():
+            logging.info('Asking for filename')
             if not export_popup_entry.get().strip():
+                logging.info('No filename given')
                 error_label = Label(
                     popup, text="Please add a filename!", fg="red")
                 error_label.grid(row=1, column=0)
             else:
                 filename = self.project_path + export_popup_entry.get() + '.pdf'
+                logging.info('Saving figure at {}'.format(filename))
                 with PdfPages(filename) as export_pdf:
                     plt.figure(self.window_id * 2 - 1)
                     export_pdf.savefig()
                     plt.figure(self.window_id * 2)
                     export_pdf.savefig()
+                logging.info('Export finished')
                 cancel()
 
+        logging.info('Exporting graph to pdf')
         popup = Toplevel(self.master)
         popup.title('')
         popup.iconbitmap(r'res/general_images/favicon.ico')
@@ -548,10 +574,12 @@ class TkBase:
         """
         draws the main graph and the referece graph given data, timestamps and annotations
         """
+        logging.info('Drawing main graph')
         self.main_graph_ax.clear()
         # plot values on the axe and set plot hue to NHS blue
         self.main_graph_ax.plot(timestamps, data, color='#5436ff')
         # draw all saved annotations
+        logging.info('Drawing annotations')
         for annotation in annotations:
             self.draw_annotation(annotation)
 
@@ -569,6 +597,7 @@ class TkBase:
         self.main_graph.canvas.toolbar.push_current()
 
         # second, reference graph displayed
+        logging.info('Drawing reference graph')
         self.reference_graph_ax.clear()
         self.reference_graph_ax.plot(
             self.timestamps, self.data, color="cyan", linewidth=1)
@@ -617,6 +646,7 @@ class NavigationToolbar(NavigationToolbar2Tk):
         try:
             self.tkbase_.open_concurrent()
         except Exception as e:
+            logging.warning('Open concurrent failed')
             messagebox.showerror("Error:", e)
 
     def call_export(self):

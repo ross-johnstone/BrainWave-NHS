@@ -1,4 +1,4 @@
-from tkinter import Label, Button, Toplevel, Entry, filedialog, PhotoImage, ttk
+from tkinter import Label, Button, Toplevel, Entry, filedialog, PhotoImage, ttk, colorchooser
 import tkinter
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg, NavigationToolbar2Tk
@@ -23,14 +23,17 @@ class TkBase:
         self.master = master
         self.toolitems = toolitems
 
+        self.master.protocol("WM_DELETE_WINDOW", self.master.quit)
         master.title("BrainWave Visualization")
         master.state('zoomed')
+        master.protocol("WM_DELETE_WINDOW", self.root_close)
 
         self.initialize_annotation_display()
 
         self.initialize_graph_display(FIGSIZE)
 
         self.project_path = path
+        self.json_path = self.project_path + "annotations.json"
         try:
             self.data, self.timestamps, self.annotations = data.open_project(
                 path)
@@ -96,12 +99,8 @@ class TkBase:
                                               wraplength=150, bg="#949494", anchor='w')
         self.labelDescription.grid(column=0, row=3)
 
-        # self.go_to_annotation = tkinter.Button(
-            # self.listbox_frame, text='Go To annotation', command=self.goto_callback)
-
         self.go_to_annotation = ttk.Button(
             self.listbox_frame, text='Go-To', width=30, command=self.goto_callback)
-
         self.go_to_annotation.grid(column=0, row=4)
 
         self.edit_annotation = ttk.Button(
@@ -146,16 +145,25 @@ class TkBase:
          callback method for the open button, opens an existing project
         """
         path = filedialog.askdirectory()
-        path = path + "/"
+        self.project_path = path + "/"
+        self.json_path = self.project_path + "annotations.json"
         try:
             if data.check_valid_path(path):
                 self.data, self.timestamps, self.annotations = data.open_project(
-                    path)
+                    self.project_path)
                 if self.annotations != []:
                     if self.annotations[0] == -1:
                         messagebox.showerror("Error: ", self.annotations[1])
                         self.annotations = []
                 self.draw_graph(self.data, self.timestamps, self.annotations)
+                self.index_to_ids = list()
+                self.id_to_shape = dict()
+                for id in self.annotations:
+                    id = id.id
+                    self.index_to_ids.append(id)
+                self.listb.delete(0, tkinter.END)
+                for a in self.annotations:
+                    self.listb.insert(tkinter.END, a.title)
         except Exception as e:
             print(e)
             messagebox.showerror("Error:", e)
@@ -187,8 +195,10 @@ class TkBase:
         try:
             if data.check_valid_path(path):
                 new_root = Toplevel(self.master)
-                new_root.protocol("WM_DELETE_WINDOW", new_root.destroy)
-                TkBase(new_root, path, second_toolitems)
+                child_gui = TkBase(new_root, path, second_toolitems)
+                child_gui.master.protocol(
+                    "WM_DELETE_WINDOW", child_gui.child_close)
+                child_gui.master.iconbitmap(r'res/general_images/favicon.ico')
         except Exception as e:
             raise Exception(e)
 
@@ -308,7 +318,7 @@ class TkBase:
                     annotation.content = description_entry.get(
                         1.0, tkinter.END)
                     save_json(self.annotations,
-                              'data/recording1/pat1/annotations.json')
+                              self.json_path)
                     self.listb.delete(index)
                     self.listb.insert(index, title_entry.get())
                     cancel()
@@ -375,8 +385,12 @@ class TkBase:
                     del self.id_to_shape[id]
                     self.main_graph.canvas.draw()
                     save_json(self.annotations,
-                              'data/recording1/pat1/annotations.json')
+                              self.json_path)
                     self.listb.delete(index)
+
+    def pick_color(self):
+        color = colorchooser.askcolor()
+        return color[0]
 
     def annotate(self):
         """
@@ -401,8 +415,13 @@ class TkBase:
         callback method for the annotate button after span is sellected this button
         is pressed to add descriptions to the annotation and confirm selection
         """
+        annotation_color = None
         # if something is selected
         if (self.span_min):
+            def pick_color():
+                nonlocal annotation_color
+                annotation_color = self.pick_color()
+
             # method called when cancel button on popup is pressed
             def cancel():
                 self.span_min = False
@@ -416,12 +435,13 @@ class TkBase:
                         top, text="Please add a title!", fg="red")
                     error_label.grid(row=3)
                 else:
+                    nonlocal annotation_color
+                    if annotation_color is None:
+                        annotation_color = (256, 0, 0)
                     new_annotation = Annotation(title_entry.get(), description_entry.get(1.0, tkinter.END),
-                                                self.span_min, self.span_max)
-
+                                                self.span_min, self.span_max, annotation_color)
                     self.annotations.append(new_annotation)
-                    json_path = self.project_path + 'annotations.json'
-                    save_json(self.annotations, json_path)
+                    save_json(self.annotations, self.json_path)
                     self.draw_annotation(new_annotation)
                     self.index_to_ids.append(new_annotation.id)
                     self.listb.insert(tkinter.END, new_annotation.title)
@@ -466,6 +486,10 @@ class TkBase:
                 master=top, text="Cancel", command=cancel, bg='white')
             cancel_button.grid(row=8)
 
+            color_button = Button(master=top, text="choose color",
+                                  command=pick_color, bg='white')
+            color_button.grid(row=9)
+
             # change button back to annotate button and hide span selector
             # again
             self.annotate_button.config(text='Annotate', command=self.annotate)
@@ -506,15 +530,18 @@ class TkBase:
         """
 
         # if date range annotation draw rectangle
+        annotation_color = annotation.color
+        annotation_color = tuple(map(lambda x: x/256, annotation_color))
+        annotation_color = annotation_color + (0.5,)
         if(annotation.start != annotation.end):
             vmax, vmin = self.get_vertical_range(annotation)
             self.id_to_shape[annotation.id] = self.main_graph_ax.add_patch(plt.Rectangle((date2num(annotation.start), vmin - 10),
-                                                                                         date2num(annotation.end) - date2num(annotation.start), vmax - vmin + 20, fc='r'))
+                                                                                         date2num(annotation.end) - date2num(annotation.start), vmax - vmin + 20, color=annotation_color))
         # if point annotation draw a vertical line
         if(annotation.start == annotation.end):
             plt.figure(self.window_id * 2 - 1)
             self.id_to_shape[annotation.id] = plt.axvline(
-                x=date2num(annotation.start))
+                x=date2num(annotation.start), color=annotation_color)
         self.main_graph.canvas.draw()
 
     def draw_graph(self, data, timestamps, annotations):
@@ -549,8 +576,12 @@ class TkBase:
         # put the second plot on the tkinter window
         self.reference_canvas.draw()
 
-    def close(self):
-        self.master.quit()
+    def root_close(self):
+        if messagebox.askokcancel("Close app", "Closing this window will close all windows, are you sure?"):
+            self.master.quit()
+
+    def child_close(self):
+        self.master.destroy()
 
 
 class NavigationToolbar(NavigationToolbar2Tk):
@@ -592,4 +623,4 @@ class NavigationToolbar(NavigationToolbar2Tk):
         self.tkbase_.export()
 
     def call_quit(self):
-        self.tkbase_.close()
+        self.tkbase_.root_close()

@@ -3,6 +3,7 @@ import datetime as dt
 import itertools
 import logging
 
+
 class AnnotationException(Exception):
     """
     Exception for when the .json file contains annotations in an incorrect format, this annotation is ignored and execution continues,

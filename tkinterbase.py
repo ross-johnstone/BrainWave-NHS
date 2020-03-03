@@ -77,7 +77,7 @@ class TkBase:
         # the screen
     def initialize_annotation_display(self):
         """
-        initializes the functionalities of the annotation display like the list and the buttons to browse annotations 
+        initializes the functionalities of the annotation display like the list and the buttons to browse annotations
         """
         logging.info('Initializing annotation display')
 
@@ -175,7 +175,7 @@ class TkBase:
                     self.listb.insert(tkinter.END, a.title)
             else:
                 logging.warning('Invalid path given.')
-            logging.info('File open successfully')    
+            logging.info('File open successfully')
         except Exception as e:
             logging.error(e)
             messagebox.showerror("Error:", e)
@@ -435,7 +435,6 @@ class TkBase:
 
         self.annotate_button.config(text='Confirm', command=self.confirm)
 
-    
     def confirm(self):
         """
         callback method for the annotate button after span is sellected this button
@@ -557,7 +556,7 @@ class TkBase:
 
         # if date range annotation draw rectangle
         annotation_color = annotation.color
-        annotation_color = tuple(map(lambda x: x/256, annotation_color))
+        annotation_color = tuple(map(lambda x: x / 256, annotation_color))
         annotation_color = annotation_color + (0.5,)
         if(annotation.start != annotation.end):
             vmax, vmin = self.get_vertical_range(annotation)

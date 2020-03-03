@@ -6,6 +6,7 @@ import datetime
 from annotations import open_json
 import logging
 
+
 def open_project(path):
     """
         Given a directory path, open_project opens each .wav file as a numpy array,
@@ -65,7 +66,8 @@ def open_project(path):
         try:
             annotations = open_json(jsonfile)
         except Exception:
-            logging.warning('The annotations could not be loaded from file at {}'.format(jsonfile))
+            logging.warning(
+                'The annotations could not be loaded from file at {}'.format(jsonfile))
             annotations = [-1,
                            "The annotation file is in an incorrect format."]
     logging.info('Finished opening project')

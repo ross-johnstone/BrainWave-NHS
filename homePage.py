@@ -26,7 +26,6 @@ default_toolitems = (
 
 
 class HomePage:
-
     def __init__(self, master):
         # Initialises window with background image and widgets
         self.master = master

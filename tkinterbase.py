@@ -86,13 +86,12 @@ class TkBase:
         self.index_to_ids = list()
 
         self.scrollbar = tkinter.Scrollbar(self.listbox_frame, orient=tkinter.VERTICAL)
-        self.listb = tkinter.Listbox(self.listbox_frame, width=30, height=int(0.1*self.master.winfo_reqheight()), yscrollcommand=self.scrollbar.set)
+        self.listb = tkinter.Listbox(self.listbox_frame, width=30, height=int(0.1 * self.master.winfo_reqheight()), yscrollcommand=self.scrollbar.set)
         self.scrollbar.config(command=self.listb.yview)
-        self.scrollbar.pack(side="right",fill="y")
-
+        self.scrollbar.pack(side="right", fill="y")
 
         self.listb.bind('<<ListboxSelect>>', self.listbox_selection)
-        self.listb.pack(side="bottom",fill="y")
+        self.listb.pack(side="bottom", fill="y")
 
         self.labelTitle = tkinter.Label(self.annotation_frame,
                                         text="Title:", bg="#949494", anchor='w')

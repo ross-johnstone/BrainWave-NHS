@@ -1,4 +1,4 @@
-from tkinter import Label, Button, Toplevel, Entry, filedialog, PhotoImage, ttk, colorchooser
+from tkinter import Label, Button, Toplevel, Entry, filedialog, PhotoImage, ttk, colorchooser, Scrollbar
 import tkinter
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg, NavigationToolbar2Tk
@@ -76,37 +76,44 @@ class TkBase:
     def initialize_annotation_display(self):
         self.id_to_shape = dict()
 
-        self.listbox_frame = tkinter.Frame(self.master, bg="#949494")
-        self.listbox_frame.pack(side=tkinter.RIGHT, padx=(10, 10))
+        self.annotation_frame = tkinter.Frame(self.master, bg="#949494")
+        self.annotation_frame.pack(side=tkinter.RIGHT, padx=(10, 10))
+
+        self.listbox_frame = tkinter.Frame(self.annotation_frame, bg="#949494")
+        self.listbox_frame.pack()
 
         # list to convert from indices in listbox to annotation ids
         self.index_to_ids = list()
 
-        self.listb = tkinter.Listbox(self.listbox_frame, width=30, height=50)
+        self.scrollbar = tkinter.Scrollbar(self.listbox_frame, orient=tkinter.VERTICAL)
+        self.listb = tkinter.Listbox(self.listbox_frame, width=30, height=int(0.1*self.master.winfo_reqheight()), yscrollcommand=self.scrollbar.set)
+        self.scrollbar.config(command=self.listb.yview)
+        self.scrollbar.pack(side="right",fill="y")
+
 
         self.listb.bind('<<ListboxSelect>>', self.listbox_selection)
-        self.listb.grid(column=0, row=1)
+        self.listb.pack(side="bottom",fill="y")
 
-        self.labelTitle = tkinter.Label(self.listbox_frame,
+        self.labelTitle = tkinter.Label(self.annotation_frame,
                                         text="Title:", bg="#949494", anchor='w')
-        self.labelTitle.grid(column=0, row=2)
+        self.labelTitle.pack(side="top")
 
-        self.labelDescription = tkinter.Label(self.listbox_frame,
+        self.labelDescription = tkinter.Label(self.annotation_frame,
                                               text="description:",
                                               wraplength=150, bg="#949494", anchor='w')
-        self.labelDescription.grid(column=0, row=3)
+        self.labelDescription.pack(side="top")
 
         self.go_to_annotation = ttk.Button(
-            self.listbox_frame, text='Go-To', width=30, command=self.goto_callback)
-        self.go_to_annotation.grid(column=0, row=4)
+            self.annotation_frame, text='Go-To', width=30, command=self.goto_callback)
+        self.go_to_annotation.pack(side="top")
 
         self.edit_annotation = ttk.Button(
-            self.listbox_frame, text='Edit', width=30, command=self.edit_callback)
-        self.edit_annotation.grid(column=0, row=5)
+            self.annotation_frame, text='Edit', width=30, command=self.edit_callback)
+        self.edit_annotation.pack(side="top")
 
         self.delete_annotation = ttk.Button(
-            self.listbox_frame, text='Delete', width=30, command=self.delete_callback)
-        self.delete_annotation.grid(column=0, row=6)
+            self.annotation_frame, text='Delete', width=30, command=self.delete_callback)
+        self.delete_annotation.pack(side="top")
 
     # function that initializes the graphs and everything to do with them
     def initialize_graph_display(self, FIGSIZE):
@@ -183,6 +190,7 @@ class TkBase:
         try:
             if data.check_valid_path(path):
                 new_root = Toplevel(self.master)
+                new_root.configure(bg='#949494')
                 child_gui = TkBase(new_root, path, second_toolitems)
                 child_gui.master.protocol(
                     "WM_DELETE_WINDOW", child_gui.child_close)

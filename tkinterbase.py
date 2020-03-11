@@ -518,7 +518,7 @@ class TkBase:
                 master=top, text="Cancel", command=cancel, bg='white')
             cancel_button.grid(row=8)
 
-            color_button = Button(master=top, text="choose color",
+            color_button = Button(master=top, text="Choose color",
                                   command=pick_color, bg='white')
             color_button.grid(row=9)
 

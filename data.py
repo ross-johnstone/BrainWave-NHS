@@ -45,6 +45,7 @@ def open_project(path):
             raise Exception("One of the data files could not be read")
         raw_data.append(tmp_data)
     data = np.hstack(raw_data)
+    data = data / 10
 
     # create timestamps
     logging.info('Creating timestamps')

@@ -73,8 +73,6 @@ class TkBase:
         self.span_min = None
         self.span_max = None
 
-        # function that initializes the display of annotations to the right of
-        # the screen
     def initialize_annotation_display(self):
         """
         initializes the functionalities of the annotation display like the list and the buttons to browse annotations
@@ -121,7 +119,6 @@ class TkBase:
             self.annotation_frame, text='Delete', width=30, command=self.delete_callback)
         self.delete_annotation.pack(side="top")
 
-    # function that initializes the graphs and everything to do with them
     def initialize_graph_display(self, FIGSIZE):
         """
         initializes the functionalities of the graph display including the main and reference graph

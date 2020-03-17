@@ -17,5 +17,5 @@ flake8:
 
 unittest:
     script:
-        - python3 -m unittest discover --verbose -s "./" -p "tests/test_*.py"
+        - python3 -m unittest discover --verbose -s "./tests" -p "test_*.py"
     stage: Test

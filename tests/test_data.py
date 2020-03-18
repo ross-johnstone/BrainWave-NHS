@@ -1,13 +1,14 @@
-import numpy as np
-import datetime
-from data import check_valid_path
-from data import open_project
-import unittest
 import sys
 import os
 from os.path import dirname
 sys.path.append(dirname(dirname(__file__)))
 sys.path.append(os.path.join(dirname(dirname(__file__)), 'res/'))
+import numpy as np
+import datetime
+from data import check_valid_path
+from data import open_project
+import unittest
+
 
 
 class Test_Data(unittest.TestCase):

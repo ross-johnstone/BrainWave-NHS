@@ -1,3 +1,8 @@
+import sys
+import os
+from os.path import dirname
+sys.path.append(dirname(dirname(__file__)))
+sys.path.append(os.path.join(dirname(dirname(__file__)), 'res/'))
 from datetime import datetime
 from annotations import decode_annotation
 from annotations import encode_annotation
@@ -5,11 +10,7 @@ from annotations import open_json
 from annotations import save_json
 from annotations import Annotation
 import unittest
-import sys
-import os
-from os.path import dirname
-sys.path.append(dirname(dirname(__file__)))
-sys.path.append(os.path.join(dirname(dirname(__file__)), 'res/'))
+
 
 
 class TestAnnotations(unittest.TestCase):

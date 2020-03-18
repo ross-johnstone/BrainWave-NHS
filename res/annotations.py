@@ -3,6 +3,7 @@ import datetime as dt
 import itertools
 import logging
 
+
 class AnnotationException(Exception):
     """
     Exception for when the .json file contains annotations in an incorrect format, this annotation is ignored and execution continues,
@@ -59,7 +60,8 @@ def decode_annotation(dict):
     Hook function to help decode an annotation object from a json file
     """
     if "__annotation__" in dict:
-        return Annotation(dict["title"], dict["content"], dt.datetime.strptime(dict["start_time"], "%Y-%m-%dT%H:%M:%S.%f"), dt.datetime.strptime(dict["end_time"], "%Y-%m-%dT%H:%M:%S.%f"), dict["color"])
+        return Annotation(dict["title"], dict["content"], dt.datetime.strptime(
+            dict["start_time"], "%Y-%m-%dT%H:%M:%S.%f"), dt.datetime.strptime(dict["end_time"], "%Y-%m-%dT%H:%M:%S.%f"), dict["color"])
     return dict
 
 

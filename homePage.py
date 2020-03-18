@@ -1,11 +1,12 @@
 import sys
 import os
-sys.path.append(os.path.join(os.path.dirname(__file__),'res/'))
-import tkinter as tk
-from tkinter import ttk, filedialog, messagebox, BOTTOM
-from tkinterbase import TkBase
-from data import check_valid_path
+sys.path.append(os.path.join(os.path.dirname(__file__), 'res/'))
 import logging
+from data import check_valid_path
+from tkinterbase import TkBase
+from tkinter import ttk, filedialog, messagebox, BOTTOM
+import tkinter as tk
+
 default_toolitems = (
     ('Home', 'Reset original view', 'home', 'home'),
     ('Back', 'Back to previous view', 'back', 'back'),

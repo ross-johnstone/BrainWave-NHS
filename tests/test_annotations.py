@@ -1,16 +1,15 @@
+from datetime import datetime
+from annotations import decode_annotation
+from annotations import encode_annotation
+from annotations import open_json
+from annotations import save_json
+from annotations import Annotation
 import unittest
 import sys
 import os
 from os.path import dirname
 sys.path.append(dirname(dirname(__file__)))
-sys.path.append(os.path.join(dirname(dirname(__file__)),'res/'))
-from annotations import Annotation
-from annotations import save_json
-from annotations import open_json
-from annotations import encode_annotation
-from annotations import decode_annotation
-import os
-from datetime import datetime
+sys.path.append(os.path.join(dirname(dirname(__file__)), 'res/'))
 
 
 class TestAnnotations(unittest.TestCase):
@@ -73,7 +72,8 @@ class TestAnnotations(unittest.TestCase):
         self.assertEqual(len(loaded_annotations),
                          len(annotations), "Should be: 4")
         for i in range(len(annotations)):
-            # check whether the annotation objects loaded have the correct information
+            # check whether the annotation objects loaded have the correct
+            # information
             self.assertEqual(
                 annotations[i], loaded_annotations[i], "Annotations should be equal")
         os.remove("test.json")

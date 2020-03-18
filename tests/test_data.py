@@ -1,7 +1,9 @@
 import unittest
 import sys
+import os
 from os.path import dirname
 sys.path.append(dirname(dirname(__file__)))
+sys.path.append(os.path.join(dirname(dirname(__file__)),'res/'))
 from data import open_project
 import datetime
 import numpy as np

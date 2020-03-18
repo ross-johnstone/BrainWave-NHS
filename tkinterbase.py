@@ -176,6 +176,11 @@ class TkBase:
                 self.listb.delete(0, tkinter.END)
                 for a in self.annotations:
                     self.listb.insert(tkinter.END, a.title)
+                self.span = SpanSelector(self.main_graph_ax, self.onselect, 'horizontal', useblit=True,
+                                         rectprops=dict(alpha=0.5, facecolor='red'), span_stays=True)
+                self.span.set_visible(False)
+                self.span_min = None
+                self.span_max = None
             else:
                 logging.warning('Invalid path given.')
             logging.info('File open successfully')

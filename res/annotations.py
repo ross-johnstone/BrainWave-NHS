@@ -1,7 +1,7 @@
 import json
 import datetime as dt
 import itertools
-
+import logging
 
 class AnnotationException(Exception):
     """
@@ -12,14 +12,18 @@ class AnnotationException(Exception):
 
 
 class Annotation:
+    """
+    Basic annotation class to represent annotations within the application, implements eq, str and repr for debugging purposes.
+    """
     id_generator = itertools.count(1)
 
-    def __init__(self, title, content, start_time, end_time):
+    def __init__(self, title, content, start_time, end_time, color):
         self.title = title
         self.content = content
         self.start = start_time
         self.end = end_time
         self.id = next(self.id_generator)
+        self.color = color
 
     def __str__(self):
         return str(vars(self))
@@ -39,11 +43,11 @@ class Annotation:
 
 def encode_annotation(annotation):
     """
-    Function to help encode an annotation object to save in a json file
+    Helper function to encode an annotation object to save in a json file
     """
     if isinstance(annotation, Annotation):
         return {"__annotation__": True, "title": annotation.title, "content": annotation.content,
-                "start_time": dt.datetime.isoformat(annotation.start), "end_time": dt.datetime.isoformat(annotation.end)}
+                "start_time": dt.datetime.isoformat(annotation.start), "end_time": dt.datetime.isoformat(annotation.end), "color": annotation.color}
     else:
         type_name = annotation.__class__.__name__
         raise TypeError(
@@ -55,14 +59,15 @@ def decode_annotation(dict):
     Hook function to help decode an annotation object from a json file
     """
     if "__annotation__" in dict:
-        return Annotation(dict["title"], dict["content"], dt.datetime.strptime(dict["start_time"], "%Y-%m-%dT%H:%M:%S.%f"), dt.datetime.strptime(dict["end_time"], "%Y-%m-%dT%H:%M:%S.%f"))
+        return Annotation(dict["title"], dict["content"], dt.datetime.strptime(dict["start_time"], "%Y-%m-%dT%H:%M:%S.%f"), dt.datetime.strptime(dict["end_time"], "%Y-%m-%dT%H:%M:%S.%f"), dict["color"])
     return dict
 
 
 def save_json(annotations, filename):
     """
-    Saves an annotation object as json
+    Saves an a list of annotations as a json, takes the list and filename as arguments and saves it as filename in the project directory.
     """
+    logging.info('Encoding annotations as json into {}'.format(filename))
     with open(filename, "w+") as outfile:
         json.dump(annotations, outfile, sort_keys=True,
                   default=encode_annotation)
@@ -70,11 +75,14 @@ def save_json(annotations, filename):
 
 def open_json(filename):
     """
-    Unpacks a json object into an annotation
+    Given a filename unpacks a json object into an annotation list
     """
+    logging.info('Opening json file {}'.format(filename))
     with open(filename) as infile:
         try:
+            logging.info('Decoding .json into annotations'.format(filename))
             return json.load(infile, object_hook=decode_annotation)
         except Exception:
+            logging.error('Wrong annotation format in .json file')
             raise AnnotationException(
                 "Wrong format of annotation in .json file, annotations could not be loaded.")

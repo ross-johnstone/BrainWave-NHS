@@ -1,3 +1,6 @@
+import sys
+import os
+sys.path.append(os.path.join(os.path.dirname(__file__),'res/'))
 import tkinter as tk
 from tkinter import ttk, filedialog, messagebox, BOTTOM
 from tkinterbase import TkBase

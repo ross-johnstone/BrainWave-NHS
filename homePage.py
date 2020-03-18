@@ -2,7 +2,7 @@ import tkinter as tk
 from tkinter import ttk, filedialog, messagebox, BOTTOM
 from tkinterbase import TkBase
 from data import check_valid_path
-
+import logging
 default_toolitems = (
     ('Home', 'Reset original view', 'home', 'home'),
     ('Back', 'Back to previous view', 'back', 'back'),
@@ -28,6 +28,11 @@ default_toolitems = (
 class HomePage:
 
     def __init__(self, master):
+
+        logging.basicConfig(filename='event_log.log',
+                            level=logging.INFO, filemode='w')
+        logging.info('Starting application')
+
         # Initialises window with background image and widgets
         self.master = master
         master.title("BrainWave Visualization - HomePage")
@@ -58,6 +63,9 @@ class HomePage:
         self.frame.pack()
 
     def load_project(self):
+        """
+        handler function for the open button, loads project if given a valid path otherwise does nothing
+        """
         path = filedialog.askdirectory()
         if not path:
             # If user exits file directory  - do nothing
@@ -76,8 +84,7 @@ class HomePage:
             except Exception as e:
                 # If user picks a folder with no .cal or .wav files - shows
                 # error msg
-                e.message = "Inappropriate file type."
-                messagebox.showerror("Error", e)
+                messagebox.showerror("Error: ", e)
 
     def close(self):
         # Pop up to user asking them if they want to quit

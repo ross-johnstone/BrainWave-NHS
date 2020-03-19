@@ -91,7 +91,8 @@ class TkBase:
         self.index_to_ids = list()
 
         self.scrollbar = Scrollbar(self.listbox_frame, orient=tkinter.VERTICAL)
-        self.listb = tkinter.Listbox(self.listbox_frame, width=30, height=int(0.1 * self.master.winfo_reqheight()), yscrollcommand=self.scrollbar.set)
+        self.listb = tkinter.Listbox(self.listbox_frame, width=30, height=int(
+            0.1 * self.master.winfo_reqheight()), yscrollcommand=self.scrollbar.set)
         self.scrollbar.config(command=self.listb.yview)
         self.scrollbar.pack(side="right", fill="y")
 
@@ -176,6 +177,11 @@ class TkBase:
                 self.listb.delete(0, tkinter.END)
                 for a in self.annotations:
                     self.listb.insert(tkinter.END, a.title)
+                self.span = SpanSelector(self.main_graph_ax, self.onselect, 'horizontal', useblit=True,
+                                         rectprops=dict(alpha=0.5, facecolor='red'), span_stays=True)
+                self.span.set_visible(False)
+                self.span_min = None
+                self.span_max = None
             else:
                 logging.warning('Invalid path given.')
             logging.info('File open successfully')
@@ -551,7 +557,8 @@ class TkBase:
             self.timestamps > annotation.start, self.timestamps < annotation.end))
 
         range_data = self.data[range_indices]
-        return range_data[np.argmax(range_data)], range_data[np.argmin(range_data)]
+        return range_data[np.argmax(
+            range_data)], range_data[np.argmin(range_data)]
 
     def draw_annotation(self, annotation):
         """
@@ -609,7 +616,8 @@ class TkBase:
         self.reference_canvas.draw()
 
     def root_close(self):
-        if messagebox.askokcancel("Close app", "Closing this window will close all windows, are you sure?"):
+        if messagebox.askokcancel(
+                "Close app", "Closing this window will close all windows, are you sure?"):
             self.master.quit()
 
     def child_close(self):

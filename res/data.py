@@ -22,13 +22,14 @@ def open_project(path):
     jsonfile = ""
     # acquire filepaths for the different project files
     for filepath in contents:
-        if re.match(r'\d{2}-\d{2}-\d{4}_\d{2}_\d{2}_\d{2}_\d{1,4}_\d*.cal', filepath):
+        if re.match(
+                r'\d{2}-\d{2}-\d{4}_\d{2}_\d{2}_\d{2}_\d{1,4}_\d*.cal', filepath):
             logging.info('Found calfile: {}'.format(filepath))
             calfile = path + filepath
         elif re.match(r'\d{2}-\d{2}-\d{4}_\d{2}_\d{2}_\d{2}_\d{1,4}_\d*.wav', filepath):
             logging.info('Found datafile: {}'.format(filepath))
             datafiles.append(path + filepath)
-        elif re.match('.*\.json', filepath):
+        elif re.match(r'.*\.json', filepath):
             logging.info('Found jsonfile: {}'.format(filepath))
             jsonfile = path + filepath
     # sort datafiles to obtain the correct order of data
@@ -86,7 +87,8 @@ def check_valid_path(path):
     calfile = ""
     datafiles = []
     for filepath in contents:
-        if re.match(r'\d{2}-\d{2}-\d{4}_\d{2}_\d{2}_\d{2}_\d{1,4}_\d*.cal', filepath):
+        if re.match(
+                r'\d{2}-\d{2}-\d{4}_\d{2}_\d{2}_\d{2}_\d{1,4}_\d*.cal', filepath):
             calfile = path + filepath
         elif re.match(r'\d{2}-\d{2}-\d{4}_\d{2}_\d{2}_\d{2}_\d{1,4}_\d*.wav', filepath):
             datafiles.append(path + filepath)

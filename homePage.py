@@ -1,10 +1,10 @@
 import logging
-from tkinterbase import TkBase
 from tkinter import ttk, filedialog, messagebox, BOTTOM
 import tkinter as tk
 import sys
 import os
 sys.path.append(os.path.join(os.path.dirname(__file__), 'res/'))
+from tkinterbase import TkBase  # noqua: E402
 from data import check_valid_path  # noqa: E402
 
 default_toolitems = (
